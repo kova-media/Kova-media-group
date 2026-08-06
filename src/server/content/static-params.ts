@@ -26,9 +26,20 @@ import { getPublishedCaseStudySlugs, getPublishedPageSlugs } from './queries'
  */
 const NO_CONTENT_SENTINEL = '__no-published-content__'
 
-export async function safePublishedPageSlugs(): Promise<string[]> {
+/**
+ * `exclude` is applied *before* the sentinel, and that ordering is the whole
+ * point. The catch-all excludes "home" (served by the root route); filtering in
+ * the caller instead re-emptied the list the moment `home` became the only
+ * published page, tripping the very "at least one result" error the sentinel
+ * exists to prevent.
+ */
+export async function safePublishedPageSlugs(
+  options: { exclude?: readonly string[] } = {},
+): Promise<string[]> {
+  const excluded = new Set(options.exclude ?? [])
+
   try {
-    const slugs = await getPublishedPageSlugs()
+    const slugs = (await getPublishedPageSlugs()).filter((slug) => !excluded.has(slug))
     return slugs.length > 0 ? slugs : [NO_CONTENT_SENTINEL]
   } catch (error) {
     logger.error(

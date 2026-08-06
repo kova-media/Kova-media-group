@@ -14,10 +14,13 @@ import { safePublishedPageSlugs } from '@/server/content/static-params'
  * /contact and /work resolve to their own files (ARCHITECTURE.md §4.1.2).
  */
 export async function generateStaticParams() {
-  const slugs = await safePublishedPageSlugs()
+  // "home" is served by the root route, not the catch-all. The exclusion is
+  // passed in rather than applied here, so the sentinel fallback survives it —
+  // filtering afterwards re-emptied the list once home was the only published
+  // page, tripping the "at least one result" constraint.
+  const slugs = await safePublishedPageSlugs({ exclude: ['home'] })
 
-  // "home" is served by the root route, not the catch-all.
-  return slugs.filter((slug) => slug !== 'home').map((slug) => ({ slug: [slug] }))
+  return slugs.map((slug) => ({ slug: [slug] }))
 }
 
 async function loadPage(slugSegments: string[]) {

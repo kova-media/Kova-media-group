@@ -1,6 +1,10 @@
-import 'dotenv/config'
+import { config as loadEnv } from 'dotenv'
 
 import { PrismaPg } from '@prisma/adapter-pg'
+
+// The Prisma CLI does not read .env.local the way Next.js does.
+loadEnv({ path: '.env.local' })
+loadEnv({ path: '.env' })
 
 import { PrismaClient } from '../src/generated/prisma/client'
 

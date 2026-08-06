@@ -362,6 +362,10 @@ Publishing copies `draftContent` into `publishedContent` in one statement and ap
 - **The build now requires database access.** `DATABASE_URL` must be present in the Vercel build environment, and a database outage becomes a build failure. This is a real new dependency and is called out in `ARCHITECTURE.md` §11.
 - Params must still be awaited _inside_ a Suspense boundary even when statically known, or the App Shell gets tied to one URL.
 
+**Discovered during implementation (2026-08-06):** under Cache Components, `generateStaticParams` must return **at least one** result — an empty array is a build error, because the framework needs a concrete param to validate the route has no unguarded dynamic access. `src/server/content/static-params.ts` therefore returns a sentinel slug when nothing is published or the slug read fails, logging at error level. The sentinel matches no content, so the route renders its not-found branch.
+
+Page _content_ reads deliberately do **not** get the same tolerance: if the database is unreachable while prerendering, the build fails rather than shipping a site with empty pages. A failed deploy you retry beats a silently contentless homepage.
+
 ---
 
 ## ADR-018 — Cookieless analytics, no consent banner, and a stated retention policy

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { Suspense } from 'react'
 
 import { LoginForm } from '@/features/admin/auth/login-form'
@@ -33,9 +34,9 @@ export default function LoginPage(props: PageProps<'/admin/login'>) {
         </div>
 
         <p className="mt-6 text-center text-xs text-ink-500">
-          <a href="/admin/forgot-password" className="underline hover:text-ink-800">
+          <Link href="/admin/forgot-password" className="underline hover:text-ink-800">
             Forgot your password?
-          </a>
+          </Link>
         </p>
       </div>
     </main>

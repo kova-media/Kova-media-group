@@ -1,8 +1,17 @@
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitest/config'
 
+const emptyModule = fileURLToPath(new URL('./tests/stubs/empty.ts', import.meta.url))
+
 export default defineConfig({
-  // Native tsconfig path resolution — replaces vite-tsconfig-paths.
-  resolve: { tsconfigPaths: true },
+  resolve: {
+    // Native tsconfig path resolution — replaces vite-tsconfig-paths.
+    tsconfigPaths: true,
+    alias: {
+      'server-only': emptyModule,
+      'client-only': emptyModule,
+    },
+  },
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],

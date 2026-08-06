@@ -27,6 +27,27 @@ const sizes: Record<Size, string> = {
   icon: 'size-9',
 }
 
+/**
+ * Shared class builder, so a `<Link>` can look like a button without nesting an
+ * anchor inside a `<button>` — which is invalid HTML and breaks keyboard use.
+ */
+export function buttonClasses(options?: {
+  variant?: Variant
+  size?: Size
+  className?: string
+}) {
+  const { variant = 'primary', size = 'md', className } = options ?? {}
+
+  return cn(
+    'inline-flex items-center justify-center rounded-md font-medium whitespace-nowrap',
+    'duration-fast transition-colors ease-out-quart',
+    'disabled:pointer-events-none disabled:opacity-50',
+    variants[variant],
+    sizes[size],
+    className,
+  )
+}
+
 export type ButtonProps = ComponentProps<'button'> & {
   variant?: Variant
   size?: Size
@@ -42,14 +63,7 @@ export function Button({
   return (
     <button
       type={type}
-      className={cn(
-        'inline-flex items-center justify-center rounded-md font-medium whitespace-nowrap',
-        'duration-fast transition-colors ease-out-quart',
-        'disabled:pointer-events-none disabled:opacity-50',
-        variants[variant],
-        sizes[size],
-        className,
-      )}
+      className={buttonClasses({ variant, size, className })}
       {...props}
     />
   )

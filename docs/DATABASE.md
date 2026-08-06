@@ -50,10 +50,10 @@ const adapter = new PrismaPg({ connectionString: env.DATABASE_URL })
 new PrismaClient({ adapter })
 ```
 
-| Variable       | Points at                    | Used by                                    |
-| -------------- | ---------------------------- | ------------------------------------------ |
-| `DATABASE_URL` | Supavisor transaction pooler | Prisma Client at runtime, via `PrismaPg`   |
-| `DIRECT_URL`   | Direct Postgres              | `prisma migrate`, seed, introspection      |
+| Variable       | Points at                    | Used by                                  |
+| -------------- | ---------------------------- | ---------------------------------------- |
+| `DATABASE_URL` | Supavisor transaction pooler | Prisma Client at runtime, via `PrismaPg` |
+| `DIRECT_URL`   | Direct Postgres              | `prisma migrate`, seed, introspection    |
 
 Getting this wrong produces failures that only appear under load in production. Verify the exact connection string parameters (pooler port, `pgbouncer`/`connection_limit` flags) against Supabase's current documentation when wiring this up — the specifics have changed across Supabase releases (OD-1).
 
@@ -414,8 +414,11 @@ Three rules that carry real weight:
 
 Prisma connects with a privileged role, so RLS does not constrain our own queries. We enable it anyway:
 
-- RLS **enabled** on every application table.
-- **No permissive policies.** The `anon` and `authenticated` roles get nothing.
+- RLS **enabled** on every application table — `ENABLE`, deliberately **not** `FORCE`.
+- **No permissive policies.** The `anon` and `authenticated` roles get nothing, and their table grants are revoked as well.
+
+> `FORCE ROW LEVEL SECURITY` applies policies to the table owner too. Prisma connects **as** the owner, so forcing RLS with no policies in place would lock the application out of every table. `ENABLE` stops the Supabase API roles while leaving the owner unaffected, which is precisely the intent. This is an easy and total mistake to make; the migration carries the same warning.
+
 - Consequence: if the Supabase anon key leaks, or a Client Component ever instantiates a Supabase client and queries a table, it reads zero rows.
 
 This is cheap, invisible in normal operation, and eliminates an entire class of accidental exposure. Supabase Storage buckets get their own policies: the media bucket is public-read for delivery, and writes are only possible via server-issued signed upload URLs.

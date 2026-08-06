@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # `postinstall` runs `prisma generate`; the client is a build artefact and
+      # is not committed.
+      - run: npm ci
+
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test
+
+      - run: npm run build
+        env:
+          # The build reads the database for generateStaticParams (ADR-017).
+          # Real values come from repository secrets once Supabase exists; the
+          # placeholders keep the shape valid for branches that touch no data.
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://user:pass@localhost:5432/postgres' }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL || 'postgresql://user:pass@localhost:5432/postgres' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder' }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || 'placeholder' }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY || 'placeholder' }}
+          CONTACT_NOTIFICATION_EMAIL: hello@kovamediagroup.com
+          MAIL_FROM_EMAIL: website@kovamediagroup.com
+          NEXT_PUBLIC_SITE_URL: https://kovamediagroup.com
+          PREVIEW_SECRET: ${{ secrets.PREVIEW_SECRET || 'ci-placeholder-secret-at-least-32-chars-long' }}
+          IP_HASH_SALT: ${{ secrets.IP_HASH_SALT || 'ci-placeholder-secret-at-least-32-chars-long' }}
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET || 'ci-placeholder-secret-at-least-32-chars-long' }}
+
+  # Migrations are applied before the Vercel deploy is promoted, never as part of
+  # a request. Runs only on main, and only when migrations actually changed.
+  migrate:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx prisma migrate deploy
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}

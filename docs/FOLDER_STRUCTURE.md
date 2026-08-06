@@ -74,22 +74,28 @@ src/app/
 │   └── opengraph-image.tsx
 │
 ├── admin/
-│   ├── layout.tsx              auth guard + admin shell
-│   ├── login/
-│   │   ├── layout.tsx          bare layout (no admin chrome)
-│   │   └── page.tsx
-│   ├── page.tsx                dashboard
-│   ├── pages/
-│   │   ├── page.tsx
-│   │   └── [id]/page.tsx
-│   ├── case-studies/
-│   ├── library/
-│   │   ├── testimonials/
-│   │   ├── partner-logos/
-│   │   └── email-examples/
-│   ├── media/
-│   ├── submissions/
-│   └── settings/
+│   ├── (auth)/                 UNAUTHENTICATED — no admin shell
+│   │   ├── layout.tsx          bare layout
+│   │   ├── login/page.tsx
+│   │   ├── forgot-password/page.tsx
+│   │   └── reset-password/page.tsx
+│   │
+│   └── (authenticated)/        requireAdmin() + admin shell
+│       ├── layout.tsx          auth guard, `export const instant = false`
+│       ├── error.tsx
+│       ├── not-found.tsx
+│       ├── page.tsx            dashboard
+│       ├── pages/
+│       │   ├── page.tsx
+│       │   └── [id]/page.tsx
+│       ├── case-studies/
+│       ├── library/
+│       │   ├── testimonials/
+│       │   ├── partner-logos/
+│       │   └── email-examples/
+│       ├── media/
+│       ├── submissions/
+│       └── settings/
 │
 └── api/
     ├── preview/route.ts        GET  — enable Draft Mode
@@ -100,6 +106,7 @@ src/app/
 Notes:
 
 - **Route groups** `(marketing)` and the `admin` segment give the two surfaces independent layouts without affecting URLs.
+- **`admin/(auth)` and `admin/(authenticated)` must stay separate.** There is no `admin/layout.tsx`: a layout at that level would wrap the login screen in `requireAdmin()`, redirecting login to itself forever. The split also keeps the auth screens prerenderable while the authenticated shell opts out with `instant = false`. Verified by the build output — `/admin` renders dynamic, `/admin/login` partial-prerenders, the other auth screens are fully static.
 - **The catch-all `[...slug]` is intentionally last.** Static segments win over dynamic ones, so `/contact` resolves to its own route while `/about` falls through to the CMS.
 - **Route files stay thin.** A page composes, sets `<Suspense>` boundaries, and exports `generateMetadata`. It does not query, transform, or lay out.
 - Use the generated `PageProps<'/work/[slug]'>` and `LayoutProps<'/…'>` helpers rather than hand-written prop types. Run `npx next typegen` after adding routes.

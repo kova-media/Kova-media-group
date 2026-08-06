@@ -126,6 +126,30 @@
   --radius-lg: 0.875rem;
   --radius-xl: 1.25rem;
 
+  /* --- Semantic aliases --------------------------------------------------
+   * shadcn/ui components (admin only, ADR-008) address colours by role rather
+   * than by shade. Mapping those roles onto the Kova palette here means a
+   * dropped-in component inherits the brand instead of importing a second,
+   * competing token vocabulary into this file.
+   */
+  --color-background: var(--color-paper);
+  --color-foreground: var(--color-ink-900);
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: var(--color-ink-900);
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: var(--color-ink-900);
+  --color-primary: var(--color-ink-950);
+  --color-primary-foreground: var(--color-paper);
+  --color-secondary: var(--color-ink-100);
+  --color-secondary-foreground: var(--color-ink-900);
+  --color-muted: var(--color-ink-100);
+  --color-muted-foreground: var(--color-ink-500);
+  --color-border: var(--color-ink-200);
+  --color-input: var(--color-ink-200);
+  --color-ring: var(--color-accent-600);
+  --color-destructive: var(--color-danger);
+  --color-destructive-foreground: var(--color-paper);
+
   --shadow-subtle: 0 1px 2px oklch(0.13 0.004 90 / 0.04);
   --shadow-raised:
     0 1px 2px oklch(0.13 0.004 90 / 0.05), 0 8px 24px oklch(0.13 0.004 90 / 0.06);

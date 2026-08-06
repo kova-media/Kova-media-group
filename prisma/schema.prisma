@@ -1,0 +1,253 @@
+// Kova Media Group — database schema
+// See docs/DATABASE.md for the reasoning behind this shape.
+//
+// Prisma 7: the datasource URL lives in prisma.config.ts (CLI/migrations) and is
+// passed to PrismaClient at runtime from src/db/prisma.ts (pooled connection).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Identity
+// ---------------------------------------------------------------------------
+
+/// Supabase Auth owns credentials; this table owns authorization.
+/// Deactivating an admin takes effect on their next request.
+model AdminUser {
+  id          String    @id @default(cuid())
+  supabaseId  String    @unique
+  email       String    @unique
+  name        String
+  isActive    Boolean   @default(true)
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Content
+//
+// Page and CaseStudy content is a Zod-validated JSON document (ADR-012).
+// `publishedContent != null` is the single source of truth for "is this live?".
+// ---------------------------------------------------------------------------
+
+model Page {
+  id       String  @id @default(cuid())
+  slug     String  @unique
+  title    String
+  /// System pages cannot be deleted from the admin.
+  isSystem Boolean @default(false)
+
+  /// { sections: [...] } — validated by pageContentSchema
+  draftContent     Json      @default("{\"sections\":[]}")
+  publishedContent Json?
+  publishedAt      DateTime?
+  publishedBy      String?
+
+  /// Optimistic concurrency for autosave; incremented on every draft write.
+  draftVersion Int @default(0)
+
+  seoTitle       String?
+  seoDescription String?
+  seoImageId     String?
+  seoNoIndex     Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([publishedAt])
+}
+
+model CaseStudy {
+  id           String  @id @default(cuid())
+  slug         String  @unique
+  clientName   String
+  clientLogoId String?
+  headline     String
+  summary      String
+  industry     String?
+  isFeatured   Boolean @default(false)
+  position     Int     @default(0)
+  heroImageId  String?
+
+  /// { sections: [...], metrics: [...] } — validated by caseStudyContentSchema
+  draftContent     Json      @default("{\"sections\":[],\"metrics\":[]}")
+  publishedContent Json?
+  publishedAt      DateTime?
+  publishedBy      String?
+  draftVersion     Int       @default(0)
+
+  seoTitle       String?
+  seoDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([publishedAt, isFeatured, position])
+}
+
+/// Append-only publish history. Never read on the public path.
+/// Polymorphic by design (entityType + entityId): Prisma cannot express a
+/// polymorphic FK, so revisions are deleted explicitly alongside their entity.
+model ContentRevision {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  content    Json
+  action     String
+  createdAt  DateTime @default(now())
+  createdBy  String
+
+  @@index([entityType, entityId, createdAt(sort: Desc)])
+}
+
+// ---------------------------------------------------------------------------
+// Content library — referenced by id from section data, resolved at render time
+// ---------------------------------------------------------------------------
+
+model Testimonial {
+  id            String   @id @default(cuid())
+  quote         String
+  authorName    String
+  authorRole    String?
+  companyName   String
+  companyLogoId String?
+  avatarId      String?
+  caseStudyId   String?
+  isPublished   Boolean  @default(false)
+  position      Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isPublished, position])
+}
+
+model PartnerLogo {
+  id          String   @id @default(cuid())
+  name        String
+  mediaId     String
+  href        String?
+  isPublished Boolean  @default(false)
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished, position])
+}
+
+model EmailExample {
+  id          String   @id @default(cuid())
+  title       String
+  clientName  String?
+  mediaId     String
+  category    String?
+  caseStudyId String?
+  isPublished Boolean  @default(false)
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished, position])
+}
+
+// ---------------------------------------------------------------------------
+// Media
+// ---------------------------------------------------------------------------
+
+/// width/height/blurDataURL are derived server-side after upload and are
+/// required by next/image to meet the CLS budget (ARCHITECTURE.md §12).
+model MediaAsset {
+  id          String    @id @default(cuid())
+  storagePath String    @unique
+  url         String
+  filename    String
+  mimeType    String
+  byteSize    Int
+  width       Int?
+  height      Int?
+  blurDataURL String?
+  alt         String    @default("")
+  caption     String?
+  folder      String?
+  uploadedBy  String
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([deletedAt, createdAt(sort: Desc)])
+  @@index([folder])
+}
+
+// ---------------------------------------------------------------------------
+// Settings
+// ---------------------------------------------------------------------------
+
+/// Single row, id fixed to "singleton". Enforced by a check constraint.
+model SiteSettings {
+  id                    String   @id @default("singleton")
+  siteName              String
+  defaultSeoTitle       String
+  defaultSeoDescription String
+  defaultSeoImageId     String?
+  contactEmail          String
+  bookingUrl            String?
+  socialLinks           Json     @default("[]")
+  navigation            Json     @default("[]")
+  footer                Json     @default("{}")
+  updatedAt             DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Lead capture
+// ---------------------------------------------------------------------------
+
+/// Contains personal data. No soft delete — removal is a hard delete, and rows
+/// are purged after 24 months by a scheduled job (ADR-018).
+model ContactSubmission {
+  id             String           @id @default(cuid())
+  name           String
+  email          String
+  company        String?
+  websiteUrl     String?
+  monthlyRevenue String?
+  message        String
+  source         String?
+  status         SubmissionStatus @default(NEW)
+  adminNotes     String?
+  /// Set when the Resend notification succeeded. Null on an old row means the
+  /// notification never went out — surfaced in the admin dashboard.
+  notifiedAt     DateTime?
+  /// Salted hash, never a raw IP.
+  ipHash         String?
+  userAgent      String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([ipHash, createdAt])
+}
+
+enum SubmissionStatus {
+  NEW
+  READ
+  REPLIED
+  BOOKED
+  ARCHIVED
+  SPAM
+}
+
+/// Windowed rate limiting (ADR-019). Pruned by the same job as submissions.
+model RateLimitEntry {
+  id        String   @id @default(cuid())
+  bucket    String
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([bucket, key, createdAt])
+}

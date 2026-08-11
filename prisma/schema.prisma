@@ -197,6 +197,10 @@ model SiteSettings {
   defaultSeoImageId     String?
   contactEmail          String
   bookingUrl            String?
+  /// Logotype for light ground. Null falls back to the typographic wordmark.
+  logoId                String?
+  /// Logotype for dark ground (footer, dark sections). Falls back to logoId.
+  logoDarkId            String?
   socialLinks           Json     @default("[]")
   navigation            Json     @default("[]")
   footer                Json     @default("{}")

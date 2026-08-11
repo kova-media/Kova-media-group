@@ -294,6 +294,8 @@ type SettingsRow = {
   defaultSeoImageId: string | null
   contactEmail: string
   bookingUrl: string | null
+  logoId: string | null
+  logoDarkId: string | null
   socialLinks: unknown
   navigation: unknown
   footer: unknown
@@ -307,6 +309,8 @@ export function toSiteSettings(row: SettingsRow): SiteSettingsDto {
     defaultSeoImageId: row.defaultSeoImageId,
     contactEmail: row.contactEmail,
     bookingUrl: row.bookingUrl,
+    logoId: row.logoId,
+    logoDarkId: row.logoDarkId,
     socialLinks: socialLinksSchema.parse(row.socialLinks),
     navigation: navigationSchema.parse(row.navigation),
     footer: footerSchema.parse(row.footer),

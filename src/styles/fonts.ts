@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google'
+import { Geist, Geist_Mono } from 'next/font/google'
 
 /**
  * Self-hosted through next/font — no external requests, no layout shift from a
@@ -6,6 +6,10 @@ import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google'
  *
  * `display: 'swap'` shows fallback text immediately rather than blocking on the
  * font, which protects LCP.
+ *
+ * Two families, matching the v0 design system: Geist Sans carries the whole
+ * typographic hierarchy, and Geist Mono is used for eyebrows, metrics, and
+ * labels where it reads as technical precision rather than decoration.
  */
 export const sans = Geist({
   variable: '--font-geist-sans',
@@ -19,12 +23,4 @@ export const mono = Geist_Mono({
   display: 'swap',
 })
 
-/** Editorial counterpoint for display type. Used deliberately, never as body copy. */
-export const display = Instrument_Serif({
-  variable: '--font-instrument-serif',
-  subsets: ['latin'],
-  weight: '400',
-  display: 'swap',
-})
-
-export const fontVariables = [sans.variable, mono.variable, display.variable].join(' ')
+export const fontVariables = [sans.variable, mono.variable].join(' ')

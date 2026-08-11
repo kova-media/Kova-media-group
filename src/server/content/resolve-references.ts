@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { getPublishedCaseStudies } from './queries'
 import type { PageContent } from './schemas/page'
 import {
   getEmailExamples,
@@ -8,6 +9,7 @@ import {
   getTestimonials,
 } from './resolvers'
 import type {
+  CaseStudySummary,
   EmailExampleDto,
   MediaAssetDto,
   PartnerLogoDto,
@@ -26,6 +28,14 @@ export type ResolvedReferences = {
   testimonials: Map<string, TestimonialDto>
   logos: PartnerLogoDto[]
   emailExamples: EmailExampleDto[]
+  /**
+   * Every published case study, keyed by id, plus the same list in display
+   * order. Sections pick from it rather than each performing their own read:
+   * the whole set is one cached, index-tagged query, and the volume here is a
+   * handful of rows.
+   */
+  caseStudies: Map<string, CaseStudySummary>
+  caseStudyOrder: CaseStudySummary[]
 }
 
 type Collected = {
@@ -35,6 +45,7 @@ type Collected = {
   emailExampleIds: string[]
   needsLogos: boolean
   needsEmailExamples: boolean
+  needsCaseStudies: boolean
 }
 
 function collect(content: PageContent): Collected {
@@ -44,6 +55,7 @@ function collect(content: PageContent): Collected {
   const emailExampleIds = new Set<string>()
   let needsLogos = false
   let needsEmailExamples = false
+  let needsCaseStudies = false
 
   const walkForMedia = (value: unknown) => {
     if (!value || typeof value !== 'object') return
@@ -86,6 +98,10 @@ function collect(content: PageContent): Collected {
       }
     }
 
+    if (section.type === 'CASE_STUDY_FEATURE' || section.type === 'CASE_STUDY_GRID') {
+      needsCaseStudies = true
+    }
+
     if (section.type === 'EMAIL_GALLERY') {
       needsEmailExamples = true
       if (Array.isArray(data['exampleIds'])) {
@@ -103,6 +119,7 @@ function collect(content: PageContent): Collected {
     emailExampleIds: [...emailExampleIds],
     needsLogos,
     needsEmailExamples,
+    needsCaseStudies,
   }
 }
 
@@ -111,20 +128,24 @@ export async function resolveReferences(
 ): Promise<ResolvedReferences> {
   const wanted = collect(content)
 
-  const [testimonials, logos, emailExamples] = await Promise.all([
+  const [testimonials, logos, emailExamples, caseStudies] = await Promise.all([
     getTestimonials(wanted.testimonialIds),
     wanted.needsLogos ? getPartnerLogos(wanted.logoIds) : Promise.resolve([]),
     wanted.needsEmailExamples
       ? getEmailExamples(wanted.emailExampleIds)
       : Promise.resolve([]),
+    wanted.needsCaseStudies ? getPublishedCaseStudies() : Promise.resolve([]),
   ])
 
-  // Logos and email examples carry their own media, resolved in a second pass
-  // now that we know which ones were selected.
+  // Logos, email examples and case studies carry their own media, resolved in a
+  // second pass now that we know which ones were selected.
   const allMediaIds = [
     ...wanted.mediaIds,
     ...logos.map((logo) => logo.mediaId),
     ...emailExamples.map((example) => example.mediaId),
+    ...caseStudies
+      .map((study) => study.heroImageId)
+      .filter((id): id is string => Boolean(id)),
   ]
 
   const media = await getMediaAssets(allMediaIds)
@@ -134,5 +155,7 @@ export async function resolveReferences(
     testimonials: new Map(testimonials.map((entry) => [entry.id, entry])),
     logos,
     emailExamples,
+    caseStudies: new Map(caseStudies.map((study) => [study.id, study])),
+    caseStudyOrder: caseStudies,
   }
 }

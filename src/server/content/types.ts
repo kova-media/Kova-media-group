@@ -104,6 +104,8 @@ export type SiteSettingsDto = {
   defaultSeoImageId: string | null
   contactEmail: string
   bookingUrl: string | null
+  logoId: string | null
+  logoDarkId: string | null
   socialLinks: { label: string; href: string }[]
   navigation: { label: string; href: string }[]
   footer: { tagline?: string }

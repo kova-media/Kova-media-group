@@ -1,4 +1,4 @@
-import { Container, Eyebrow, Section } from '@/components/primitives/container'
+import { Container, Eyebrow, Section } from '@/components/site/primitives'
 import { MediaImage } from '@/components/media/media-image'
 import { richTextSchema } from '@/server/content/schemas/rich-text'
 import type { PageContent } from '@/server/content/schemas/page'
@@ -69,19 +69,19 @@ function Hero({ data, refs, isFirst }: SectionProps) {
   const primary = data['primaryCta'] as { label: string; href: string } | undefined
 
   return (
-    <Section spacing="lg" className="pt-section-sm">
+    <Section spacing="lg" className="pt-14">
       <Container>
         {str(data['eyebrow']) && <Eyebrow>{str(data['eyebrow'])}</Eyebrow>}
-        <h1 className="mt-5 max-w-4xl text-4xl font-medium text-balance text-ink-950 sm:text-5xl lg:text-6xl">
+        <h1 className="mt-5 max-w-4xl text-4xl font-medium text-balance text-foreground sm:text-5xl lg:text-6xl">
           {str(data['headline'])}
         </h1>
         {str(data['subhead']) && (
-          <p className="mt-6 max-w-xl text-lg text-ink-600">{str(data['subhead'])}</p>
+          <p className="mt-6 max-w-xl text-lg text-muted-foreground">{str(data['subhead'])}</p>
         )}
         {primary?.href && (
           <a
             href={primary.href}
-            className="duration-fast mt-9 inline-flex h-12 items-center rounded-md bg-ink-950 px-7 text-sm font-medium text-paper transition-colors hover:bg-ink-800"
+            className="duration-fast mt-9 inline-flex h-12 items-center rounded-md bg-foreground px-7 text-sm font-medium text-background transition-colors hover:bg-brand"
           >
             {primary.label}
           </a>
@@ -109,7 +109,7 @@ function LogoStrip({ data, refs }: SectionProps) {
     <Section spacing="sm">
       <Container>
         {str(data['caption']) && (
-          <p className="mb-8 text-center text-sm text-ink-500">
+          <p className="mb-8 text-center text-sm text-muted-foreground">
             {str(data['caption'])}
           </p>
         )}
@@ -150,20 +150,20 @@ function ProofMetrics({ data }: SectionProps) {
       <Container>
         {str(data['eyebrow']) && <Eyebrow>{str(data['eyebrow'])}</Eyebrow>}
         {str(data['heading']) && (
-          <h2 className="mt-4 max-w-2xl text-3xl font-medium text-balance text-ink-950">
+          <h2 className="mt-4 max-w-2xl text-3xl font-medium text-balance text-foreground">
             {str(data['heading'])}
           </h2>
         )}
         <dl className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {metrics.map((metric, index) => (
             <div key={index}>
-              <dt className="text-5xl font-medium tracking-tight text-ink-950">
+              <dt className="text-5xl font-medium tracking-tight text-foreground">
                 {formatMetric(metric.value, metric.unit)}
               </dt>
-              <dd className="mt-3 text-sm text-ink-600">
+              <dd className="mt-3 text-sm text-muted-foreground">
                 {metric.label}
                 {metric.timeframe && (
-                  <span className="block text-ink-400">{metric.timeframe}</span>
+                  <span className="block text-muted-foreground">{metric.timeframe}</span>
                 )}
               </dd>
             </div>
@@ -186,7 +186,7 @@ function Narrative({ data, refs }: SectionProps) {
           <div className={position === 'left' && asset ? 'lg:order-2' : undefined}>
             {str(data['eyebrow']) && <Eyebrow>{str(data['eyebrow'])}</Eyebrow>}
             {str(data['heading']) && (
-              <h2 className="mt-4 text-3xl font-medium text-balance text-ink-950">
+              <h2 className="mt-4 text-3xl font-medium text-balance text-foreground">
                 {str(data['heading'])}
               </h2>
             )}
@@ -209,7 +209,7 @@ function Narrative({ data, refs }: SectionProps) {
 }
 
 function cnGrid(hasMedia: boolean, position: 'left' | 'right' | 'below') {
-  if (!hasMedia) return 'max-w-content'
+  if (!hasMedia) return 'max-w-3xl'
   if (position === 'below') return 'flex flex-col gap-12'
   return 'grid items-center gap-12 lg:grid-cols-2'
 }
@@ -225,7 +225,7 @@ function OutcomeList({ data }: SectionProps) {
     <Section>
       <Container>
         {str(data['eyebrow']) && <Eyebrow>{str(data['eyebrow'])}</Eyebrow>}
-        <h2 className="mt-4 max-w-2xl text-3xl font-medium text-balance text-ink-950">
+        <h2 className="mt-4 max-w-2xl text-3xl font-medium text-balance text-foreground">
           {str(data['heading'])}
         </h2>
         <RichTextRenderer nodes={richText(data['body'])} className="mt-6 max-w-xl" />
@@ -233,8 +233,8 @@ function OutcomeList({ data }: SectionProps) {
           <ul className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((item, index) => (
               <li key={index}>
-                <h3 className="text-base font-medium text-ink-950">{item.title}</h3>
-                <p className="mt-2 text-sm text-ink-600">{item.detail}</p>
+                <h3 className="text-base font-medium text-foreground">{item.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{item.detail}</p>
               </li>
             ))}
           </ul>
@@ -259,7 +259,7 @@ function TestimonialGrid({ data, refs }: SectionProps) {
       <Container>
         {str(data['eyebrow']) && <Eyebrow>{str(data['eyebrow'])}</Eyebrow>}
         {str(data['heading']) && (
-          <h2 className="mt-4 max-w-2xl text-3xl font-medium text-balance text-ink-950">
+          <h2 className="mt-4 max-w-2xl text-3xl font-medium text-balance text-foreground">
             {str(data['heading'])}
           </h2>
         )}
@@ -267,10 +267,10 @@ function TestimonialGrid({ data, refs }: SectionProps) {
           {quotes.map((quote) => (
             <li key={quote.id}>
               <figure>
-                <blockquote className="text-lg text-balance text-ink-800">
+                <blockquote className="text-lg text-balance text-foreground/85">
                   “{quote.quote}”
                 </blockquote>
-                <figcaption className="mt-4 text-sm text-ink-500">
+                <figcaption className="mt-4 text-sm text-muted-foreground">
                   {quote.authorName}
                   {quote.authorRole && `, ${quote.authorRole}`} · {quote.companyName}
                 </figcaption>
@@ -291,10 +291,10 @@ function TestimonialFeature({ data, refs }: SectionProps) {
     <Section>
       <Container width="content">
         <figure className="text-center">
-          <blockquote className="text-3xl font-medium text-balance text-ink-950">
+          <blockquote className="text-3xl font-medium text-balance text-foreground">
             “{quote.quote}”
           </blockquote>
-          <figcaption className="mt-6 text-sm text-ink-500">
+          <figcaption className="mt-6 text-sm text-muted-foreground">
             {quote.authorName}
             {quote.authorRole && `, ${quote.authorRole}`} · {quote.companyName}
           </figcaption>
@@ -312,7 +312,7 @@ function EmailGallery({ data, refs }: SectionProps) {
       <Container>
         {str(data['eyebrow']) && <Eyebrow>{str(data['eyebrow'])}</Eyebrow>}
         {str(data['heading']) && (
-          <h2 className="mt-4 max-w-2xl text-3xl font-medium text-balance text-ink-950">
+          <h2 className="mt-4 max-w-2xl text-3xl font-medium text-balance text-foreground">
             {str(data['heading'])}
           </h2>
         )}
@@ -329,9 +329,9 @@ function EmailGallery({ data, refs }: SectionProps) {
                   sizes="(max-width: 640px) 100vw, 380px"
                   className="w-full rounded-lg"
                 />
-                <p className="mt-3 text-sm font-medium text-ink-700">{example.title}</p>
+                <p className="mt-3 text-sm font-medium text-foreground/80">{example.title}</p>
                 {example.category && (
-                  <p className="text-xs text-ink-500">{example.category}</p>
+                  <p className="text-xs text-muted-foreground">{example.category}</p>
                 )}
               </li>
             )
@@ -352,14 +352,14 @@ function Faq({ data }: SectionProps) {
       <Container width="content">
         {str(data['eyebrow']) && <Eyebrow>{str(data['eyebrow'])}</Eyebrow>}
         {str(data['heading']) && (
-          <h2 className="mt-4 text-3xl font-medium text-balance text-ink-950">
+          <h2 className="mt-4 text-3xl font-medium text-balance text-foreground">
             {str(data['heading'])}
           </h2>
         )}
         <dl className="mt-10 flex flex-col">
           {items.map((item, index) => (
-            <div key={index} className="border-t border-ink-100 py-6 last:border-b">
-              <dt className="text-lg font-medium text-ink-950">{item.question}</dt>
+            <div key={index} className="border-t border-border py-6 last:border-b">
+              <dt className="text-lg font-medium text-foreground">{item.question}</dt>
               <dd>
                 <RichTextRenderer nodes={richText(item.answer)} className="mt-2" />
               </dd>
@@ -378,18 +378,18 @@ function Cta({ data }: SectionProps) {
     <Section spacing="lg">
       <Container width="content" className="text-center">
         {str(data['eyebrow']) && <Eyebrow>{str(data['eyebrow'])}</Eyebrow>}
-        <h2 className="mt-4 text-4xl font-medium text-balance text-ink-950">
+        <h2 className="mt-4 text-4xl font-medium text-balance text-foreground">
           {str(data['heading'])}
         </h2>
         {str(data['body']) && (
-          <p className="mx-auto mt-5 max-w-lg text-lg text-ink-600">
+          <p className="mx-auto mt-5 max-w-lg text-lg text-muted-foreground">
             {str(data['body'])}
           </p>
         )}
         {primary?.href && (
           <a
             href={primary.href}
-            className="duration-fast mt-9 inline-flex h-12 items-center rounded-md bg-ink-950 px-7 text-sm font-medium text-paper transition-colors hover:bg-ink-800"
+            className="duration-fast mt-9 inline-flex h-12 items-center rounded-md bg-foreground px-7 text-sm font-medium text-background transition-colors hover:bg-brand"
           >
             {primary.label}
           </a>
@@ -404,7 +404,7 @@ function RichTextSection({ data }: SectionProps) {
     <Section>
       <Container width="content">
         {str(data['heading']) && (
-          <h2 className="mb-6 text-3xl font-medium text-ink-950">
+          <h2 className="mb-6 text-3xl font-medium text-foreground">
             {str(data['heading'])}
           </h2>
         )}

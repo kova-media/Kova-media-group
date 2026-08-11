@@ -6,9 +6,7 @@ import {
   services,
   caseStudies as fallbackCaseStudies,
   process,
-  resources as fallbackResources,
   type CaseStudy,
-  type Resource,
 } from '@/lib/site-data'
 import { Container, Eyebrow, ButtonLink, LiftCard } from '@/components/site/ui'
 import { Reveal, RevealGroup, RevealItem } from '@/components/site/reveal'
@@ -266,66 +264,6 @@ export function AboutPreview() {
             </div>
           </Reveal>
         </div>
-      </Container>
-    </section>
-  )
-}
-
-/* ------------------------------------------------------------- Resources preview */
-
-export function ResourcesPreview({
-  articles,
-  linkable = false,
-}: {
-  articles?: Resource[]
-  /** False when showing bundled fallbacks, which have no detail page yet. */
-  linkable?: boolean
-}) {
-  const featured = (articles ?? fallbackResources).slice(0, 3)
-
-  if (featured.length === 0) return null
-  return (
-    <section className="bg-surface py-24 md:py-32">
-      <Container>
-        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <Reveal className="max-w-2xl">
-            <Eyebrow>Resources</Eyebrow>
-            <h2 className="mt-5 text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
-              Ideas worth your inbox.
-            </h2>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <ButtonLink href="/resources" variant="secondary" withArrow>
-              All resources
-            </ButtonLink>
-          </Reveal>
-        </div>
-
-        <RevealGroup className="mt-14 grid gap-6 md:grid-cols-3">
-          {featured.map((r) => (
-            <RevealItem key={r.slug}>
-              <LiftCard className="h-full">
-                <Link
-                  href={linkable ? `/resources/${r.slug}` : '/resources'}
-                  className="flex h-full flex-col rounded-2xl border border-border bg-card p-7 shadow-[var(--shadow-soft)]"
-                >
-                  <div className="flex items-center gap-3 text-xs">
-                    <span className="rounded-full bg-muted px-2.5 py-1 font-medium text-foreground">
-                      {r.category}
-                    </span>
-                    <span className="text-muted-foreground">{r.readTime}</span>
-                  </div>
-                  <h3 className="mt-5 text-lg leading-snug font-medium text-pretty text-foreground">
-                    {r.title}
-                  </h3>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-pretty text-muted-foreground">
-                    {r.excerpt}
-                  </p>
-                </Link>
-              </LiftCard>
-            </RevealItem>
-          ))}
-        </RevealGroup>
       </Container>
     </section>
   )

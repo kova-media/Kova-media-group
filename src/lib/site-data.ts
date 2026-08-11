@@ -17,7 +17,6 @@ export const nav = [
   { label: 'Case Studies', href: '/case-studies' },
   { label: 'Process', href: '/process' },
   { label: 'About', href: '/about' },
-  { label: 'Resources', href: '/resources' },
 ]
 
 export const clients = [
@@ -244,26 +243,20 @@ export const process = [
   },
 ]
 
-export const testimonials = [
-  {
-    quote:
-      'Kova treated email like a core part of the business, not a checkbox. Within a few months it became one of our most reliable revenue channels.',
-    name: 'Founder',
-    role: 'DTC Consumer Brand',
-  },
-  {
-    quote:
-      'They understood our brand voice immediately. The emails finally sound like us, and the numbers speak for themselves.',
-    name: 'Ecommerce Manager',
-    role: 'Family & Lifestyle Brand',
-  },
-  {
-    quote:
-      'Clear communication, real strategy, and no fluff. We always know what’s being worked on and why.',
-    name: 'Marketing Director',
-    role: 'Home Goods Brand',
-  },
-]
+/**
+ * Client testimonials.
+ *
+ * **Deliberately empty.** Every quote shown on this site must come from a real,
+ * attributable Kova client. The three quotes that previously sat here were
+ * produced by the v0 generation and attributed anonymously ("Founder, DTC
+ * Consumer Brand") — they are not verifiably real, so they are gone rather than
+ * left in place to fill a section.
+ *
+ * Real quotes are added through the admin (Library → Testimonials) and appear
+ * automatically. Until then the testimonials section renders nothing at all:
+ * showing fewer is correct, inventing more never is.
+ */
+export const testimonials: { quote: string; name: string; role: string }[] = []
 
 export const faqs = [
   {
@@ -276,7 +269,7 @@ export const faqs = [
   },
   {
     q: 'Which platforms do you work in?',
-    a: 'Klaviyo, primarily — we manage it end to end as part of your programme. The platform is a tool, not the service: what you are buying is the strategy, the writing, and the day-to-day management that runs through it. We can also advise on a migration when the current setup is holding the account back.',
+    a: 'Klaviyo, Privy, Postscript, and many more.',
   },
   {
     q: 'How quickly will we see results?',
@@ -289,71 +282,5 @@ export const faqs = [
   {
     q: 'How do we get started?',
     a: 'It starts with a free call and an account audit. You’ll walk away with a clear picture of what your program is leaving on the table, whether or not we work together.',
-  },
-]
-
-export type Resource = {
-  slug: string
-  title: string
-  excerpt: string
-  category: string
-  readTime: string
-  date: string
-}
-
-export const resources: Resource[] = [
-  {
-    slug: 'flows-every-store-needs',
-    title: 'The email flows every ecommerce store should have live',
-    excerpt:
-      'A practical breakdown of the automations that quietly drive the majority of email revenue — and how to prioritize building them.',
-    category: 'Automation',
-    readTime: '6 min read',
-    date: '2026-01-14',
-  },
-  {
-    slug: 'deliverability-fundamentals',
-    title: 'Deliverability fundamentals: how to actually reach the inbox',
-    excerpt:
-      'Authentication, list hygiene, and sending reputation explained without the jargon — plus the mistakes that quietly hurt your sender score.',
-    category: 'Deliverability',
-    readTime: '8 min read',
-    date: '2026-01-02',
-  },
-  {
-    slug: 'segmentation-that-works',
-    title: 'Segmentation that works: fewer sends, more revenue',
-    excerpt:
-      'Why sending less to the right people beats blasting your whole list, and a simple framework to start segmenting today.',
-    category: 'Strategy',
-    readTime: '5 min read',
-    date: '2025-12-18',
-  },
-  {
-    slug: 'sms-without-annoying-customers',
-    title: 'Using SMS without annoying your customers',
-    excerpt:
-      'SMS is the most personal channel you have. Here’s how to grow a compliant list and use it for the moments that genuinely matter.',
-    category: 'SMS',
-    readTime: '6 min read',
-    date: '2025-12-05',
-  },
-  {
-    slug: 'campaign-calendar',
-    title: 'How to build a campaign calendar that compounds',
-    excerpt:
-      'A repeatable planning system for consistent, on-brand sends that build momentum instead of one-off spikes.',
-    category: 'Strategy',
-    readTime: '7 min read',
-    date: '2025-11-20',
-  },
-  {
-    slug: 'welcome-flow-teardown',
-    title: 'Anatomy of a welcome flow that converts',
-    excerpt:
-      'A step-by-step teardown of a high-performing welcome series, from the first email to the moment a subscriber becomes a buyer.',
-    category: 'Automation',
-    readTime: '9 min read',
-    date: '2025-11-06',
   },
 ]

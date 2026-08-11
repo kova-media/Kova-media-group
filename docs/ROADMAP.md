@@ -229,6 +229,26 @@ Consequences recorded here because they change earlier decisions:
   inline styles from rAF, so the CSS `prefers-reduced-motion` block never
   reached it and every reveal ignored the preference.
 
+## Removed from scope
+
+- **The resource centre / blog.** Built, then removed at the owner's direction:
+  maintaining a publication is a standing commitment, and a stale blog costs
+  more credibility than no blog earns. The `Resource` table is dropped, its
+  revisions cleaned up, and the routes, admin screens and homepage section are
+  gone. The section registry and rich-text renderer remain — they serve the
+  CMS pages.
+
+- **Bundled testimonials.** The three quotes that shipped with the v0 design
+  were generated and attributed anonymously ("Founder, DTC Consumer Brand").
+  They are not verifiably real, so they are deleted from the database and from
+  `site-data.ts`, and there is deliberately **no fallback**. The testimonials
+  section renders nothing when the library is empty and appears the moment a
+  real quote is added through the admin. Showing fewer is correct; filling the
+  space is not.
+
+  Note this differs from case studies, where the bundled content _is_ real
+  client work supplied with the brief and therefore does serve as a fallback.
+
 ## Post-launch backlog
 
 Not scheduled. Each requires an ADR before it starts.

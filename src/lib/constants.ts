@@ -14,7 +14,6 @@ export const routes = {
   caseStudy: (slug: string) => `/case-studies/${slug}`,
   process: '/process',
   about: '/about',
-  resources: '/resources',
   faq: '/faq',
   /** Where every primary CTA points. Hosts the scheduler. */
   book: '/book',
@@ -29,7 +28,6 @@ export const DEFAULT_NAVIGATION = [
   { label: 'Case Studies', href: routes.caseStudies },
   { label: 'Process', href: routes.process },
   { label: 'About', href: routes.about },
-  { label: 'Resources', href: routes.resources },
 ] as const
 
 /**

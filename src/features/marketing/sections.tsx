@@ -4,12 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Plus } from 'lucide-react'
-import {
-  clients,
-  metrics,
-  testimonials as fallbackTestimonials,
-  faqs as fallbackFaqs,
-} from '@/lib/site-data'
+import { clients, metrics, faqs as fallbackFaqs } from '@/lib/site-data'
 import { Container, Eyebrow, CountUp, ButtonLink } from '@/components/site/ui'
 import { Reveal, RevealGroup, RevealItem } from '@/components/site/reveal'
 import { cn } from '@/lib/utils'
@@ -87,16 +82,25 @@ export function MetricsRow() {
 /* ------------------------------------------------------------------ Testimonials */
 
 /**
- * Quotes come from the CMS testimonial library via the page, falling back to
- * the bundled set. Attribution is shown exactly as stored — these are real
- * client quotes attributed by role, and nothing here invents a name.
+ * Client testimonials, from the CMS library.
+ *
+ * **Renders nothing when there are none, by design.** There is no bundled
+ * fallback and there must never be one: a testimonial is a claim about a real
+ * person's experience, and inventing one to fill a layout is a different
+ * category of thing from writing marketing copy. If the library is empty the
+ * section is simply absent — showing fewer is correct, fabricating more is not.
+ *
+ * Attribution renders exactly as stored, including quotes attributed by role
+ * rather than by name where that is how the client gave them.
  */
 export function Testimonials({
   quotes,
 }: {
   quotes?: { quote: string; name: string; role: string }[]
 }) {
-  const testimonials = quotes?.length ? quotes : fallbackTestimonials
+  const testimonials = quotes ?? []
+
+  if (testimonials.length === 0) return null
 
   return (
     <section className="bg-surface py-24 md:py-32">
@@ -107,7 +111,18 @@ export function Testimonials({
             Trusted by the founders who hired us.
           </h2>
         </Reveal>
-        <RevealGroup className="mt-14 grid gap-6 md:grid-cols-3">
+        <RevealGroup
+          className={cn(
+            'mt-14 grid gap-6',
+            // Match the column count to what actually exists: two real quotes
+            // in a three-column grid reads as a missing third.
+            testimonials.length >= 3
+              ? 'md:grid-cols-3'
+              : testimonials.length === 2
+                ? 'md:grid-cols-2'
+                : 'max-w-2xl',
+          )}
+        >
           {testimonials.map((t) => (
             <RevealItem
               key={t.quote}

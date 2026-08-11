@@ -2,14 +2,10 @@ import 'server-only'
 
 import {
   caseStudies as fallbackCaseStudies,
-  resources as fallbackResources,
-  testimonials as fallbackTestimonials,
   type CaseStudy as CaseStudyView,
-  type Resource as ResourceView,
 } from '@/lib/site-data'
 
 import { getPublishedCaseStudies, getPublishedCaseStudy } from './queries'
-import { getPublishedResources } from './resource-queries'
 import { getAllTestimonials } from './resolvers'
 import { DEFAULT_CASE_STUDY_ACCENT } from './schemas/case-study'
 
@@ -25,7 +21,7 @@ import { DEFAULT_CASE_STUDY_ACCENT } from './schemas/case-study'
  * none of which should produce a site with an empty work section. The static
  * content is the floor, the database is the override.
  */
-export type { CaseStudyView, ResourceView }
+export type { CaseStudyView }
 
 export type TestimonialView = {
   quote: string
@@ -92,10 +88,16 @@ export async function getCaseStudySlugs(): Promise<string[]> {
   return studies.map((study) => study.slug)
 }
 
+/**
+ * Published testimonials.
+ *
+ * **No fallback, deliberately.** Unlike case studies — where the bundled set is
+ * real content the site can render before the database is seeded — there is no
+ * safe default for a testimonial. An empty list means the section does not
+ * render, which is the correct outcome.
+ */
 export async function getTestimonialList(): Promise<TestimonialView[]> {
   const published = await getAllTestimonials()
-
-  if (published.length === 0) return fallbackTestimonials
 
   return published.map((quote) => ({
     quote: quote.quote,
@@ -104,34 +106,4 @@ export async function getTestimonialList(): Promise<TestimonialView[]> {
     // supporting line, so they are joined rather than dropped.
     role: [quote.authorRole, quote.companyName].filter(Boolean).join(', '),
   }))
-}
-
-/**
- * Published articles for the resources index and the homepage preview.
- *
- * Falls back to the bundled set so a fresh environment still renders a complete
- * resource centre. The `slug` is preserved either way, so links stay valid —
- * the fallback articles simply have no detail page until they are published
- * through the admin.
- */
-export async function getResourceList(): Promise<ResourceView[]> {
-  const published = await getPublishedResources()
-
-  if (published.length === 0) return fallbackResources
-
-  return published.map((resource) => ({
-    slug: resource.slug,
-    title: resource.title,
-    excerpt: resource.excerpt,
-    category: resource.category,
-    readTime: resource.readTime,
-    // The index shows a date; published articles use their publish date.
-    date: resource.publishedAt ?? new Date(0).toISOString(),
-  }))
-}
-
-/** True when the resource centre is CMS-backed rather than showing fallbacks. */
-export async function hasPublishedResources(): Promise<boolean> {
-  const published = await getPublishedResources()
-  return published.length > 0
 }

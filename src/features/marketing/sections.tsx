@@ -145,11 +145,29 @@ export function Testimonials({
 
 /* ------------------------------------------------------------------------- FAQ */
 
-export function Faq({ items }: { items?: { q: string; a: string }[] }) {
+/**
+ * `tone` exists because the homepage alternates background and surface bands,
+ * and the section directly above the FAQ is conditional — the testimonials
+ * section only renders when there are real quotes in the library. Hard-coding
+ * a tone here would leave two identical bands stacked whenever it is absent.
+ * The page decides; this component just honours it.
+ */
+export function Faq({
+  items,
+  tone = 'background',
+}: {
+  items?: { q: string; a: string }[]
+  tone?: 'background' | 'surface'
+}) {
   const faqs = items?.length ? items : fallbackFaqs
   const [open, setOpen] = useState<number | null>(0)
   return (
-    <section className="bg-background py-24 md:py-32">
+    <section
+      className={cn(
+        'py-24 md:py-32',
+        tone === 'surface' ? 'bg-surface' : 'bg-background',
+      )}
+    >
       <Container className="max-w-4xl">
         <Reveal className="mx-auto max-w-2xl text-center">
           <Eyebrow className="justify-center">FAQ</Eyebrow>

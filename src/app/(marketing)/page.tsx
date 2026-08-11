@@ -42,7 +42,10 @@ export default async function HomePage() {
       <ProcessPreview />
       <AboutPreview />
       <Testimonials quotes={quotes} />
-      <Faq items={faqItems} />
+      {/* The testimonials band above is conditional, so the FAQ takes over its
+          tone when it is absent — otherwise About and the FAQ stack as two
+          identical bands and the alternating rhythm breaks. */}
+      <Faq items={faqItems} tone={quotes.length > 0 ? 'background' : 'surface'} />
       <FinalCta />
     </>
   )

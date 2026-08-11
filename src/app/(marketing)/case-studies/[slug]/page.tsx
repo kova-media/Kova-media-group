@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import {
@@ -20,7 +19,12 @@ import { FinalCta } from '@/features/marketing/sections'
  */
 export async function generateStaticParams() {
   const slugs = await getCaseStudySlugs()
-  return slugs.map((slug) => ({ slug }))
+  // Cache Components requires at least one result. The bundled fallback means
+  // this is never empty today, but relying on that is a trap for whoever
+  // removes it later.
+  return (slugs.length > 0 ? slugs : ['__no-published-content__']).map((slug) => ({
+    slug,
+  }))
 }
 
 export async function generateMetadata({
@@ -38,31 +42,22 @@ export async function generateMetadata({
 }
 
 /**
- * The whole page is slug-dependent, so reading `params` here directly would
- * stop the route producing an instant prefetchable shell (ADR-017). The shell
- * is the chrome plus the scaffold below; the study itself streams in.
+ * Blocking rather than instant-shell (ADR-017 revisited).
+ *
+ * Every published slug is prerendered by `generateStaticParams`, so real pages
+ * are served as static HTML and lose nothing here. The only URLs that reach a
+ * runtime render are ones that do not exist — and with an instant shell those
+ * flush a 200 before `notFound()` is ever reached, producing a soft 404 that
+ * search engines treat as a thin page. Blocking lets the 404 status be set
+ * correctly, which matters more than an instant shell on a URL with no content.
  */
-export default function CaseStudyPage({
+export const instant = false
+
+export default async function CaseStudyPage({
   params,
 }: {
   params: Promise<{ slug: string }>
 }) {
-  return (
-    <Suspense fallback={<CaseStudySkeleton />}>
-      <CaseStudyContent params={params} />
-    </Suspense>
-  )
-}
-
-/**
- * Reserves the hero's vertical space so the streamed content does not shift
- * the page when it arrives.
- */
-function CaseStudySkeleton() {
-  return <div className="pt-32 pb-24 sm:pt-40" aria-hidden />
-}
-
-async function CaseStudyContent({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const [study, caseStudies] = await Promise.all([
     getCaseStudyDetail(slug),

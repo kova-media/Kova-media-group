@@ -14,7 +14,12 @@ import {
   ResourcesPreview,
 } from '@/features/marketing/home/sections'
 import { getFaqItems } from '@/server/content/faq'
-import { getCaseStudyList, getTestimonialList } from '@/server/content/site-content'
+import {
+  getCaseStudyList,
+  getResourceList,
+  getTestimonialList,
+  hasPublishedResources,
+} from '@/server/content/site-content'
 
 /**
  * The homepage.
@@ -27,11 +32,14 @@ import { getCaseStudyList, getTestimonialList } from '@/server/content/site-cont
  * warm cache performs no database work at all.
  */
 export default async function HomePage() {
-  const [caseStudies, quotes, faqItems] = await Promise.all([
-    getCaseStudyList(),
-    getTestimonialList(),
-    getFaqItems(),
-  ])
+  const [caseStudies, quotes, faqItems, articles, resourcesLinkable] =
+    await Promise.all([
+      getCaseStudyList(),
+      getTestimonialList(),
+      getFaqItems(),
+      getResourceList(),
+      hasPublishedResources(),
+    ])
 
   return (
     <>
@@ -43,7 +51,7 @@ export default async function HomePage() {
       <ProcessPreview />
       <AboutPreview />
       <Testimonials quotes={quotes} />
-      <ResourcesPreview />
+      <ResourcesPreview articles={articles} linkable={resourcesLinkable} />
       <Faq items={faqItems} />
       <FinalCta />
     </>

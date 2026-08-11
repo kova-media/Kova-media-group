@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { Suspense } from 'react'
 
 import { PageView } from '@/features/marketing/page-view'
 import { getDraftPage } from '@/server/content/admin-queries'
@@ -49,23 +48,18 @@ export async function generateMetadata({
 }
 
 /**
- * `params` is read inside a Suspense boundary so the route still produces an
- * instant, prefetchable shell (ADR-017) — reading it in the page body itself
- * would force the whole route to block on the URL.
+ * Blocking rather than instant-shell (ADR-017 revisited).
+ *
+ * Every published slug is prerendered by `generateStaticParams`, so real pages
+ * are served as static HTML and lose nothing here. The only URLs that reach a
+ * runtime render are ones that do not exist — and with an instant shell those
+ * flush a 200 before `notFound()` is ever reached, producing a soft 404 that
+ * search engines treat as a thin page. Blocking lets the 404 status be set
+ * correctly, which matters more than an instant shell on a URL with no content.
  */
-export default function CmsPage({ params }: PageProps<'/[...slug]'>) {
-  return (
-    <Suspense fallback={<div className="pt-32 pb-24 sm:pt-40" aria-hidden />}>
-      <CmsPageContent params={params} />
-    </Suspense>
-  )
-}
+export const instant = false
 
-async function CmsPageContent({
-  params,
-}: {
-  params: PageProps<'/[...slug]'>['params']
-}) {
+export default async function CmsPage({ params }: PageProps<'/[...slug]'>) {
   const { slug } = await params
   const page = await loadPage(slug)
 

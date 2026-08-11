@@ -6,8 +6,9 @@ import {
   services,
   caseStudies as fallbackCaseStudies,
   process,
-  resources,
+  resources as fallbackResources,
   type CaseStudy,
+  type Resource,
 } from '@/lib/site-data'
 import { Container, Eyebrow, ButtonLink, LiftCard } from '@/components/site/ui'
 import { Reveal, RevealGroup, RevealItem } from '@/components/site/reveal'
@@ -272,8 +273,17 @@ export function AboutPreview() {
 
 /* ------------------------------------------------------------- Resources preview */
 
-export function ResourcesPreview() {
-  const featured = resources.slice(0, 3)
+export function ResourcesPreview({
+  articles,
+  linkable = false,
+}: {
+  articles?: Resource[]
+  /** False when showing bundled fallbacks, which have no detail page yet. */
+  linkable?: boolean
+}) {
+  const featured = (articles ?? fallbackResources).slice(0, 3)
+
+  if (featured.length === 0) return null
   return (
     <section className="bg-surface py-24 md:py-32">
       <Container>
@@ -296,7 +306,7 @@ export function ResourcesPreview() {
             <RevealItem key={r.slug}>
               <LiftCard className="h-full">
                 <Link
-                  href="/resources"
+                  href={linkable ? `/resources/${r.slug}` : '/resources'}
                   className="flex h-full flex-col rounded-2xl border border-border bg-card p-7 shadow-[var(--shadow-soft)]"
                 >
                   <div className="flex items-center gap-3 text-xs">

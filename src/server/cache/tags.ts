@@ -18,6 +18,9 @@ export const cacheTags = {
   caseStudy: (slug: string) => `case-study:${slug}`,
   caseStudiesIndex: 'case-studies:index',
 
+  resource: (slug: string) => `resource:${slug}`,
+  resourcesIndex: 'resources:index',
+
   testimonial: (id: string) => `testimonial:${id}`,
   testimonialsIndex: 'testimonials:index',
 

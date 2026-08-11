@@ -3,6 +3,7 @@ import type { MetadataRoute } from 'next'
 import { env } from '@/env'
 import { routes } from '@/lib/constants'
 import { getPublishedPageSlugs } from '@/server/content/queries'
+import { getPublishedResourceSlugs } from '@/server/content/resource-queries'
 import { getCaseStudySlugs } from '@/server/content/site-content'
 
 /**
@@ -26,9 +27,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: routes.contact, priority: 0.8 },
   ]
 
-  const [cmsSlugs, studySlugs] = await Promise.all([
+  const [cmsSlugs, studySlugs, articleSlugs] = await Promise.all([
     getPublishedPageSlugs(),
     getCaseStudySlugs(),
+    getPublishedResourceSlugs(),
   ])
 
   // "home" has its own route; the rest of the CMS pages resolve via the
@@ -49,6 +51,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...studySlugs.map((slug) => ({
       url: `${base}${routes.caseStudy(slug)}`,
       priority: 0.8,
+    })),
+    ...articleSlugs.map((slug) => ({
+      url: `${base}${routes.resources}/${slug}`,
+      priority: 0.6,
     })),
     ...cmsEntries,
   ]

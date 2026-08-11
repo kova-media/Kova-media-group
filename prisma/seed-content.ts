@@ -7,7 +7,7 @@ loadEnv({ path: '.env.local' })
 loadEnv({ path: '.env' })
 
 import { PrismaClient } from '../src/generated/prisma/client'
-import { caseStudies, faqs, testimonials } from '../src/lib/site-data'
+import { caseStudies, faqs, resources, testimonials } from '../src/lib/site-data'
 
 /**
  * Moves the real Kova content out of `site-data.ts` and into the CMS.
@@ -181,15 +181,58 @@ async function seedFaqPage() {
   return 1
 }
 
+/**
+ * Articles are seeded as **drafts**, not published.
+ *
+ * The bundled resource entries are titles and excerpts with no body — they were
+ * written as index cards, not articles. Publishing them would put live pages on
+ * the site with nothing on them. Seeded as drafts, they appear in the admin
+ * ready to be written, and the public index keeps showing the bundled cards
+ * until a real article is published.
+ */
+async function seedResources() {
+  let created = 0
+
+  for (const [index, article] of resources.entries()) {
+    const existing = await prisma.resource.findUnique({
+      where: { slug: article.slug },
+      select: { id: true },
+    })
+
+    if (existing) continue
+
+    await prisma.resource.create({
+      data: {
+        slug: article.slug,
+        title: article.title,
+        excerpt: article.excerpt,
+        category: article.category,
+        readTime: article.readTime,
+        isFeatured: index === 0,
+        position: index,
+        draftContent: { sections: [] },
+        seoTitle: article.title,
+        seoDescription: article.excerpt,
+      },
+    })
+
+    created += 1
+  }
+
+  return created
+}
+
 async function main() {
-  const [studies, quotes, faqPage] = [
+  const [studies, quotes, faqPage, articles] = [
     await seedCaseStudies(),
     await seedTestimonials(),
     await seedFaqPage(),
+    await seedResources(),
   ]
 
   console.log(
-    `Content seed complete: ${studies} case studies, ${quotes} testimonials, ${faqPage} FAQ page.`,
+    `Content seed complete: ${studies} case studies, ${quotes} testimonials, ` +
+      `${faqPage} FAQ page, ${articles} draft articles.`,
   )
   console.log('(Existing rows are never modified — re-running is a no-op.)')
 }

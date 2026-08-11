@@ -15,6 +15,7 @@ const NAV_ITEMS: readonly NavItem[] = [
   { href: '/admin', label: 'Dashboard', exact: true },
   { href: '/admin/pages', label: 'Pages' },
   { href: '/admin/case-studies', label: 'Case studies' },
+  { href: '/admin/resources', label: 'Resources' },
   { href: '/admin/library', label: 'Library' },
   { href: '/admin/media', label: 'Media' },
   { href: '/admin/submissions', label: 'Submissions' },

@@ -3,6 +3,7 @@ import 'server-only'
 import { logger } from '@/lib/logger'
 
 import { getPublishedCaseStudySlugs, getPublishedPageSlugs } from './queries'
+import { getPublishedResourceSlugs } from './resource-queries'
 
 /**
  * Slugs for `generateStaticParams` (ADR-017).
@@ -59,6 +60,25 @@ export async function safePublishedCaseStudySlugs(): Promise<string[]> {
   } catch (error) {
     logger.error(
       'generateStaticParams could not read case study slugs; falling back to ISR',
+      { error },
+    )
+    return [NO_CONTENT_SENTINEL]
+  }
+}
+
+/**
+ * Articles are the one collection that is legitimately empty at launch — the
+ * bundled resource entries are index cards with no body and are seeded as
+ * drafts. So this hits the sentinel path in normal operation, not just on a
+ * failed read.
+ */
+export async function safePublishedResourceSlugs(): Promise<string[]> {
+  try {
+    const slugs = await getPublishedResourceSlugs()
+    return slugs.length > 0 ? slugs : [NO_CONTENT_SENTINEL]
+  } catch (error) {
+    logger.error(
+      'generateStaticParams could not read resource slugs; falling back to ISR',
       { error },
     )
     return [NO_CONTENT_SENTINEL]

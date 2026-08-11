@@ -181,23 +181,59 @@ Each phase has explicit exit criteria. A phase is not done because the code exis
 
 ---
 
+## Phase 4.5 — v0 frontend integration ✅
+
+Not in the original plan. A separately generated v0 frontend became the visual
+source of truth mid-project, and it was branched from a snapshot of `main` in a
+way that deleted the entire backend (23,529 deletions). The frontend was ported
+across rather than the branch merged; see PR #2 for the full reasoning.
+
+Consequences recorded here because they change earlier decisions:
+
+- **The design token layer is v0's**, not the one specified in Phase 4. The
+  admin's `ink-*` / `paper` vocabulary is mapped onto it in a scoped
+  compatibility block rather than rewriting ~160 class usages on a working,
+  tested surface.
+- **The homepage is a fixed composition, not a CMS-arranged page.** Its sections
+  and their order are a designed narrative; the CMS controls the content inside
+  them (case studies, quotes, FAQ, articles). The generic section registry still
+  serves utility pages through the catch-all.
+- **`instant = false` on all three dynamic routes**, revising ADR-017 for them.
+  Reading `params` inside a Suspense boundary flushes a 200 before `notFound()`
+  is reached, turning every missing page into a soft 404. Every published slug
+  is prerendered, so real pages lose nothing.
+- **The public JS budget of < 130 kB gzipped (Phase 5) is not met and is
+  withdrawn as stated.** The homepage ships ~255 kB gzipped. The brief that
+  produced the v0 design explicitly requires scroll-driven motion, parallax and
+  animated mockups, and names Framer Motion and Lenis as acceptable; that is a
+  deliberate, sanctioned cost, not an oversight. Lenis is loaded dynamically
+  after hydration and barrel imports are optimised. The remaining lever is
+  Framer Motion's `LazyMotion`, which would require replacing `motion.*` with
+  `m.*` across every v0 component — deferred, because the instruction is to
+  preserve those animations exactly.
+- **`MotionConfig reducedMotion="user"`** is set site-wide. Framer Motion writes
+  inline styles from rAF, so the CSS `prefers-reduced-motion` block never
+  reached it and every reveal ignored the preference.
+
 ## Post-launch backlog
 
 Not scheduled. Each requires an ADR before it starts.
 
-| Item                                              | Trigger                                                                             |
-| ------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Content version history UI                        | Owner needs rollback; `ContentRevision` already stores the data                     |
-| Blog / resources section                          | Content strategy commits to publishing cadence                                      |
-| Booking integration (Cal.com / Savvycal) embedded | Conversion data suggests the handoff is leaking (OD-4)                              |
-| A/B testing on homepage copy                      | Enough traffic for significance                                                     |
-| Sentry (server-side first)                        | A production bug that structured logs cannot explain (ADR-019)                      |
-| KV-backed rate limiting                           | A genuine spam problem, or multi-region need (ADR-019)                              |
-| GSAP                                              | A specific effect Framer Motion cannot deliver, with measured bundle cost (ADR-015) |
-| React `<ViewTransition>` adoption                 | After stability in production usage (OD-6)                                          |
-| React Compiler                                    | Measured build-time cost vs. re-render benefit (OD-5)                               |
-| Multi-user roles                                  | A second person needs admin access                                                  |
-| Client portal                                     | A commercial decision, not a technical one                                          |
+| Item                                              | Trigger                                                                                         |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Content version history UI                        | Owner needs rollback; `ContentRevision` already stores the data                                 |
+| Blog / resources section                          | Content strategy commits to publishing cadence                                                  |
+| Booking integration (Cal.com / Savvycal) embedded | Conversion data suggests the handoff is leaking (OD-4)                                          |
+| A/B testing on homepage copy                      | Enough traffic for significance                                                                 |
+| Sentry (server-side first)                        | A production bug that structured logs cannot explain (ADR-019)                                  |
+| KV-backed rate limiting                           | A genuine spam problem, or multi-region need (ADR-019)                                          |
+| GSAP                                              | A specific effect Framer Motion cannot deliver, with measured bundle cost (ADR-015)             |
+| Framer Motion `LazyMotion`                        | A measured need to cut the ~255 kB homepage bundle, weighed against touching every v0 animation |
+| Real logo and favicon                             | Brand files supplied; the logo already resolves from Site settings with no code change          |
+| React `<ViewTransition>` adoption                 | After stability in production usage (OD-6)                                                      |
+| React Compiler                                    | Measured build-time cost vs. re-render benefit (OD-5)                                           |
+| Multi-user roles                                  | A second person needs admin access                                                              |
+| Client portal                                     | A commercial decision, not a technical one                                                      |
 
 ---
 

@@ -236,10 +236,18 @@ Why `queries.ts` and `admin-queries.ts` are separate files: public queries are w
 ```
 src/components/
 ├── ui/            shadcn/ui primitives (admin) — generated, then owned by us
-├── primitives/    handcrafted public primitives: Container, Section, Prose, Eyebrow…
-├── motion/        motion wrappers: FadeIn, StaggerChildren, ScrollReveal, Parallax
+├── site/          the v0 design system (public): ui, reveal, mockups, logo,
+│                  page-header, smooth-scroll, primitives
 └── media/         Image wrappers bound to MediaAsset
 ```
+
+**`site/` replaced the planned `primitives/` + `motion/` split.** The v0
+implementation is the visual source of truth and arrived with its own design
+system; keeping a second, competing set of primitives alongside it would have
+guaranteed drift. `site/ui.tsx` carries motion and is therefore a Client
+Component, so `site/primitives.tsx` exists as the server-safe equivalent for
+anything rendered on the server (the CMS section renderer) that only needs a
+width.
 
 Nothing here fetches data or imports from `src/server/**`. These are presentational, take props, and are reusable across both surfaces.
 

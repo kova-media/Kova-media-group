@@ -80,6 +80,16 @@ const nextConfig: NextConfig = {
     serverActions: {
       allowedOrigins: [new URL(siteUrl).host],
     },
+
+    /**
+     * Rewrites barrel imports to direct paths.
+     *
+     * `import { Mail } from 'lucide-react'` otherwise pulls the package's index
+     * into the graph, and the icon set is thousands of modules — it measured
+     * 47kB gzipped on the homepage for roughly a dozen icons. Naming the
+     * packages here is what makes the tree-shaking actually happen.
+     */
+    optimizePackageImports: ['lucide-react', 'motion'],
   },
 
   async headers() {

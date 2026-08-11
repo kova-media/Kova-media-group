@@ -72,6 +72,7 @@ export function ContactForm({ source }: { source?: string }) {
   const fieldErrors = state && !state.ok ? (state.fieldErrors ?? {}) : {}
   const errorFor = (name: string) => fieldErrors[name]?.[0]
 
+
   return (
     <div className="relative rounded-2xl border border-border bg-card p-7 shadow-sm sm:p-9">
       <AnimatePresence mode="wait">
@@ -167,7 +168,7 @@ export function ContactForm({ source }: { source?: string }) {
 
             <fieldset className="flex flex-col gap-2">
               <legend className="mb-2 text-sm font-medium text-foreground">
-                Monthly revenue
+                Annual revenue
               </legend>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {REVENUE_BANDS.map((option) => (

@@ -20,9 +20,15 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
  * (ADR-016) and loads no third-party scripts (ADR-018). `/admin` gets a strict
  * nonce-based policy from proxy.ts instead. See ADR-013.
  */
+const isDev = process.env.NODE_ENV === 'development'
+
 const publicCsp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  // React's development build uses eval() for debugging features (rebuilding
+  // stack traces across environments). It never does so in production, so the
+  // allowance is scoped to `next dev` — without it the dev console fills with
+  // CSP violations and real errors get lost in the noise.
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' blob: data: https://${supabaseHostname}`,
   "font-src 'self' data:",

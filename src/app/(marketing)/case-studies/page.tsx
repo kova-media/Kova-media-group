@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
-import { caseStudies } from '@/lib/site-data'
+import { getCaseStudyList } from '@/server/content/site-content'
 import { Container } from '@/components/site/ui'
 import { PageHeader } from '@/components/site/page-header'
 import { Reveal, RevealGroup, RevealItem } from '@/components/site/reveal'
@@ -13,7 +13,9 @@ export const metadata: Metadata = {
     'Real results from ecommerce brands. See how Kova Media Group turned email and SMS into dependable revenue channels.',
 }
 
-export default function CaseStudiesPage() {
+export default async function CaseStudiesPage() {
+  const caseStudies = await getCaseStudyList()
+
   return (
     <>
       <PageHeader

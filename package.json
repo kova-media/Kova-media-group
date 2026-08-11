@@ -19,7 +19,8 @@
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
     "verify": "npm run typecheck && npm run lint && npm run test",
-    "admin:create": "tsx scripts/create-admin.ts"
+    "admin:create": "tsx scripts/create-admin.ts",
+    "db:seed:content": "tsx prisma/seed-content.ts"
   },
   "engines": {
     "node": ">=20.9.0"

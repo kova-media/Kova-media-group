@@ -12,7 +12,12 @@ export const routes = {
   services: '/services',
   caseStudies: '/case-studies',
   caseStudy: (slug: string) => `/case-studies/${slug}`,
+  process: '/process',
   about: '/about',
+  resources: '/resources',
+  faq: '/faq',
+  /** Where every primary CTA points. Hosts the scheduler. */
+  book: '/book',
   contact: '/contact',
   privacy: '/privacy',
   terms: '/terms',
@@ -21,17 +26,21 @@ export const routes = {
 /** Nav shown when SiteSettings has not been configured yet. */
 export const DEFAULT_NAVIGATION = [
   { label: 'Services', href: routes.services },
-  { label: 'Case studies', href: routes.caseStudies },
+  { label: 'Case Studies', href: routes.caseStudies },
+  { label: 'Process', href: routes.process },
   { label: 'About', href: routes.about },
-  { label: 'Contact', href: routes.contact },
+  { label: 'Resources', href: routes.resources },
 ] as const
 
 /**
- * The single conversion action. Until a booking tool is connected, this points
- * at the contact page, where the booking ask lives (ADR: booking integration is
- * post-launch, ROADMAP backlog). SiteSettings.bookingUrl overrides it.
+ * The scheduler embedded on `/book`. `SiteSettings.bookingUrl` overrides it, so
+ * the owner can swap the Calendly link without a deploy.
+ *
+ * Note this is the *scheduler*, not the CTA target: buttons across the site
+ * link to `routes.book`, which hosts this embed.
  */
-export const DEFAULT_BOOKING_URL = routes.contact
+export const DEFAULT_BOOKING_URL =
+  'https://calendly.com/damian-kovamediagroup-7lpe/30min'
 
 /** Seconds, to match Framer Motion. Mirrors --duration-* in globals.css. */
 export const duration = {

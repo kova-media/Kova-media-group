@@ -1,15 +1,26 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { caseStudies } from '@/lib/site-data'
+import {
+  getCaseStudyDetail,
+  getCaseStudyList,
+  getCaseStudySlugs,
+} from '@/server/content/site-content'
 import { Container, Eyebrow, CountUp } from '@/components/site/ui'
 import { Reveal, RevealLines } from '@/components/site/reveal'
 import { DashboardCard } from '@/components/site/mockups'
 import { FinalCta } from '@/features/marketing/sections'
 
-export function generateStaticParams() {
-  return caseStudies.map((study) => ({ slug: study.slug }))
+/**
+ * Prerenders every published case study at build time (ADR-017). Reads the
+ * same source as the page, so a newly published study is picked up on the
+ * next build and served on demand before that.
+ */
+export async function generateStaticParams() {
+  const slugs = await getCaseStudySlugs()
+  return slugs.map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({
@@ -18,7 +29,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const study = caseStudies.find((s) => s.slug === slug)
+  const study = await getCaseStudyDetail(slug)
   if (!study) return { title: 'Case Study' }
   return {
     title: `${study.brand} Case Study`,
@@ -26,18 +37,47 @@ export async function generateMetadata({
   }
 }
 
-export default async function CaseStudyPage({
+/**
+ * The whole page is slug-dependent, so reading `params` here directly would
+ * stop the route producing an instant prefetchable shell (ADR-017). The shell
+ * is the chrome plus the scaffold below; the study itself streams in.
+ */
+export default function CaseStudyPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  return (
+    <Suspense fallback={<CaseStudySkeleton />}>
+      <CaseStudyContent params={params} />
+    </Suspense>
+  )
+}
+
+/**
+ * Reserves the hero's vertical space so the streamed content does not shift
+ * the page when it arrives.
+ */
+function CaseStudySkeleton() {
+  return <div className="pt-32 pb-24 sm:pt-40" aria-hidden />
+}
+
+async function CaseStudyContent({
   params,
 }: {
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const study = caseStudies.find((s) => s.slug === slug)
+  const [study, caseStudies] = await Promise.all([
+    getCaseStudyDetail(slug),
+    getCaseStudyList(),
+  ])
+
   if (!study) notFound()
 
-  // Wraps around to the first study after the last one. `study` was found
-  // above, so the list is non-empty and the modulo always lands on a real
-  // entry — the fallback exists to satisfy the compiler, not a real case.
+  // Wraps around to the first study after the last one. `study` exists, so the
+  // list is non-empty and the modulo always lands on a real entry — the
+  // fallback exists to satisfy the compiler, not a real case.
   const index = caseStudies.findIndex((s) => s.slug === slug)
   const next = caseStudies[(index + 1) % caseStudies.length] ?? study
 

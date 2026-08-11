@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Mail, Clock } from 'lucide-react'
-import { LinkedInIcon } from '@/components/site/icons'
 import { site } from '@/lib/site-data'
 import { Container, Eyebrow } from '@/components/site/ui'
 import { Reveal, RevealLines } from '@/components/site/reveal'
@@ -54,15 +53,6 @@ export default function ContactPage() {
                 >
                   <Mail className="h-4 w-4 text-muted-foreground" />
                   {site.email}
-                </a>
-                <a
-                  href={site.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 text-sm text-foreground transition-colors hover:text-primary"
-                >
-                  <LinkedInIcon className="h-4 w-4 text-muted-foreground" />
-                  Connect on LinkedIn
                 </a>
                 <span className="inline-flex items-center gap-3 text-sm text-muted-foreground">
                   <Clock className="h-4 w-4 text-muted-foreground" />

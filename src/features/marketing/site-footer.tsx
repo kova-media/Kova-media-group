@@ -1,7 +1,8 @@
 import { cacheLife } from 'next/cache'
 import Link from 'next/link'
 import { site, nav } from '@/lib/site-data'
-import { Logo } from '@/components/site/logo'
+import { LogoLink } from '@/components/site/logo'
+import { getSiteChrome } from '@/server/content/site-chrome'
 
 /**
  * The copyright year.
@@ -19,13 +20,13 @@ async function getCopyrightYear(): Promise<number> {
 }
 
 export async function SiteFooter() {
-  const year = await getCopyrightYear()
+  const [year, chrome] = await Promise.all([getCopyrightYear(), getSiteChrome()])
   return (
     <footer className="border-t border-border bg-surface">
       <div className="mx-auto w-full max-w-[76rem] px-6 py-16 md:px-8 md:py-20">
         <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
           <div className="max-w-sm">
-            <Logo />
+            <LogoLink asset={chrome.logo} />
             <p className="mt-5 text-pretty text-sm leading-relaxed text-muted-foreground">
               A specialist Email &amp; SMS marketing agency for direct-to-consumer ecommerce
               brands. We turn the customers you already have into recurring revenue.
@@ -57,25 +58,15 @@ export async function SiteFooter() {
               <ul className="mt-4 space-y-3 text-sm">
                 <li>
                   <a
-                    href={`mailto:${site.email}`}
+                    href={`mailto:${chrome.contactEmail}`}
                     className="text-foreground/80 transition-colors hover:text-brand"
                   >
                     Email
                   </a>
                 </li>
                 <li>
-                  <a
-                    href={site.linkedin}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-foreground/80 transition-colors hover:text-brand"
-                  >
-                    LinkedIn
-                  </a>
-                </li>
-                <li>
                   <Link
-                    href="/contact"
+                    href="/book"
                     className="text-foreground/80 transition-colors hover:text-brand"
                   >
                     Book a call

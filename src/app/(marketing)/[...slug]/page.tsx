@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
 
 import { PageView } from '@/features/marketing/page-view'
 import { getDraftPage } from '@/server/content/admin-queries'
@@ -47,7 +48,24 @@ export async function generateMetadata({
   }
 }
 
-export default async function CmsPage({ params }: PageProps<'/[...slug]'>) {
+/**
+ * `params` is read inside a Suspense boundary so the route still produces an
+ * instant, prefetchable shell (ADR-017) — reading it in the page body itself
+ * would force the whole route to block on the URL.
+ */
+export default function CmsPage({ params }: PageProps<'/[...slug]'>) {
+  return (
+    <Suspense fallback={<div className="pt-32 pb-24 sm:pt-40" aria-hidden />}>
+      <CmsPageContent params={params} />
+    </Suspense>
+  )
+}
+
+async function CmsPageContent({
+  params,
+}: {
+  params: PageProps<'/[...slug]'>['params']
+}) {
   const { slug } = await params
   const page = await loadPage(slug)
 

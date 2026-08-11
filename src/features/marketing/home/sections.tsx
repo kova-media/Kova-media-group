@@ -10,7 +10,13 @@ import {
   ArrowUpRight,
   ArrowRight,
 } from 'lucide-react'
-import { services, caseStudies, process, resources } from '@/lib/site-data'
+import {
+  services,
+  caseStudies as fallbackCaseStudies,
+  process,
+  resources,
+  type CaseStudy,
+} from '@/lib/site-data'
 import { Container, Eyebrow, ButtonLink, LiftCard } from '@/components/site/ui'
 import { Reveal, RevealGroup, RevealItem } from '@/components/site/reveal'
 import { FlowDiagram, DashboardCard } from '@/components/site/mockups'
@@ -70,8 +76,15 @@ export function ServicesPreview() {
 
 /* ---------------------------------------------------------- Featured case studies */
 
-export function FeaturedCaseStudies() {
-  const featured = caseStudies.slice(0, 3)
+/**
+ * `studies` comes from the CMS via the page. It falls back to the bundled
+ * content so this component still renders in isolation — and so a database
+ * with no published studies never produces an empty "Selected work" section.
+ */
+export function FeaturedCaseStudies({ studies }: { studies?: CaseStudy[] }) {
+  const featured = (studies ?? fallbackCaseStudies).slice(0, 3)
+
+  if (featured.length === 0) return null
   return (
     <section className="bg-background py-24 md:py-32">
       <Container>

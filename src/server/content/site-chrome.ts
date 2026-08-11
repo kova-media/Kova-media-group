@@ -31,7 +31,7 @@ export type SiteChrome = {
   logoDark: MediaAssetDto | null
 }
 
-const FALLBACK_EMAIL = 'hello@kovamediagroup.com'
+const FALLBACK_EMAIL = 'damian@kovamediagroup.com'
 
 export async function getSiteChrome(): Promise<SiteChrome> {
   const settings = await getSiteSettings()

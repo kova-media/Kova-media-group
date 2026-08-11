@@ -60,8 +60,21 @@ export function ContactForm({ source }: { source?: string }) {
   // Stamped on mount rather than on the server, so the bot timing check
   // measures how long the visitor had the form — not how long the page sat in
   // a CDN cache.
-  const [renderedAt, setRenderedAt] = useState<number | null>(null)
-  useEffect(() => setRenderedAt(Date.now()), [])
+  //
+  // Held in a ref and injected at submit time rather than kept in state: the
+  // value is never rendered, so storing it in state would cost a re-render on
+  // mount for nothing.
+  const mountedAtRef = useRef<number | null>(null)
+  useEffect(() => {
+    mountedAtRef.current = Date.now()
+  }, [])
+
+  const submit = (formData: FormData) => {
+    if (mountedAtRef.current !== null) {
+      formData.set('renderedAt', String(mountedAtRef.current))
+    }
+    formAction(formData)
+  }
 
   // Success replaces the form, so focus has to move deliberately or a keyboard
   // user is left on a control that no longer exists.
@@ -99,14 +112,13 @@ export function ContactForm({ source }: { source?: string }) {
         ) : (
           <motion.form
             key="form"
-            action={formAction}
+            action={submit}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="flex flex-col gap-5"
           >
             <input type="hidden" name="source" value={source ?? ''} />
-            <input type="hidden" name="renderedAt" value={renderedAt ?? ''} />
             <input type="hidden" name="monthlyRevenue" value={revenue} />
 
             {/* Honeypot. Hidden from sight and from assistive technology, and

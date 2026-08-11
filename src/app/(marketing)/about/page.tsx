@@ -4,6 +4,7 @@ import { Container, Eyebrow, CountUp } from '@/components/site/ui'
 import { PageHeader } from '@/components/site/page-header'
 import { Reveal, RevealGroup, RevealItem } from '@/components/site/reveal'
 import { Testimonials, FinalCta } from '@/features/marketing/sections'
+import { getTestimonialList } from '@/server/content/site-content'
 
 export const metadata: Metadata = {
   title: 'About',
@@ -30,7 +31,9 @@ const values = [
   },
 ]
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const quotes = await getTestimonialList()
+
   return (
     <>
       <PageHeader
@@ -85,7 +88,7 @@ export default function AboutPage() {
         </Container>
       </section>
 
-      <Testimonials />
+      <Testimonials quotes={quotes} />
       <FinalCta />
     </>
   )

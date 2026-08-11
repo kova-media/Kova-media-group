@@ -1,3 +1,4 @@
+import type { CaseStudyNarrative, CaseStudyResult } from './schemas/case-study'
 import type { CaseStudyMetric, PageContent } from './schemas/page'
 
 /**
@@ -79,6 +80,8 @@ export type PublishedCaseStudy = {
   isFeatured: boolean
   heroImageId: string | null
   metrics: CaseStudyMetric[]
+  /** The designed template's content — what the case study page renders. */
+  narrative: CaseStudyNarrative
   content: PageContent
   seo: Pick<SeoFields, 'title' | 'description'>
   publishedAt: string | null
@@ -95,6 +98,8 @@ export type CaseStudySummary = {
   isFeatured: boolean
   heroImageId: string | null
   metrics: CaseStudyMetric[]
+  results: CaseStudyResult[]
+  accent: string
 }
 
 export type SiteSettingsDto = {

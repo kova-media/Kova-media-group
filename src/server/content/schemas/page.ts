@@ -3,6 +3,13 @@ import { z } from 'zod'
 import { logger } from '@/lib/logger'
 
 import {
+  caseStudyNarrativeSchema,
+  emptyCaseStudyNarrative,
+  parseStoredNarrative,
+  type CaseStudyNarrative,
+} from './case-study'
+
+import {
   publishSectionSchema,
   sectionSchema,
   sectionRegistry,
@@ -38,15 +45,26 @@ export const caseStudyMetricSchema = z.object({
 export const caseStudyContentSchema = z.object({
   sections: z.array(sectionSchema).default([]),
   metrics: z.array(caseStudyMetricSchema).default([]),
+  /**
+   * The designed case-study template's content (see schemas/case-study.ts).
+   * `sections` remains for anything a study needs beyond that template; the
+   * narrative is what the v0 detail page actually renders.
+   */
+  narrative: caseStudyNarrativeSchema.default(emptyCaseStudyNarrative),
 })
 
 export type CaseStudyMetric = z.infer<typeof caseStudyMetricSchema>
 export type CaseStudyContent = {
   sections: ValidatedSection[]
   metrics: CaseStudyMetric[]
+  narrative: CaseStudyNarrative
 }
 
-export const emptyCaseStudyContent: CaseStudyContent = { sections: [], metrics: [] }
+export const emptyCaseStudyContent: CaseStudyContent = {
+  sections: [],
+  metrics: [],
+  narrative: emptyCaseStudyNarrative,
+}
 
 /**
  * Parses a stored document, dropping sections that no longer validate.
@@ -96,14 +114,19 @@ export function parseStoredCaseStudyContent(
     return {
       sections: parsed.data.sections as ValidatedSection[],
       metrics: parsed.data.metrics,
+      narrative: parsed.data.narrative,
     }
   }
 
   const { sections } = parseStoredPageContent(value, context)
-  const raw = (value ?? {}) as { metrics?: unknown }
+  const raw = (value ?? {}) as { metrics?: unknown; narrative?: unknown }
   const metrics = z.array(caseStudyMetricSchema).safeParse(raw.metrics)
 
-  return { sections, metrics: metrics.success ? metrics.data : [] }
+  return {
+    sections,
+    metrics: metrics.success ? metrics.data : [],
+    narrative: parseStoredNarrative(raw.narrative),
+  }
 }
 
 /** A new section, with the defaults registered for its type. */

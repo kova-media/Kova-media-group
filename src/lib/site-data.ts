@@ -1,8 +1,14 @@
 export const site = {
   name: 'Kova Media Group',
   shortName: 'Kova',
-  email: 'hello@kovamediagroup.com',
-  linkedin: 'https://www.linkedin.com/company/kova-media-group',
+  email: 'damian@kovamediagroup.com',
+  /**
+   * The single conversion action for the whole site.
+   *
+   * Kova runs no social accounts, so there are deliberately no social links
+   * anywhere — a footer column of dead icons costs credibility.
+   */
+  bookingUrl: 'https://calendly.com/damian-kovamediagroup-7lpe/30min',
   tagline: 'Email & SMS marketing that drives revenue.',
 }
 

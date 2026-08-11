@@ -170,6 +170,7 @@ export function toPublishedCaseStudy(
     isFeatured: row.isFeatured,
     heroImageId: row.heroImageId,
     metrics: content.metrics,
+    narrative: content.narrative,
     content: { sections: content.sections },
     seo: { title: row.seoTitle, description: row.seoDescription },
     publishedAt: row.publishedAt?.toISOString() ?? null,
@@ -198,6 +199,10 @@ export function toCaseStudySummary(
     isFeatured: row.isFeatured,
     heroImageId: row.heroImageId,
     metrics: content.metrics,
+    // The index and the homepage grid both show headline results, so the
+    // summary carries them rather than forcing a second read per card.
+    results: content.narrative.results,
+    accent: content.narrative.accent,
   }
 }
 

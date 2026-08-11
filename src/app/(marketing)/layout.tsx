@@ -5,6 +5,7 @@ import { SmoothScroll } from '@/components/site/smooth-scroll'
 import { PreviewBanner } from '@/features/marketing/preview-banner'
 import { SiteFooter } from '@/features/marketing/site-footer'
 import { SiteHeader } from '@/features/marketing/site-header'
+import { getSiteChrome } from '@/server/content/site-chrome'
 
 /**
  * Public marketing shell — the v0 chrome.
@@ -17,7 +18,9 @@ import { SiteHeader } from '@/features/marketing/site-header'
  * fallback ships in the static shell and the banner streams in. Awaiting it
  * here would stop every public page from prerendering.
  */
-export default function MarketingLayout({ children }: LayoutProps<'/'>) {
+export default async function MarketingLayout({ children }: LayoutProps<'/'>) {
+  const chrome = await getSiteChrome()
+
   return (
     <SmoothScroll>
       <Suspense fallback={null}>
@@ -33,7 +36,7 @@ export default function MarketingLayout({ children }: LayoutProps<'/'>) {
         Skip to content
       </a>
 
-      <SiteHeader />
+      <SiteHeader logo={chrome.logo} />
       <main id="main">{children}</main>
       <SiteFooter />
 

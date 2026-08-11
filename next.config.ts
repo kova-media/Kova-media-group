@@ -37,6 +37,10 @@ const publicCsp = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
+  // The booking page embeds Calendly's scheduler as an iframe rather than
+  // loading its widget script, so only framing needs to be allowed — the
+  // script-src policy stays closed to third parties.
+  'frame-src https://calendly.com https://*.calendly.com',
   'upgrade-insecure-requests',
 ].join('; ')
 

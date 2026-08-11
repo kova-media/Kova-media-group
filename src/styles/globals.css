@@ -42,6 +42,9 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-cta: var(--cta);
+  --color-cta-foreground: var(--cta-foreground);
+  --color-navy: var(--navy);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
@@ -97,11 +100,11 @@
   --color-ink-950: oklch(0.205 0 0);
 
   --color-accent-50: var(--brand-muted);
-  --color-accent-100: oklch(0.93 0.05 262);
-  --color-accent-300: oklch(0.75 0.12 262);
+  --color-accent-100: #ccfbf1;
+  --color-accent-300: #5eead4;
   --color-accent-500: var(--brand);
   --color-accent-600: var(--brand);
-  --color-accent-700: oklch(0.47 0.17 262);
+  --color-accent-700: #0f766e;
 
   --color-danger: var(--destructive);
 
@@ -137,18 +140,29 @@
   --border: oklch(0.925 0.002 258);
   --border-strong: oklch(0.87 0.004 258);
   --input: oklch(0.925 0.002 258);
-  --ring: oklch(0.55 0.19 262);
+  --ring: #14b8a6;
 
-  --brand: oklch(0.55 0.19 262); /* refined blue */
+  /* Kova brand accent. The v0 design used a generic blue here; the identity's
+   * teal takes its place so the accent is actually Kova's. It stays an accent —
+   * eyebrow marks, hovers, small emphasis — never a large fill. */
+  --brand: #14b8a6;
   --brand-foreground: oklch(0.985 0 0);
-  --brand-muted: oklch(0.955 0.03 262);
+  --brand-muted: #e0f2fe;
+
+  /* The booking action. A distinct hue from the accent so "the thing to click"
+   * is never confused with "the thing to notice". */
+  --cta: #0ea5e9;
+  --cta-foreground: oklch(0.985 0 0);
+
+  /* The identity's deep navy. Used as a dark ground, not as the page. */
+  --navy: #0b1120;
 
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.976 0.001 106);
   --secondary-foreground: oklch(0.205 0 0);
-  --accent: oklch(0.955 0.03 262);
-  --accent-foreground: oklch(0.4 0.16 262);
+  --accent: #e0f2fe;
+  --accent-foreground: #0f766e;
 
   /* State colours. Used by the admin and by form validation only — the public
    * marketing surface stays on the neutral + brand palette. */
@@ -179,7 +193,7 @@
   }
 
   ::selection {
-    background: oklch(0.55 0.19 262 / 0.16);
+    background: rgb(20 184 166 / 0.18);
   }
 
   /* A visible focus ring is non-negotiable (CODING_STANDARDS.md §9).

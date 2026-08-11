@@ -4,7 +4,12 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Plus } from 'lucide-react'
-import { clients, metrics, testimonials, faqs } from '@/lib/site-data'
+import {
+  clients,
+  metrics,
+  testimonials as fallbackTestimonials,
+  faqs as fallbackFaqs,
+} from '@/lib/site-data'
 import { Container, Eyebrow, CountUp, ButtonLink } from '@/components/site/ui'
 import { Reveal, RevealGroup, RevealItem } from '@/components/site/reveal'
 import { cn } from '@/lib/utils'
@@ -79,7 +84,18 @@ export function MetricsRow() {
 
 /* ------------------------------------------------------------------ Testimonials */
 
-export function Testimonials() {
+/**
+ * Quotes come from the CMS testimonial library via the page, falling back to
+ * the bundled set. Attribution is shown exactly as stored — these are real
+ * client quotes attributed by role, and nothing here invents a name.
+ */
+export function Testimonials({
+  quotes,
+}: {
+  quotes?: { quote: string; name: string; role: string }[]
+}) {
+  const testimonials = quotes?.length ? quotes : fallbackTestimonials
+
   return (
     <section className="bg-surface py-24 md:py-32">
       <Container>
@@ -112,7 +128,8 @@ export function Testimonials() {
 
 /* ------------------------------------------------------------------------- FAQ */
 
-export function Faq() {
+export function Faq({ items }: { items?: { q: string; a: string }[] }) {
+  const faqs = items?.length ? items : fallbackFaqs
   const [open, setOpen] = useState<number | null>(0)
   return (
     <section className="bg-background py-24 md:py-32">
@@ -195,7 +212,7 @@ export function FinalCta() {
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
-                href="/contact"
+                href="/book"
                 className="group inline-flex items-center justify-center gap-2 rounded-full bg-background px-7 py-3.5 text-[0.95rem] font-medium text-foreground transition-all duration-300 hover:bg-brand hover:text-brand-foreground"
               >
                 Book a strategy call

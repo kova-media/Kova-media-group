@@ -232,7 +232,12 @@ function StatusBar({
       <div className="flex items-center gap-3">
         {message && <span className="text-xs text-ink-600">{message}</span>}
         {study.isLive && (
-          <Button variant="secondary" size="sm" onClick={onUnpublish} disabled={isPublishing}>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onUnpublish}
+            disabled={isPublishing}
+          >
             Unpublish
           </Button>
         )}
@@ -460,8 +465,8 @@ function ResultsEditor({
     <div className="flex flex-col gap-2">
       <Label>Headline results</Label>
       <p className="-mt-1 mb-1 text-xs text-ink-500">
-        Values are shown as written — “3x”, “+22%”, “40%+”. The number animates;
-        the qualifier stays.
+        Values are shown as written — “3x”, “+22%”, “40%+”. The number animates; the
+        qualifier stays.
       </p>
       {results.map((result, index) => (
         <div key={index} className="flex items-start gap-2">

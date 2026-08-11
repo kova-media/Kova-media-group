@@ -53,15 +53,23 @@ export function Container({
   className?: string
 }) {
   return (
-    <div className={cn('mx-auto w-full max-w-[76rem] px-6 md:px-8', className)}>{children}</div>
+    <div className={cn('mx-auto w-full max-w-[76rem] px-6 md:px-8', className)}>
+      {children}
+    </div>
   )
 }
 
-export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
+export function Eyebrow({
+  children,
+  className,
+}: {
+  children: ReactNode
+  className?: string
+}) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground',
+        'inline-flex items-center gap-2 font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase',
         className,
       )}
     >
@@ -72,13 +80,7 @@ export function Eyebrow({ children, className }: { children: ReactNode; classNam
 }
 
 /** Animated number that counts up from 0 when scrolled into view. */
-export function CountUp({
-  value,
-  className,
-}: {
-  value: string
-  className?: string
-}) {
+export function CountUp({ value, className }: { value: string; className?: string }) {
   const ref = useRef<HTMLSpanElement>(null)
   const inView = useInView(ref, { once: true, margin: '0px 0px -15% 0px' })
   const [display, setDisplay] = useState(value.replace(/[\d.]+/, '0'))

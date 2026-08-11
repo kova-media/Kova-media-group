@@ -85,7 +85,6 @@ export function ContactForm({ source }: { source?: string }) {
   const fieldErrors = state && !state.ok ? (state.fieldErrors ?? {}) : {}
   const errorFor = (name: string) => fieldErrors[name]?.[0]
 
-
   return (
     <div className="relative rounded-2xl border border-border bg-card p-7 shadow-sm sm:p-9">
       <AnimatePresence mode="wait">
@@ -104,7 +103,7 @@ export function ContactForm({ source }: { source?: string }) {
             <h3 className="mt-6 text-2xl font-medium tracking-tight">
               Thanks — we&apos;ll be in touch.
             </h3>
-            <p className="mt-3 max-w-sm text-pretty text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-3 max-w-sm text-sm leading-relaxed text-pretty text-muted-foreground">
               We&apos;ll review your details and reply within one business day to set up
               your free account audit.
             </p>
@@ -167,7 +166,11 @@ export function ContactForm({ source }: { source?: string }) {
               </Field>
             </div>
 
-            <Field label="Brand / company" htmlFor="company" error={errorFor('company')}>
+            <Field
+              label="Brand / company"
+              htmlFor="company"
+              error={errorFor('company')}
+            >
               <input
                 id="company"
                 type="text"

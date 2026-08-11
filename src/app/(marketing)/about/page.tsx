@@ -66,9 +66,10 @@ export default async function AboutPage() {
           <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
             <Reveal>
               <Eyebrow>What we believe</Eyebrow>
-              <p className="mt-6 text-2xl font-light leading-relaxed text-foreground text-balance sm:text-3xl">
-                Retention is where great brands are built. We help ecommerce companies turn
-                subscribers into repeat customers — and treat every send like it matters.
+              <p className="mt-6 text-2xl leading-relaxed font-light text-balance text-foreground sm:text-3xl">
+                Retention is where great brands are built. We help ecommerce companies
+                turn subscribers into repeat customers — and treat every send like it
+                matters.
               </p>
             </Reveal>
 
@@ -76,7 +77,9 @@ export default async function AboutPage() {
               {values.map((value) => (
                 <RevealItem key={value.title}>
                   <div className="h-full rounded-xl border border-border bg-card p-7">
-                    <h3 className="text-lg font-medium tracking-tight">{value.title}</h3>
+                    <h3 className="text-lg font-medium tracking-tight">
+                      {value.title}
+                    </h3>
                     <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                       {value.body}
                     </p>

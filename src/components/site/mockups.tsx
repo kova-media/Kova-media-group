@@ -22,7 +22,9 @@ export function EmailCard({ className }: { className?: string }) {
           <Mail className="h-3.5 w-3.5" />
         </span>
         <div className="min-w-0">
-          <p className="truncate text-xs font-medium text-foreground">Your cart misses you</p>
+          <p className="truncate text-xs font-medium text-foreground">
+            Your cart misses you
+          </p>
           <p className="truncate text-[10px] text-muted-foreground">Kova Brand · now</p>
         </div>
       </div>
@@ -88,11 +90,13 @@ export function DashboardCard({ className }: { className?: string }) {
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          <p className="text-xs font-medium tracking-[0.14em] text-muted-foreground uppercase">
             Attributed revenue
           </p>
           <div className="mt-1 flex items-end gap-2">
-            <span className="text-2xl font-semibold tracking-tight text-foreground">$248,910</span>
+            <span className="text-2xl font-semibold tracking-tight text-foreground">
+              $248,910
+            </span>
             <span className="mb-1 inline-flex items-center gap-1 text-xs font-medium text-brand">
               <TrendingUp className="h-3 w-3" /> +35%
             </span>
@@ -108,7 +112,10 @@ export function DashboardCard({ className }: { className?: string }) {
           <motion.div
             key={i}
             className="flex-1 rounded-t-sm"
-            style={{ backgroundColor: i === bars.length - 1 ? 'var(--brand)' : 'var(--border-strong)' }}
+            style={{
+              backgroundColor:
+                i === bars.length - 1 ? 'var(--brand)' : 'var(--border-strong)',
+            }}
             initial={{ height: 0 }}
             animate={inView ? { height: `${h}%` } : { height: 0 }}
             transition={{ duration: 0.9, delay: i * 0.06, ease }}
@@ -154,7 +161,7 @@ export function FlowDiagram({ className }: { className?: string }) {
         className,
       )}
     >
-      <p className="mb-4 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+      <p className="mb-4 text-xs font-medium tracking-[0.14em] text-muted-foreground uppercase">
         Welcome flow
       </p>
       <div className="flex flex-col">
@@ -172,12 +179,17 @@ export function FlowDiagram({ className }: { className?: string }) {
                   className={cn(
                     'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border text-xs',
                     node.kind === 'trigger' && 'border-brand/30 bg-brand/10 text-brand',
-                    node.kind === 'goal' && 'border-foreground/15 bg-foreground text-background',
+                    node.kind === 'goal' &&
+                      'border-foreground/15 bg-foreground text-background',
                     (node.kind === 'action' || node.kind === 'wait') &&
                       'border-border bg-muted text-foreground',
                   )}
                 >
-                  {Icon ? <Icon className="h-4 w-4" /> : <span className="font-mono">2d</span>}
+                  {Icon ? (
+                    <Icon className="h-4 w-4" />
+                  ) : (
+                    <span className="font-mono">2d</span>
+                  )}
                 </div>
                 <div className="flex-1 rounded-lg border border-border bg-background px-3 py-2">
                   <p className="text-xs font-medium text-foreground">{node.label}</p>

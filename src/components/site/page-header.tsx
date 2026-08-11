@@ -28,9 +28,9 @@ export function PageHeader({
 }) {
   const standfirst = description ?? intro
   return (
-    <section className="relative overflow-hidden border-b border-border bg-background pb-16 pt-36 md:pb-24 md:pt-44">
+    <section className="relative overflow-hidden border-b border-border bg-background pt-36 pb-16 md:pt-44 md:pb-24">
       <div
-        className="pointer-events-none absolute inset-0 -z-10 opacity-40 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]"
+        className="pointer-events-none absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)] opacity-40"
         aria-hidden
       >
         <div className="grid-lines h-full w-full" />
@@ -41,13 +41,13 @@ export function PageHeader({
             <Eyebrow>{eyebrow}</Eyebrow>
           </Reveal>
           <Reveal delay={0.05}>
-            <h1 className="mt-6 text-balance text-5xl font-semibold leading-[1.03] tracking-tightest text-foreground md:text-6xl">
+            <h1 className="tracking-tightest mt-6 text-5xl leading-[1.03] font-semibold text-balance text-foreground md:text-6xl">
               {title}
             </h1>
           </Reveal>
           {standfirst && (
             <Reveal delay={0.1}>
-              <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">
+              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground md:text-xl">
                 {standfirst}
               </p>
             </Reveal>

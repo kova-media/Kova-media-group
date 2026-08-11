@@ -219,9 +219,7 @@ export async function publishCaseStudyAction(
 
   try {
     // Publish-time validation: a live study must actually say something.
-    const { getCaseStudyForEdit } = await import(
-      '@/server/content/case-study-queries'
-    )
+    const { getCaseStudyForEdit } = await import('@/server/content/case-study-queries')
     const study = await getCaseStudyForEdit(id)
 
     if (!study) return fail('That case study no longer exists.')

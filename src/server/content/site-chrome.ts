@@ -1,10 +1,6 @@
 import 'server-only'
 
-import {
-  DEFAULT_BOOKING_URL,
-  DEFAULT_NAVIGATION,
-  routes,
-} from '@/lib/constants'
+import { DEFAULT_BOOKING_URL, DEFAULT_NAVIGATION, routes } from '@/lib/constants'
 
 import { getSiteSettings } from './queries'
 import { getMediaAssets } from './resolvers'
@@ -36,8 +32,8 @@ const FALLBACK_EMAIL = 'damian@kovamediagroup.com'
 export async function getSiteChrome(): Promise<SiteChrome> {
   const settings = await getSiteSettings()
 
-  const logoIds = [settings?.logoId, settings?.logoDarkId].filter(
-    (id): id is string => Boolean(id),
+  const logoIds = [settings?.logoId, settings?.logoDarkId].filter((id): id is string =>
+    Boolean(id),
   )
   const media = logoIds.length ? await getMediaAssets(logoIds) : new Map()
 

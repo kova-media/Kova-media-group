@@ -62,10 +62,7 @@ export const emptyCaseStudyNarrative: CaseStudyNarrative =
 export const publishCaseStudyNarrativeSchema = caseStudyNarrativeSchema.extend({
   background: z.string().min(1, 'Background is required to publish.').max(2000),
   challenge: z.string().min(1, 'The challenge is required to publish.').max(2000),
-  results: z
-    .array(caseStudyResultSchema)
-    .min(1, 'Add at least one result.')
-    .max(6),
+  results: z.array(caseStudyResultSchema).min(1, 'Add at least one result.').max(6),
 })
 
 /**

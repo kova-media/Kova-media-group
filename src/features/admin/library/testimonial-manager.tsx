@@ -111,8 +111,8 @@ export function TestimonialManager({ rows }: { rows: TestimonialAdminRow[] }) {
 
       {rows.length === 0 && !isCreating && (
         <p className="rounded-lg border border-dashed border-border px-4 py-10 text-center text-sm text-ink-500">
-          No testimonials yet. The site falls back to the bundled quotes until you
-          add one.
+          No testimonials yet. The site falls back to the bundled quotes until you add
+          one.
         </p>
       )}
     </div>

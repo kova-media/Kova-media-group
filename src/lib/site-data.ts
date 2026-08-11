@@ -102,8 +102,7 @@ export const services: Service[] = [
   {
     slug: 'copywriting',
     title: 'Copywriting',
-    summary:
-      'Words that sound like your brand and give the reader a reason to act.',
+    summary: 'Words that sound like your brand and give the reader a reason to act.',
     description:
       'Subject lines that earn the open, body copy that holds attention, and calls to action that do not shout. We write in your voice across email and SMS, and we test the parts worth testing rather than guessing at what works.',
     points: [

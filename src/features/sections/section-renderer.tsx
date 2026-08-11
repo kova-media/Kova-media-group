@@ -76,7 +76,9 @@ function Hero({ data, refs, isFirst }: SectionProps) {
           {str(data['headline'])}
         </h1>
         {str(data['subhead']) && (
-          <p className="mt-6 max-w-xl text-lg text-muted-foreground">{str(data['subhead'])}</p>
+          <p className="mt-6 max-w-xl text-lg text-muted-foreground">
+            {str(data['subhead'])}
+          </p>
         )}
         {primary?.href && (
           <a
@@ -163,7 +165,9 @@ function ProofMetrics({ data }: SectionProps) {
               <dd className="mt-3 text-sm text-muted-foreground">
                 {metric.label}
                 {metric.timeframe && (
-                  <span className="block text-muted-foreground">{metric.timeframe}</span>
+                  <span className="block text-muted-foreground">
+                    {metric.timeframe}
+                  </span>
                 )}
               </dd>
             </div>
@@ -329,7 +333,9 @@ function EmailGallery({ data, refs }: SectionProps) {
                   sizes="(max-width: 640px) 100vw, 380px"
                   className="w-full rounded-lg"
                 />
-                <p className="mt-3 text-sm font-medium text-foreground/80">{example.title}</p>
+                <p className="mt-3 text-sm font-medium text-foreground/80">
+                  {example.title}
+                </p>
                 {example.category && (
                   <p className="text-xs text-muted-foreground">{example.category}</p>
                 )}

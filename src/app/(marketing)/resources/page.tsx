@@ -46,7 +46,7 @@ export default function ResourcesPage() {
                   </span>
                   <span>{featured.category}</span>
                 </div>
-                <h2 className="mt-6 text-3xl font-medium leading-tight tracking-tight text-balance sm:text-4xl">
+                <h2 className="mt-6 text-3xl leading-tight font-medium tracking-tight text-balance sm:text-4xl">
                   {featured.title}
                 </h2>
                 <p className="mt-4 leading-relaxed text-muted-foreground">
@@ -74,7 +74,7 @@ export default function ResourcesPage() {
                   <div className="flex items-center gap-3 font-mono text-xs text-muted-foreground">
                     <span className="text-primary">{post.category}</span>
                   </div>
-                  <h3 className="mt-4 text-xl font-medium leading-snug tracking-tight text-balance">
+                  <h3 className="mt-4 text-xl leading-snug font-medium tracking-tight text-balance">
                     {post.title}
                   </h3>
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">

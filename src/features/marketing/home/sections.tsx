@@ -1,13 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import {
-  Mail,
-  MessageSquare,
-  ClipboardCheck,
-  PenLine,
-  ArrowRight,
-} from 'lucide-react'
+import { Mail, MessageSquare, ClipboardCheck, PenLine, ArrowRight } from 'lucide-react'
 import {
   services,
   caseStudies as fallbackCaseStudies,
@@ -25,48 +19,76 @@ const serviceIcons = [Mail, MessageSquare, ClipboardCheck, PenLine]
 /* --------------------------------------------------------------- Services preview */
 
 export function ServicesPreview() {
-  // All four. There is no "and more" here — four is the whole offer.
-  const featured = services
+  /**
+   * The two primary channels only.
+   *
+   * Audits and copywriting are real services and live on the services page,
+   * but they support the two channels rather than standing beside them. Showing
+   * four here diluted the "two channels" claim the headline makes — the section
+   * now says the same thing twice, in words and in structure.
+   */
+  const primary = services.slice(0, 2)
+
   return (
     <section className="bg-surface py-24 md:py-32">
       <Container>
-        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <Reveal className="max-w-2xl">
-            <Eyebrow>What we do</Eyebrow>
-            <h2 className="mt-5 text-balance text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
-              Two channels. Done exceptionally well.
-            </h2>
-            <p className="mt-4 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-              We are not a full-service agency. We do email and SMS — the highest-ROI
-              channels in ecommerce — plus the audits and copywriting that make both
-              perform.
-            </p>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <ButtonLink href="/services" variant="secondary" withArrow>
-              All services
-            </ButtonLink>
-          </Reveal>
-        </div>
+        <Reveal className="max-w-2xl">
+          <Eyebrow>What we do</Eyebrow>
+          <h2 className="mt-5 text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
+            Two channels. Done exceptionally well.
+          </h2>
+          <p className="mt-4 max-w-xl text-lg leading-relaxed text-pretty text-muted-foreground">
+            We are not a full-service agency. We do email and SMS — the highest-ROI
+            channels in ecommerce — and we do them better than generalists ever could.
+          </p>
+        </Reveal>
 
-        <RevealGroup className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2">
-          {featured.map((service, i) => {
-            const Icon = serviceIcons[i % serviceIcons.length] ?? Mail
+        {/* Two panels, each given real weight: the icon sits inline with the
+            title rather than stacked above it, and the key inclusions are
+            listed, so a pair of cards reads as deliberate rather than as a grid
+            that lost half its contents. */}
+        <RevealGroup className="mt-16 grid gap-6 lg:grid-cols-2">
+          {primary.map((service, i) => {
+            const Icon = serviceIcons[i] ?? Mail
+
             return (
-              <RevealItem key={service.slug}>
+              <RevealItem key={service.slug} className="h-full">
                 <Link
                   href="/services"
-                  className="group flex h-full flex-col bg-card p-8 transition-colors duration-300 hover:bg-background"
+                  className="group flex h-full flex-col rounded-2xl border border-border bg-card p-8 shadow-[var(--shadow-soft)] transition-all duration-300 hover:-translate-y-0.5 hover:border-foreground/15 hover:shadow-[var(--shadow-lift)] md:p-10"
                 >
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted text-foreground transition-colors duration-300 group-hover:bg-brand group-hover:text-brand-foreground">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <h3 className="mt-6 text-xl font-medium text-foreground">
-                    {service.title}
-                  </h3>
-                  <p className="mt-3 text-pretty text-sm leading-relaxed text-muted-foreground">
+                  <div className="flex items-center gap-4">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-muted text-foreground transition-colors duration-300 group-hover:bg-brand group-hover:text-brand-foreground">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <h3 className="text-2xl font-semibold tracking-tight text-foreground">
+                      {service.title}
+                    </h3>
+                  </div>
+
+                  <p className="mt-6 leading-relaxed text-pretty text-foreground/85">
                     {service.summary}
                   </p>
+
+                  <ul className="mt-8 flex flex-col gap-3 border-t border-border pt-7">
+                    {service.points.slice(0, 4).map((point) => (
+                      <li
+                        key={point}
+                        className="flex items-start gap-3 text-sm leading-relaxed text-muted-foreground"
+                      >
+                        <span
+                          className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-brand"
+                          aria-hidden
+                        />
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <span className="mt-auto inline-flex items-center gap-2 pt-8 text-sm font-medium text-foreground">
+                    Explore our services
+                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
                 </Link>
               </RevealItem>
             )
@@ -93,12 +115,12 @@ export function FeaturedCaseStudies({ studies }: { studies?: CaseStudy[] }) {
       <Container>
         <Reveal className="max-w-2xl">
           <Eyebrow>Selected work</Eyebrow>
-          <h2 className="mt-5 text-balance text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+          <h2 className="mt-5 text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
             See our work.
           </h2>
-          <p className="mt-4 text-pretty text-lg leading-relaxed text-muted-foreground">
-            Real programs for real brands. Here is a look at how focused email and SMS work
-            translates into revenue.
+          <p className="mt-4 text-lg leading-relaxed text-pretty text-muted-foreground">
+            Real programs for real brands. Here is a look at how focused email and SMS
+            work translates into revenue.
           </p>
         </Reveal>
 
@@ -111,13 +133,13 @@ export function FeaturedCaseStudies({ studies }: { studies?: CaseStudy[] }) {
                   className="grid items-center gap-8 p-8 md:grid-cols-2 md:p-10"
                 >
                   <div>
-                    <span className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                    <span className="font-mono text-xs tracking-[0.16em] text-muted-foreground uppercase">
                       {cs.category}
                     </span>
                     <h3 className="mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
                       {cs.brand}
                     </h3>
-                    <p className="mt-4 max-w-md text-pretty leading-relaxed text-muted-foreground">
+                    <p className="mt-4 max-w-md leading-relaxed text-pretty text-muted-foreground">
                       {cs.summary}
                     </p>
                     <div className="mt-7 flex flex-wrap gap-8">
@@ -139,10 +161,13 @@ export function FeaturedCaseStudies({ studies }: { studies?: CaseStudy[] }) {
                   </div>
                   <div
                     className="relative flex h-56 items-center justify-center overflow-hidden rounded-2xl md:h-72"
-                    style={{ backgroundColor: 'color-mix(in oklch, ' + cs.accent + ' 8%, white)' }}
+                    style={{
+                      backgroundColor:
+                        'color-mix(in oklch, ' + cs.accent + ' 8%, white)',
+                    }}
                   >
                     <div
-                      className="absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-20 blur-2xl"
+                      className="absolute -top-10 -right-10 h-40 w-40 rounded-full opacity-20 blur-2xl"
                       style={{ backgroundColor: cs.accent }}
                       aria-hidden
                     />
@@ -173,10 +198,10 @@ export function ProcessPreview() {
           <div>
             <Reveal>
               <Eyebrow>How we work</Eyebrow>
-              <h2 className="mt-5 text-balance text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+              <h2 className="mt-5 text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
                 A clear, four-step engagement.
               </h2>
-              <p className="mt-4 max-w-md text-pretty text-lg leading-relaxed text-muted-foreground">
+              <p className="mt-4 max-w-md text-lg leading-relaxed text-pretty text-muted-foreground">
                 No mystery, no fluff. You always know what we are working on and why.
               </p>
             </Reveal>
@@ -187,7 +212,7 @@ export function ProcessPreview() {
                   <div className="relative flex gap-6 pb-10 last:pb-0">
                     {i < process.length - 1 && (
                       <span
-                        className="absolute left-[19px] top-11 h-full w-px bg-border-strong"
+                        className="absolute top-11 left-[19px] h-full w-px bg-border-strong"
                         aria-hidden
                       />
                     )}
@@ -196,7 +221,7 @@ export function ProcessPreview() {
                     </span>
                     <div className="pt-1">
                       <h3 className="text-lg font-medium text-foreground">{p.title}</h3>
-                      <p className="mt-2 max-w-md text-pretty text-sm leading-relaxed text-muted-foreground">
+                      <p className="mt-2 max-w-md text-sm leading-relaxed text-pretty text-muted-foreground">
                         {p.description}
                       </p>
                     </div>
@@ -225,10 +250,11 @@ export function AboutPreview() {
         <div className="mx-auto max-w-3xl text-center">
           <Reveal>
             <Eyebrow className="justify-center">Why specialists</Eyebrow>
-            <p className="mt-8 text-balance text-2xl font-medium leading-[1.4] tracking-tight text-foreground md:text-3xl md:leading-[1.4]">
-              Full-service agencies spread themselves thin across a dozen channels. We chose the
-              opposite. By focusing only on email and SMS, we go deeper — better strategy, sharper
-              copy, cleaner data, and results generalists can&apos;t match.
+            <p className="mt-8 text-2xl leading-[1.4] font-medium tracking-tight text-balance text-foreground md:text-3xl md:leading-[1.4]">
+              Full-service agencies spread themselves thin across a dozen channels. We
+              chose the opposite. By focusing only on email and SMS, we go deeper —
+              better strategy, sharper copy, cleaner data, and results generalists
+              can&apos;t match.
             </p>
           </Reveal>
           <Reveal delay={0.1}>
@@ -254,7 +280,7 @@ export function ResourcesPreview() {
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <Reveal className="max-w-2xl">
             <Eyebrow>Resources</Eyebrow>
-            <h2 className="mt-5 text-balance text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+            <h2 className="mt-5 text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
               Ideas worth your inbox.
             </h2>
           </Reveal>
@@ -279,10 +305,10 @@ export function ResourcesPreview() {
                     </span>
                     <span className="text-muted-foreground">{r.readTime}</span>
                   </div>
-                  <h3 className="mt-5 text-pretty text-lg font-medium leading-snug text-foreground">
+                  <h3 className="mt-5 text-lg leading-snug font-medium text-pretty text-foreground">
                     {r.title}
                   </h3>
-                  <p className="mt-3 flex-1 text-pretty text-sm leading-relaxed text-muted-foreground">
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-pretty text-muted-foreground">
                     {r.excerpt}
                   </p>
                 </Link>

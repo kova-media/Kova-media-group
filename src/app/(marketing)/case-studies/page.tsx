@@ -49,7 +49,7 @@ export default async function CaseStudiesPage() {
                       </p>
                     </div>
 
-                    <div className="flex gap-8 border-t border-border pt-6 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0">
+                    <div className="flex gap-8 border-t border-border pt-6 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-10">
                       {study.results.slice(0, 2).map((result) => (
                         <div key={result.label}>
                           <div
@@ -71,9 +71,9 @@ export default async function CaseStudiesPage() {
           </RevealGroup>
 
           <Reveal className="mt-8">
-            <p className="text-center text-sm text-muted-foreground text-pretty">
-              Client names shown reflect brands we&apos;ve partnered with. Specific figures are
-              representative of typical program outcomes.
+            <p className="text-center text-sm text-pretty text-muted-foreground">
+              Client names shown reflect brands we&apos;ve partnered with. Specific
+              figures are representative of typical program outcomes.
             </p>
           </Reveal>
         </Container>

@@ -66,11 +66,7 @@ export function SettingsForm({
             )}
           </Field>
 
-          <Field
-            id="tagline"
-            label="Footer tagline"
-            error={errors?.tagline?.[0]}
-          >
+          <Field id="tagline" label="Footer tagline" error={errors?.tagline?.[0]}>
             {(props) => (
               <Input {...props} name="tagline" defaultValue={values.tagline} />
             )}

@@ -37,7 +37,8 @@ export function SiteHeader({ logo }: { logo?: LogoAsset | null }) {
 
           <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
             {nav.map((item) => {
-              const active = pathname === item.href || pathname.startsWith(item.href + '/')
+              const active =
+                pathname === item.href || pathname.startsWith(item.href + '/')
               return (
                 <Link
                   key={item.href}
@@ -89,7 +90,10 @@ export function SiteHeader({ logo }: { logo?: LogoAsset | null }) {
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="border-b border-border bg-background md:hidden"
           >
-            <nav className="mx-auto flex w-full max-w-[76rem] flex-col gap-1 px-6 py-4" aria-label="Mobile">
+            <nav
+              className="mx-auto flex w-full max-w-[76rem] flex-col gap-1 px-6 py-4"
+              aria-label="Mobile"
+            >
               {nav.map((item) => (
                 <Link
                   key={item.href}

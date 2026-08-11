@@ -62,11 +62,7 @@ function CaseStudySkeleton() {
   return <div className="pt-32 pb-24 sm:pt-40" aria-hidden />
 }
 
-async function CaseStudyContent({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
+async function CaseStudyContent({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const [study, caseStudies] = await Promise.all([
     getCaseStudyDetail(slug),
@@ -110,11 +106,11 @@ async function CaseStudyContent({
             {study.category}
           </div>
 
-          <h1 className="mt-6 max-w-4xl text-5xl font-medium leading-[0.95] tracking-tight sm:text-6xl md:text-7xl">
+          <h1 className="mt-6 max-w-4xl text-5xl leading-[0.95] font-medium tracking-tight sm:text-6xl md:text-7xl">
             <RevealLines lines={[study.brand]} />
           </h1>
           <Reveal delay={0.15}>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground text-pretty">
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground">
               {study.summary}
             </p>
           </Reveal>
@@ -146,7 +142,7 @@ async function CaseStudyContent({
                 <Reveal key={block.label}>
                   <div className="grid gap-4 sm:grid-cols-[8rem_1fr] sm:gap-8">
                     <Eyebrow>{block.label}</Eyebrow>
-                    <p className="max-w-2xl text-lg leading-relaxed text-foreground/85 text-pretty">
+                    <p className="max-w-2xl text-lg leading-relaxed text-pretty text-foreground/85">
                       {block.body}
                     </p>
                   </div>
@@ -191,7 +187,7 @@ async function CaseStudyContent({
             className="group flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
           >
             <div>
-              <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
                 Next case study
               </span>
               <div className="mt-2 text-3xl font-medium tracking-tight sm:text-4xl">

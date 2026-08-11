@@ -16,8 +16,8 @@ export default async function EditCaseStudyPage({
   if (!study) notFound()
 
   // One read for both images rather than one per field.
-  const ids = [study.heroImageId, study.clientLogoId].filter(
-    (value): value is string => Boolean(value),
+  const ids = [study.heroImageId, study.clientLogoId].filter((value): value is string =>
+    Boolean(value),
   )
   const assets = await getMediaByIdsForAdmin(ids)
   const byId = new Map(assets.map((asset) => [asset.id, asset]))

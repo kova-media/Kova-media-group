@@ -24,21 +24,27 @@ export default function ContactPage() {
         <div className="grid gap-14 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
           <div>
             <Eyebrow>Contact</Eyebrow>
-            <h1 className="mt-6 text-5xl font-medium leading-[0.95] tracking-tight sm:text-6xl">
+            <h1 className="mt-6 text-5xl leading-[0.95] font-medium tracking-tight sm:text-6xl">
               <RevealLines lines={['Let’s grow', 'your owned', 'channels.']} />
             </h1>
             <Reveal delay={0.2}>
-              <p className="mt-6 max-w-md text-lg leading-relaxed text-muted-foreground text-pretty">
-                Every engagement starts with a free call and account audit. Here&apos;s what you
-                can expect.
+              <p className="mt-6 max-w-md text-lg leading-relaxed text-pretty text-muted-foreground">
+                Every engagement starts with a free call and account audit. Here&apos;s
+                what you can expect.
               </p>
             </Reveal>
 
             <Reveal delay={0.3}>
               <ul className="mt-8 flex flex-col gap-3">
                 {points.map((point, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-foreground/85">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
+                  <li
+                    key={i}
+                    className="flex items-start gap-3 text-sm leading-relaxed text-foreground/85"
+                  >
+                    <span
+                      className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary"
+                      aria-hidden
+                    />
                     <span>{point}</span>
                   </li>
                 ))}

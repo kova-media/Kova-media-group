@@ -27,15 +27,16 @@ export async function SiteFooter() {
         <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
           <div className="max-w-sm">
             <LogoLink asset={chrome.logo} />
-            <p className="mt-5 text-pretty text-sm leading-relaxed text-muted-foreground">
-              A specialist Email &amp; SMS marketing agency for direct-to-consumer ecommerce
-              brands. We turn the customers you already have into recurring revenue.
+            <p className="mt-5 text-sm leading-relaxed text-pretty text-muted-foreground">
+              A specialist Email &amp; SMS marketing agency for direct-to-consumer
+              ecommerce brands. We turn the customers you already have into recurring
+              revenue.
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
             <div>
-              <h3 className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+              <h3 className="text-xs font-medium tracking-[0.16em] text-muted-foreground uppercase">
                 Company
               </h3>
               <ul className="mt-4 space-y-3 text-sm">
@@ -52,7 +53,7 @@ export async function SiteFooter() {
               </ul>
             </div>
             <div>
-              <h3 className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+              <h3 className="text-xs font-medium tracking-[0.16em] text-muted-foreground uppercase">
                 Connect
               </h3>
               <ul className="mt-4 space-y-3 text-sm">
@@ -75,7 +76,7 @@ export async function SiteFooter() {
               </ul>
             </div>
             <div>
-              <h3 className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+              <h3 className="text-xs font-medium tracking-[0.16em] text-muted-foreground uppercase">
                 Legal
               </h3>
               <ul className="mt-4 space-y-3 text-sm">
@@ -104,7 +105,7 @@ export async function SiteFooter() {
           <p>
             © {year} {site.name}. All rights reserved.
           </p>
-          <p className="font-mono text-xs uppercase tracking-[0.16em]">
+          <p className="font-mono text-xs tracking-[0.16em] uppercase">
             Email &amp; SMS, done right.
           </p>
         </div>

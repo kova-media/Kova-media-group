@@ -31,7 +31,7 @@ export default function ProcessPage() {
                     <div className="group relative flex gap-6 pb-12 last:pb-0">
                       {i < process.length - 1 && (
                         <span
-                          className="absolute left-[1.6rem] top-14 bottom-0 w-px bg-border"
+                          className="absolute top-14 bottom-0 left-[1.6rem] w-px bg-border"
                           aria-hidden
                         />
                       )}
@@ -39,7 +39,9 @@ export default function ProcessPage() {
                         {item.step}
                       </div>
                       <div className="pt-2">
-                        <h2 className="text-2xl font-medium tracking-tight">{item.title}</h2>
+                        <h2 className="text-2xl font-medium tracking-tight">
+                          {item.title}
+                        </h2>
                         <p className="mt-3 max-w-xl leading-relaxed text-muted-foreground">
                           {item.description}
                         </p>
@@ -54,8 +56,8 @@ export default function ProcessPage() {
               <Reveal>
                 <Eyebrow>What we build</Eyebrow>
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                  A typical automation suite recovers revenue around the clock. Here is a
-                  simplified view of the flows we design and connect.
+                  A typical automation suite recovers revenue around the clock. Here is
+                  a simplified view of the flows we design and connect.
                 </p>
                 <div className="mt-8">
                   <FlowDiagram />

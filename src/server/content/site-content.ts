@@ -58,9 +58,7 @@ export async function getCaseStudyList(): Promise<CaseStudyView[]> {
   }))
 }
 
-export async function getCaseStudyDetail(
-  slug: string,
-): Promise<CaseStudyView | null> {
+export async function getCaseStudyDetail(slug: string): Promise<CaseStudyView | null> {
   const study = await getPublishedCaseStudy(slug)
 
   if (!study) {

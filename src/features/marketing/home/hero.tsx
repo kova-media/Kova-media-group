@@ -26,7 +26,7 @@ export function Hero() {
     <section ref={ref} className="relative overflow-hidden pt-32 md:pt-40">
       {/* faint background grid */}
       <div
-        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.5] [mask-image:radial-gradient(ellipse_at_top,black,transparent_75%)]"
+        className="pointer-events-none absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_top,black,transparent_75%)] opacity-[0.5]"
         aria-hidden
       >
         <div className="grid-lines h-full w-full" />
@@ -40,24 +40,27 @@ export function Hero() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease }}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 font-mono text-xs tracking-[0.16em] text-muted-foreground uppercase"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-brand" aria-hidden />
               Email &amp; SMS specialists
             </motion.p>
 
-            <h1 className="mt-6 text-balance text-5xl font-semibold leading-[1.02] tracking-tightest text-foreground md:text-6xl lg:text-[4.25rem]">
-              <RevealLines lines={['Email & SMS', 'marketing that', 'drives revenue.']} />
+            <h1 className="tracking-tightest mt-6 text-5xl leading-[1.02] font-semibold text-balance text-foreground md:text-6xl lg:text-[4.25rem]">
+              <RevealLines
+                lines={['Email & SMS', 'marketing that', 'drives revenue.']}
+              />
             </h1>
 
             <motion.p
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease }}
-              className="mt-7 max-w-lg text-pretty text-lg leading-relaxed text-muted-foreground"
+              className="mt-7 max-w-lg text-lg leading-relaxed text-pretty text-muted-foreground"
             >
-              We help ecommerce brands generate more revenue from the customers they already have —
-              through high-performing campaigns, intelligent automations, and strategic SMS.
+              We help ecommerce brands generate more revenue from the customers they
+              already have — through high-performing campaigns, intelligent automations,
+              and strategic SMS.
             </motion.p>
 
             <motion.div
@@ -85,7 +88,7 @@ export function Hero() {
               initial={{ opacity: 0, y: 40, rotateX: 12 }}
               animate={{ opacity: 1, y: 0, rotateX: 0 }}
               transition={{ duration: 1, delay: 0.3, ease }}
-              className="absolute right-0 top-4 z-20 [transform-style:preserve-3d]"
+              className="absolute top-4 right-0 z-20 [transform-style:preserve-3d]"
             >
               <DashboardCard />
             </motion.div>
@@ -95,7 +98,7 @@ export function Hero() {
               initial={{ opacity: 0, y: 30, x: -20 }}
               animate={{ opacity: 1, y: 0, x: 0 }}
               transition={{ duration: 1, delay: 0.55, ease }}
-              className="absolute left-0 bottom-6 z-10 hidden sm:block"
+              className="absolute bottom-6 left-0 z-10 hidden sm:block"
             >
               <EmailCard className="w-[210px] rotate-[-5deg]" />
             </motion.div>

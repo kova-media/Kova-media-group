@@ -23,7 +23,7 @@ export function ClientMarquee({ heading = true }: { heading?: boolean }) {
       <Container>
         {heading && (
           <Reveal>
-            <p className="mb-10 text-center text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            <p className="mb-10 text-center text-xs font-medium tracking-[0.2em] text-muted-foreground uppercase">
               Trusted by direct-to-consumer brands
             </p>
           </Reveal>
@@ -37,7 +37,7 @@ export function ClientMarquee({ heading = true }: { heading?: boolean }) {
             {row.map((name, i) => (
               <span
                 key={`${name}-${i}`}
-                className="whitespace-nowrap text-lg font-semibold tracking-tight text-foreground/35 transition-colors hover:text-foreground/70"
+                className="text-lg font-semibold tracking-tight whitespace-nowrap text-foreground/35 transition-colors hover:text-foreground/70"
               >
                 {name}
               </span>
@@ -57,12 +57,12 @@ export function MetricsRow() {
       <Container>
         <Reveal className="max-w-2xl">
           <Eyebrow>By the numbers</Eyebrow>
-          <h2 className="mt-5 text-balance text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+          <h2 className="mt-5 text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
             Retention is the highest-ROI channel in ecommerce.
           </h2>
-          <p className="mt-4 text-pretty text-lg leading-relaxed text-muted-foreground">
-            Most brands leave that potential on the table. Here is what focused email and SMS
-            work has delivered for the brands we partner with.
+          <p className="mt-4 text-lg leading-relaxed text-pretty text-muted-foreground">
+            Most brands leave that potential on the table. Here is what focused email
+            and SMS work has delivered for the brands we partner with.
           </p>
         </Reveal>
 
@@ -73,7 +73,9 @@ export function MetricsRow() {
                 value={m.value}
                 className="block text-5xl font-semibold tracking-tight text-foreground md:text-6xl"
               />
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{m.label}</p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {m.label}
+              </p>
             </RevealItem>
           ))}
         </RevealGroup>
@@ -101,7 +103,7 @@ export function Testimonials({
       <Container>
         <Reveal className="max-w-2xl">
           <Eyebrow>Testimonials</Eyebrow>
-          <h2 className="mt-5 text-balance text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+          <h2 className="mt-5 text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
             Trusted by the founders who hired us.
           </h2>
         </Reveal>
@@ -111,7 +113,7 @@ export function Testimonials({
               key={t.quote}
               className="flex flex-col justify-between rounded-2xl border border-border bg-card p-7 shadow-[var(--shadow-soft)]"
             >
-              <p className="text-pretty text-[1.05rem] leading-relaxed text-foreground">
+              <p className="text-[1.05rem] leading-relaxed text-pretty text-foreground">
                 &ldquo;{t.quote}&rdquo;
               </p>
               <div className="mt-8 border-t border-border pt-5">
@@ -136,7 +138,7 @@ export function Faq({ items }: { items?: { q: string; a: string }[] }) {
       <Container className="max-w-4xl">
         <Reveal className="mx-auto max-w-2xl text-center">
           <Eyebrow className="justify-center">FAQ</Eyebrow>
-          <h2 className="mt-5 text-balance text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+          <h2 className="mt-5 text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
             Questions, answered.
           </h2>
         </Reveal>
@@ -168,7 +170,7 @@ export function Faq({ items }: { items?: { q: string; a: string }[] }) {
                       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                       className="overflow-hidden"
                     >
-                      <p className="max-w-2xl pb-6 text-pretty leading-relaxed text-muted-foreground">
+                      <p className="max-w-2xl pb-6 leading-relaxed text-pretty text-muted-foreground">
                         {item.a}
                       </p>
                     </motion.div>
@@ -187,7 +189,7 @@ export function Faq({ items }: { items?: { q: string; a: string }[] }) {
 
 export function FinalCta() {
   return (
-    <section className="bg-background pb-28 pt-8">
+    <section className="bg-background pt-8 pb-28">
       <Container>
         <div className="relative overflow-hidden rounded-3xl bg-foreground px-8 py-20 md:px-16 md:py-28">
           <div
@@ -200,15 +202,15 @@ export function FinalCta() {
             aria-hidden
           />
           <Reveal className="relative mx-auto max-w-2xl text-center">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-background/60">
+            <p className="font-mono text-xs tracking-[0.2em] text-background/60 uppercase">
               Book your strategy call
             </p>
-            <h2 className="mt-6 text-balance text-4xl font-semibold tracking-tight text-background md:text-6xl">
+            <h2 className="mt-6 text-4xl font-semibold tracking-tight text-balance text-background md:text-6xl">
               See what your brand is leaving on the table.
             </h2>
-            <p className="mx-auto mt-6 max-w-xl text-pretty text-lg leading-relaxed text-background/70">
-              A free call and account audit. You&apos;ll walk away with a clear plan to grow your
-              email and SMS revenue — whether or not we work together.
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-pretty text-background/70">
+              A free call and account audit. You&apos;ll walk away with a clear plan to
+              grow your email and SMS revenue — whether or not we work together.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link

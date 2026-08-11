@@ -55,10 +55,10 @@ export default function ServicesPage() {
                       <h2 className="text-3xl font-semibold tracking-tight text-balance text-foreground md:text-4xl">
                         {service.title}
                       </h2>
-                      <p className="mt-4 max-w-xl text-pretty text-lg leading-relaxed text-foreground/85">
+                      <p className="mt-4 max-w-xl text-lg leading-relaxed text-pretty text-foreground/85">
                         {service.summary}
                       </p>
-                      <p className="mt-5 max-w-xl text-pretty leading-relaxed text-muted-foreground">
+                      <p className="mt-5 max-w-xl leading-relaxed text-pretty text-muted-foreground">
                         {service.description}
                       </p>
                     </div>
@@ -96,10 +96,10 @@ export default function ServicesPage() {
                 together against a single revenue goal — so every message earns its
                 place in the inbox.
               </p>
-              <p className="mt-6 max-w-2xl text-pretty leading-relaxed text-muted-foreground">
+              <p className="mt-6 max-w-2xl leading-relaxed text-pretty text-muted-foreground">
                 Platforms are part of the job, not the offer. We manage Klaviyo end to
-                end as part of your programme — the account structure, the data, and
-                the deliverability work behind it — because that is what makes the four
+                end as part of your programme — the account structure, the data, and the
+                deliverability work behind it — because that is what makes the four
                 services above actually perform.
               </p>
             </div>

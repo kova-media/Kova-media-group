@@ -3,11 +3,9 @@
 import Link from 'next/link'
 import {
   Mail,
-  Workflow,
   MessageSquare,
+  ClipboardCheck,
   PenLine,
-  LineChart,
-  ArrowUpRight,
   ArrowRight,
 } from 'lucide-react'
 import {
@@ -21,12 +19,14 @@ import { Container, Eyebrow, ButtonLink, LiftCard } from '@/components/site/ui'
 import { Reveal, RevealGroup, RevealItem } from '@/components/site/reveal'
 import { FlowDiagram, DashboardCard } from '@/components/site/mockups'
 
-const serviceIcons = [Mail, Workflow, MessageSquare, LineChart, PenLine, ArrowUpRight]
+/** One icon per core service, in the order they are defined. */
+const serviceIcons = [Mail, MessageSquare, ClipboardCheck, PenLine]
 
 /* --------------------------------------------------------------- Services preview */
 
 export function ServicesPreview() {
-  const featured = services.slice(0, 6)
+  // All four. There is no "and more" here — four is the whole offer.
+  const featured = services
   return (
     <section className="bg-surface py-24 md:py-32">
       <Container>
@@ -37,8 +37,9 @@ export function ServicesPreview() {
               Two channels. Done exceptionally well.
             </h2>
             <p className="mt-4 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-              We are not a full-service agency. We do email and SMS — the highest-ROI channels in
-              ecommerce — and we do them better than generalists ever could.
+              We are not a full-service agency. We do email and SMS — the highest-ROI
+              channels in ecommerce — plus the audits and copywriting that make both
+              perform.
             </p>
           </Reveal>
           <Reveal delay={0.1}>
@@ -48,20 +49,22 @@ export function ServicesPreview() {
           </Reveal>
         </div>
 
-        <RevealGroup className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+        <RevealGroup className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2">
           {featured.map((service, i) => {
             const Icon = serviceIcons[i % serviceIcons.length] ?? Mail
             return (
               <RevealItem key={service.slug}>
                 <Link
                   href="/services"
-                  className="group flex h-full flex-col bg-card p-7 transition-colors duration-300 hover:bg-background"
+                  className="group flex h-full flex-col bg-card p-8 transition-colors duration-300 hover:bg-background"
                 >
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted text-foreground transition-colors duration-300 group-hover:bg-brand group-hover:text-brand-foreground">
                     <Icon className="h-5 w-5" />
                   </span>
-                  <h3 className="mt-6 text-lg font-medium text-foreground">{service.title}</h3>
-                  <p className="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">
+                  <h3 className="mt-6 text-xl font-medium text-foreground">
+                    {service.title}
+                  </h3>
+                  <p className="mt-3 text-pretty text-sm leading-relaxed text-muted-foreground">
                     {service.summary}
                   </p>
                 </Link>

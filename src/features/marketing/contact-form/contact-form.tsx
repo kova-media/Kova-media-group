@@ -248,7 +248,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="group mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-primary-foreground transition-all hover:opacity-90 disabled:opacity-60"
+      className="group mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-cta px-7 py-3.5 text-sm font-medium text-cta-foreground transition-all hover:bg-cta-hover disabled:opacity-60"
     >
       {pending ? 'Sending…' : 'Request my free audit'}
       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />

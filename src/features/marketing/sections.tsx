@@ -213,7 +213,7 @@ export function FinalCta() {
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
                 href="/book"
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-background px-7 py-3.5 text-[0.95rem] font-medium text-foreground transition-all duration-300 hover:bg-brand hover:text-brand-foreground"
+                className="group inline-flex items-center justify-center gap-2 rounded-full bg-cta px-7 py-3.5 text-[0.95rem] font-medium text-cta-foreground transition-all duration-300 hover:bg-cta-hover"
               >
                 Book a strategy call
               </Link>

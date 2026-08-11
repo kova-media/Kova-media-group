@@ -23,9 +23,14 @@ export function ButtonLink({
 }: ButtonLinkProps) {
   const base =
     'group inline-flex items-center justify-center gap-2 rounded-full text-[0.95rem] font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+  /**
+   * `primary` is the booking CTA and is teal. It is reserved for the action the
+   * whole site exists to produce — two teal buttons competing in one viewport
+   * is a bug, not a style choice. Everything else stays neutral.
+   */
   const variants = {
     primary:
-      'bg-foreground text-background px-6 py-3 hover:bg-brand hover:shadow-[0_8px_30px_rgba(37,71,235,0.25)]',
+      'bg-cta text-cta-foreground px-6 py-3 hover:bg-cta-hover hover:shadow-[0_8px_30px_rgba(20,184,166,0.28)]',
     secondary:
       'bg-transparent text-foreground px-6 py-3 border border-border-strong hover:border-foreground hover:bg-foreground/[0.03]',
     ghost: 'text-foreground px-1 py-1 hover:text-brand',

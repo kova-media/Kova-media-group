@@ -44,6 +44,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-cta: var(--cta);
   --color-cta-foreground: var(--cta-foreground);
+  --color-cta-hover: var(--cta-hover);
   --color-navy: var(--navy);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
@@ -149,10 +150,12 @@
   --brand-foreground: oklch(0.985 0 0);
   --brand-muted: #e0f2fe;
 
-  /* The booking action. A distinct hue from the accent so "the thing to click"
-   * is never confused with "the thing to notice". */
-  --cta: #0ea5e9;
+  /* The booking action. Kova's teal — the same value as the accent, used at
+   * full strength on the small number of elements that are the conversion
+   * itself. #0EA5E9 sky is deliberately not used as a CTA colour. */
+  --cta: #14b8a6;
   --cta-foreground: oklch(0.985 0 0);
+  --cta-hover: #0d9488;
 
   /* The identity's deep navy. Used as a dark ground, not as the page. */
   --navy: #0b1120;

@@ -45,86 +45,73 @@ export type Service = {
   points: string[]
 }
 
+/**
+ * The four core services.
+ *
+ * Deliberately four, not ten. Klaviyo is a platform Kova manages as part of a
+ * client's email and SMS programme — not a service in its own right — and the
+ * same is true of deliverability, segmentation, automations, campaigns and
+ * reporting. Those are how the work gets done, and they belong inside a
+ * service's description rather than fragmenting the offer into a grid of
+ * capabilities that reads like a feature list.
+ */
 export const services: Service[] = [
   {
-    slug: 'email-campaigns',
-    title: 'Email Campaign Management',
-    summary: 'Campaigns tailored to your voice, your audience, and your calendar.',
+    slug: 'email-marketing',
+    title: 'Email Marketing',
+    summary:
+      'The channel that turns existing customers into repeat revenue — planned, built, and measured end to end.',
     description:
-      'A planned send calendar built around launches, promotions, and the moments that matter to your customers. Every campaign is designed, written, and measured in-house.',
-    points: ['Strategy & calendar planning', 'Segmentation', 'A/B testing', 'Weekly reporting'],
-  },
-  {
-    slug: 'automated-flows',
-    title: 'Automated Email Flows',
-    summary: 'Always-on automations that recover revenue while you sleep.',
-    description:
-      'Welcome, browse and cart abandonment, post-purchase, win-back, and replenishment flows that quietly compound. We build, test, and refine each one against real behavior.',
-    points: ['Welcome & lead nurture', 'Abandonment recovery', 'Post-purchase', 'Win-back'],
+      'A complete email programme: the campaign calendar, the automated flows behind it, and the segmentation that decides who sees what. We plan against your launches and promotions, design and write every send, and keep the account healthy so the revenue you build actually lands in the inbox.',
+    points: [
+      'Campaign calendar planned around your launches',
+      'Automated flows — welcome, abandonment, post-purchase, win-back',
+      'Segmentation and list health',
+      'Deliverability, monitored continuously',
+      'Weekly reporting tied to revenue',
+    ],
   },
   {
     slug: 'sms-marketing',
     title: 'SMS Marketing',
-    summary: 'Clear, concise texts for drops, deals, and real-time engagement.',
+    summary:
+      'The most immediate channel you own, used for the moments that genuinely warrant it.',
     description:
-      'Reach customers instantly with messages that respect their attention. We manage list growth, compliance, timing, and the creative that makes SMS convert.',
-    points: ['List growth & compliance', 'Campaign sends', 'Automated SMS flows', 'Timing strategy'],
+      'SMS reaches customers in seconds, which is exactly why it has to be used with restraint. We grow a compliant list, pick the moments worth interrupting someone for, and write messages short enough to earn the tap — with timing and frequency managed so the channel stays welcome.',
+    points: [
+      'Compliant list growth',
+      'Launch, restock, and time-sensitive sends',
+      'Automated SMS alongside email flows',
+      'Timing and frequency strategy',
+    ],
   },
   {
-    slug: 'klaviyo-management',
-    title: 'Klaviyo Management',
-    summary: 'Certified management of your most valuable owned channel.',
+    slug: 'account-audits',
+    title: 'Account Audits',
+    summary:
+      'A clear read on what your programme is doing today, and what it is leaving on the table.',
     description:
-      'From account architecture to advanced segmentation, we run Klaviyo end to end so your data, flows, and campaigns work as one system.',
-    points: ['Account architecture', 'Advanced segmentation', 'Deliverability', 'Integrations'],
+      'We go through the account properly: structure, list health, every live flow, historic performance, and the gaps between them. You get a prioritised picture of what is working, what is quietly costing you, and what to fix first — as a standalone piece of work or as the opening step of an engagement.',
+    points: [
+      'Account structure and data review',
+      'Flow-by-flow performance analysis',
+      'List health and deliverability check',
+      'A prioritised plan, ordered by revenue impact',
+    ],
   },
   {
-    slug: 'sendlane-management',
-    title: 'Sendlane Management',
-    summary: 'Unified email and SMS on a single platform, managed for you.',
+    slug: 'copywriting',
+    title: 'Copywriting',
+    summary:
+      'Words that sound like your brand and give the reader a reason to act.',
     description:
-      'We plan, build, and optimize campaigns and automations in Sendlane, keeping email and SMS working together toward one revenue goal.',
-    points: ['Migration & setup', 'Unified automations', 'Reporting', 'Optimization'],
-  },
-  {
-    slug: 'email-design',
-    title: 'Email Design',
-    summary: 'On-brand emails engineered to render perfectly everywhere.',
-    description:
-      'Considered layouts and typography that reflect the quality of your product, hand-built to look right across every client and device.',
-    points: ['Bespoke templates', 'Modular systems', 'Dark-mode ready', 'Accessible markup'],
-  },
-  {
-    slug: 'email-copywriting',
-    title: 'Email Copywriting',
-    summary: 'Words that sound like your brand and move customers to act.',
-    description:
-      'Copy that earns the open and the click without shouting. We write in your voice, backed by testing, not guesswork.',
-    points: ['Brand voice', 'Subject-line testing', 'Story-driven sequences', 'Clear calls to action'],
-  },
-  {
-    slug: 'list-growth',
-    title: 'List Growth',
-    summary: 'Grow a list of buyers, not just subscribers.',
-    description:
-      'High-intent capture through thoughtful pop-ups, offers, and landing pages that build a subscriber base worth marketing to.',
-    points: ['Sign-up strategy', 'On-site capture', 'Lead magnets', 'Quality over volume'],
-  },
-  {
-    slug: 'deliverability',
-    title: 'Deliverability',
-    summary: 'Reach the inbox, not the promotions tab or spam folder.',
-    description:
-      'Authentication, list hygiene, and sending reputation managed continuously so the revenue you build actually lands.',
-    points: ['SPF, DKIM, DMARC', 'Reputation monitoring', 'List cleaning', 'Warm-up plans'],
-  },
-  {
-    slug: 'reporting-analytics',
-    title: 'Reporting & Analytics',
-    summary: 'Clear numbers tied to revenue, reviewed every week.',
-    description:
-      'No vanity metrics. We report on what email and SMS contribute to the business and what we are doing to grow it.',
-    points: ['Revenue attribution', 'Cohort analysis', 'Weekly reviews', 'Quarterly strategy'],
+      'Subject lines that earn the open, body copy that holds attention, and calls to action that do not shout. We write in your voice across email and SMS, and we test the parts worth testing rather than guessing at what works.',
+    points: [
+      'Brand voice, applied consistently',
+      'Subject-line and preview-text testing',
+      'Story-driven sequences',
+      'Clear, unhyped calls to action',
+    ],
   },
 ]
 
@@ -290,7 +277,7 @@ export const faqs = [
   },
   {
     q: 'Which platforms do you work in?',
-    a: 'We manage Klaviyo and Sendlane end to end, and we can advise on migrations between platforms when it makes sense for the business.',
+    a: 'Klaviyo, primarily — we manage it end to end as part of your programme. The platform is a tool, not the service: what you are buying is the strategy, the writing, and the day-to-day management that runs through it. We can also advise on a migration when the current setup is holding the account back.',
   },
   {
     q: 'How quickly will we see results?',

@@ -199,9 +199,23 @@ Consequences recorded here because they change earlier decisions:
   them (case studies, quotes, FAQ, articles). The generic section registry still
   serves utility pages through the catch-all.
 - **`instant = false` on all three dynamic routes**, revising ADR-017 for them.
-  Reading `params` inside a Suspense boundary flushes a 200 before `notFound()`
-  is reached, turning every missing page into a soft 404. Every published slug
-  is prerendered, so real pages lose nothing.
+  Reading `params` inside a Suspense boundary flushed a 200 before `notFound()`
+  was reached, so _every_ missing page was a soft 404. Every published slug is
+  prerendered, so real pages lose nothing by blocking.
+
+  **This is improved, not fully solved, and the residue is measured.** Against a
+  production build: the _first_, uncached request to an unknown URL still
+  returns `200` with the not-found body; every subsequent request returns a
+  correct `404`, and the status is what gets cached. Moving `notFound()` into
+  `generateMetadata` — which resolves before the body streams — did not change
+  it either, so the commit happens earlier than user code can reach.
+
+  The only remaining lever is removing the `<Suspense>` around `PreviewBanner`
+  in the marketing layout, which is what lets the shell flush early. That would
+  make the layout dynamic and destroy prerendering on every page — a far worse
+  trade than one soft 404 per unknown URL per cache region. Worth re-testing on
+  Vercel, whose PPR serving differs from `next start`.
+
 - **The public JS budget of < 130 kB gzipped (Phase 5) is not met and is
   withdrawn as stated.** The homepage ships ~255 kB gzipped. The brief that
   produced the v0 design explicitly requires scroll-driven motion, parallax and

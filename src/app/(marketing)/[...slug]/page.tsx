@@ -38,7 +38,9 @@ export async function generateMetadata({
   const { slug } = await params
   const page = await loadPage(slug)
 
-  if (!page) return {}
+  // See the case study route: notFound() in metadata is what produces a real
+  // 404 on the first, uncached request.
+  if (!page) notFound()
 
   return {
     title: page.seo.title ?? page.title,

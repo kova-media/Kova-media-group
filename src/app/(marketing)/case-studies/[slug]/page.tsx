@@ -34,7 +34,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params
   const study = await getCaseStudyDetail(slug)
-  if (!study) return { title: 'Case Study' }
+
+  // `notFound()` here rather than only in the page body. Metadata is resolved
+  // before the response starts streaming, so this is what makes a missing case
+  // study return a real 404 on the *first* request — the one a crawler makes.
+  // Left to the body alone, the shell has already flushed a 200 and the result
+  // is a soft 404 until the response happens to be cached.
+  if (!study) notFound()
+
   return {
     title: `${study.brand} Case Study`,
     description: study.summary,

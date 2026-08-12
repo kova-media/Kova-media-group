@@ -29,12 +29,20 @@ export const clients = [
   'LoyalTees',
 ]
 
-export const metrics = [
-  { value: '$10M+', label: 'Email & SMS revenue generated' },
-  { value: '35%', label: 'Average revenue from retention' },
-  { value: '99%', label: 'Client retention rate' },
-  { value: '100M+', label: 'Messages delivered' },
-]
+/**
+ * Agency-wide credibility figures.
+ *
+ * **Deliberately empty**, on the same rule as `testimonials` below. The four
+ * numbers that used to sit here — $10M+ generated, 35% of revenue from
+ * retention, 99% client retention, 100M+ messages delivered — came out of the
+ * v0 generation and were never provided or verified by Kova. A headline
+ * statistic is a factual claim about the business, so it is either sourced or
+ * it is absent; a plausible-looking placeholder is the one thing it cannot be.
+ *
+ * The bands that read this render nothing while it is empty. Real, verified
+ * figures can be added here and both surfaces pick them up.
+ */
+export const metrics: { value: string; label: string }[] = []
 
 export type Service = {
   slug: string
@@ -101,91 +109,98 @@ export type CaseStudy = {
   results: { value: string; label: string }[]
   qualitative?: string
   accent: string
+  /**
+   * The window the `results` figures cover, e.g. 'November 2024 – July 2025'.
+   *
+   * A percentage can travel without its timeframe; an absolute figure cannot.
+   * Absolute figures therefore stay in the narrative prose, where the sentence
+   * states the period, and this labels the headline cards so a reader knows
+   * what window they describe. Empty when the figures have no stated period.
+   */
+  resultsPeriod?: string
 }
 
+/**
+ * The bundled case studies.
+ *
+ * **Every claim here is either verified or absent.** Empty `challenge` and
+ * `design` fields are not oversights: the blocks they feed are dropped rather
+ * than filled with plausible-sounding narrative about a real client's business
+ * that nobody confirmed. The same rule governs numbers — Zilkee has verified
+ * figures and shows them with their timeframe; Tiny Explorings and Livora have
+ * none on file, so their pages carry none rather than borrowing a shape from
+ * the study that does.
+ *
+ * `sms` is empty for the two email-only engagements. Claiming a channel Kova
+ * did not run for a client is the same class of error as inventing a number.
+ */
 export const caseStudies: CaseStudy[] = [
   {
     slug: 'zilkee',
     brand: 'Zilkee',
-    category: 'Consumer Products',
+    category: 'Tech',
     summary:
-      'Rebuilt a neglected email program into a structured revenue channel with a full flow suite and a consistent campaign calendar.',
+      'Rebuilt the retention program around stronger flows, campaigns, segmentation, and SMS.',
     background:
-      'Zilkee had strong paid acquisition but treated email as an afterthought. Sends were irregular, automations were minimal, and a growing list was going unmarketed.',
-    challenge:
-      'Turn a large but under-engaged list into a dependable, high-ROI channel without discounting the brand into the ground.',
+      'Zilkee is a technology brand selling data-recovery hardware direct to consumers. Kova runs its email and SMS program.',
+    challenge: '',
     strategy: [
-      'Audited the account, list health, and existing flows',
-      'Rebuilt segmentation around purchase behavior and engagement',
-      'Established a weekly campaign calendar aligned to the product roadmap',
-      'Layered SMS onto the highest-intent moments',
+      'Rebuilt the automated flows',
+      'Put campaigns on a consistent calendar',
+      'Reworked segmentation around how customers actually buy',
+      'Added SMS as a second owned channel',
     ],
-    design:
-      'A clean, modular template system that let the team ship on-brand emails quickly while keeping every send consistent and easy to read on mobile.',
+    design: '',
     automation:
-      'A complete flow suite — welcome, browse and cart abandonment, post-purchase, and win-back — replaced ad-hoc sending and began recovering revenue automatically.',
-    sms: 'SMS was introduced for launches and time-sensitive offers, with compliant list growth and careful timing to protect the customer relationship.',
+      'Automations carry the program. Across November 2024 to July 2025 they accounted for 74% of attributed revenue, with email automation revenue rising from $114.6K to $132.7K. Attributed revenue over that window reached $334.7K, up 44.5%, and average order value rose from $83.05 to $120.97.',
+    sms: 'SMS went from a marginal contribution to a substantial one over the same window, growing from $20.2K to $128.4K.',
     results: [
-      { value: '3x', label: 'Increase in email revenue' },
-      { value: '40%+', label: 'Of revenue from owned channels' },
-      { value: '9', label: 'Automated flows live' },
+      { value: '+44.5%', label: 'Attributed revenue' },
+      { value: '+45.7%', label: 'Average order value' },
     ],
+    resultsPeriod: 'November 2024 – July 2025',
     accent: 'oklch(0.55 0.19 262)',
   },
   {
     slug: 'tiny-explorings',
     brand: 'Tiny Explorings',
-    category: 'Kids & Family',
+    category: "Children's Shoes",
     summary:
-      'Built a warm, story-led email and SMS program that matched a family brand and grew repeat purchase rate.',
+      'Built a retention program around thoughtful campaigns, automations, and a strong understanding of the brand and its customers.',
     background:
-      'Tiny Explorings had a devoted community but leaned almost entirely on social. Email felt transactional and off-brand, and SMS was unused.',
-    challenge:
-      'Extend the brand’s warmth into email and SMS while making both channels pull real weight in revenue.',
+      'Tiny Explorings is a children’s shoe brand. Kova ran its email program.',
+    challenge: '',
     strategy: [
-      'Redefined the email voice to match the brand’s community feel',
-      'Segmented by lifecycle stage and product interest',
-      'Introduced SMS for restocks and seasonal moments',
-      'Set up clean reporting tied to repeat purchase',
+      'Campaigns written in the brand’s own voice',
+      'Automations for the moments that repeat for every customer',
+      'Planning grounded in a close understanding of the brand and its customers',
     ],
-    design:
-      'Soft, editorial layouts with generous imagery that felt like the brand rather than a template, engineered to render cleanly everywhere.',
+    design: '',
     automation:
-      'Lifecycle flows nurtured first-time buyers into repeat customers, with post-purchase education that reduced support load and increased reorders.',
-    sms: 'SMS became the go-to channel for restock alerts and seasonal drops, driving fast, measurable response from the most engaged customers.',
-    results: [
-      { value: '2.4x', label: 'Repeat purchase lift from flows' },
-      { value: '28%', label: 'Revenue from email & SMS' },
-      { value: '+18%', label: 'List growth in first quarter' },
-    ],
+      'Automations ran alongside the campaign calendar, covering the points in the customer relationship that recur for every customer.',
+    sms: '',
+    results: [],
     accent: 'oklch(0.62 0.14 40)',
   },
   {
     slug: 'livora',
     brand: 'Livora',
-    category: 'Home & Lifestyle',
+    category: 'Beauty',
     summary:
-      'Introduced disciplined segmentation and deliverability work that lifted inbox placement and campaign performance.',
+      'Built a focused email program for a women’s razor brand, with campaigns, automations, and ongoing optimization.',
     background:
-      'Livora was sending to its entire list on every campaign. Engagement was declining, and deliverability was starting to suffer.',
-    challenge:
-      'Protect sender reputation and grow revenue at the same time, without shrinking the program’s reach to nothing.',
+      'Livora is a beauty brand selling razors for women. Kova ran its email program.',
+    challenge: '',
     strategy: [
-      'Cleaned the list and set up ongoing hygiene',
-      'Implemented engagement-based segmentation',
-      'Fixed authentication and monitored reputation',
-      'Rebuilt the campaign calendar around relevance',
+      'A campaign calendar the brand could keep to',
+      'Automations for the recurring moments in the customer relationship',
+      'Ongoing testing and refinement of what was already live',
     ],
-    design:
-      'Refined, product-forward templates that put Livora’s catalog first and made each campaign feel considered rather than mass-sent.',
+    design: '',
     automation:
-      'Re-engagement and post-purchase flows kept the active audience warm while quietly sunsetting contacts that were hurting deliverability.',
-    sms: 'A small, high-intent SMS list was grown deliberately and used sparingly for the moments that genuinely warranted an instant message.',
-    results: [
-      { value: '+22%', label: 'Inbox placement improvement' },
-      { value: '2x', label: 'Campaign click-through rate' },
-      { value: '30%', label: 'Lower unsubscribe rate' },
-    ],
+      'Automations handled the recurring moments in the customer relationship, leaving the campaign calendar free for what was genuinely new.',
+    sms: '',
+    results: [],
     accent: 'oklch(0.58 0.12 155)',
   },
 ]

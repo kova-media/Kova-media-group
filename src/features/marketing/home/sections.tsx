@@ -141,18 +141,23 @@ export function FeaturedCaseStudies({ studies }: { studies?: CaseStudy[] }) {
                     <p className="mt-4 max-w-md leading-relaxed text-pretty text-muted-foreground">
                       {cs.summary}
                     </p>
-                    <div className="mt-7 flex flex-wrap gap-8">
-                      {cs.results.slice(0, 3).map((r) => (
-                        <div key={r.label}>
-                          <p className="text-2xl font-semibold tracking-tight text-foreground">
-                            {r.value}
-                          </p>
-                          <p className="mt-1 max-w-[9rem] text-xs leading-snug text-muted-foreground">
-                            {r.label}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
+                    {/* Only the studies with verified figures show a figures
+                        row. The rest let the summary do the work rather than
+                        holding open a space that wants numbers in it. */}
+                    {cs.results.length > 0 && (
+                      <div className="mt-7 flex flex-wrap gap-8">
+                        {cs.results.slice(0, 3).map((r) => (
+                          <div key={r.label}>
+                            <p className="text-2xl font-semibold tracking-tight text-foreground">
+                              {r.value}
+                            </p>
+                            <p className="mt-1 max-w-[9rem] text-xs leading-snug text-muted-foreground">
+                              {r.label}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     <span className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-foreground">
                       Read case study
                       <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />

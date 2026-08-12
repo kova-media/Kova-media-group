@@ -7,9 +7,9 @@ import {
   getCaseStudyList,
   getCaseStudySlugs,
 } from '@/server/content/site-content'
+import { cn } from '@/lib/utils'
 import { Container, Eyebrow, CountUp } from '@/components/site/ui'
 import { Reveal, RevealLines } from '@/components/site/reveal'
-import { DashboardCard } from '@/components/site/mockups'
 import { FinalCta } from '@/features/marketing/sections'
 
 /**
@@ -79,13 +79,20 @@ export default async function CaseStudyPage({
   const index = caseStudies.findIndex((s) => s.slug === slug)
   const next = caseStudies[(index + 1) % caseStudies.length] ?? study
 
+  /**
+   * Empty fields drop out rather than rendering a labelled blank.
+   *
+   * Not every engagement has a verified answer for every heading, and an SMS
+   * block on an email-only engagement would claim a channel Kova did not run.
+   * Fewer blocks is the correct outcome; filling them is not.
+   */
   const blocks = [
     { label: 'Background', body: study.background },
     { label: 'The challenge', body: study.challenge },
     { label: 'Design', body: study.design },
     { label: 'Automation', body: study.automation },
     { label: 'SMS', body: study.sms },
-  ]
+  ].filter((block) => block.body.trim().length > 0)
 
   return (
     <>
@@ -117,40 +124,52 @@ export default async function CaseStudyPage({
             </p>
           </Reveal>
 
-          <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-3">
-            {study.results.map((result) => (
-              <div key={result.label} className="bg-card p-8">
-                <div
-                  className="text-4xl font-medium tracking-tight sm:text-5xl"
-                  style={{ color: study.accent }}
-                >
-                  <CountUp value={result.value} />
+          {study.results.length > 0 && (
+            <div
+              className={cn(
+                'mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border',
+                // Sized to what exists. A two-metric study in a three-column
+                // grid reads as a missing third, which invites filling it.
+                study.results.length >= 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2',
+              )}
+            >
+              {study.results.map((result) => (
+                <div key={result.label} className="bg-card p-8">
+                  <div
+                    className="text-4xl font-medium tracking-tight sm:text-5xl"
+                    style={{ color: study.accent }}
+                  >
+                    <CountUp value={result.value} />
+                  </div>
+                  <div className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    {result.label}
+                  </div>
                 </div>
-                <div className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  {result.label}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
+          {study.results.length > 0 && study.resultsPeriod && (
+            <p className="mt-4 text-sm text-muted-foreground">{study.resultsPeriod}</p>
+          )}
           <div className="pb-16" />
         </Container>
       </section>
 
       <section className="py-20 sm:py-28">
         <Container>
-          <div className="grid gap-16 lg:grid-cols-[1fr_minmax(0,22rem)] lg:gap-20">
-            <div className="flex flex-col gap-14">
-              {blocks.map((block) => (
-                <Reveal key={block.label}>
-                  <div className="grid gap-4 sm:grid-cols-[8rem_1fr] sm:gap-8">
-                    <Eyebrow>{block.label}</Eyebrow>
-                    <p className="max-w-2xl text-lg leading-relaxed text-pretty text-foreground/85">
-                      {block.body}
-                    </p>
-                  </div>
-                </Reveal>
-              ))}
+          <div className="flex flex-col gap-14">
+            {blocks.map((block) => (
+              <Reveal key={block.label}>
+                <div className="grid gap-4 sm:grid-cols-[8rem_1fr] sm:gap-8">
+                  <Eyebrow>{block.label}</Eyebrow>
+                  <p className="max-w-2xl text-lg leading-relaxed text-pretty text-foreground/85">
+                    {block.body}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
 
+            {study.strategy.length > 0 && (
               <Reveal>
                 <div className="grid gap-4 sm:grid-cols-[8rem_1fr] sm:gap-8">
                   <Eyebrow>Strategy</Eyebrow>
@@ -171,13 +190,7 @@ export default async function CaseStudyPage({
                   </ul>
                 </div>
               </Reveal>
-            </div>
-
-            <div className="lg:sticky lg:top-28 lg:self-start">
-              <Reveal>
-                <DashboardCard />
-              </Reveal>
-            </div>
+            )}
           </div>
         </Container>
       </section>

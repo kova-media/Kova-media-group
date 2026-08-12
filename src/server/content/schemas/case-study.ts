@@ -42,6 +42,15 @@ export const caseStudyNarrativeSchema = z.object({
   sms: z.string().max(2000).default(''),
   results: z.array(caseStudyResultSchema).max(6).default([]),
   /**
+   * The window the results cover, e.g. 'November 2024 – July 2025'.
+   *
+   * A percentage survives without its timeframe; an absolute figure does not.
+   * Absolute figures belong in the narrative prose, where the sentence carries
+   * the period — this labels the headline band so a reader knows what window
+   * those figures describe. Blank when there is no stated period.
+   */
+  resultsPeriod: z.string().max(80).default(''),
+  /**
    * A CSS colour used for this study's accent — the results figures, the
    * hero dot, the card wash. Stored as an authored string so the editor can
    * pick something that suits the brand rather than being limited to a
@@ -56,13 +65,17 @@ export const emptyCaseStudyNarrative: CaseStudyNarrative =
   caseStudyNarrativeSchema.parse({})
 
 /**
- * Publish rules: a live case study must actually say something. A study with
- * no background and no results is a placeholder, not a page.
+ * Publish rules: a live case study must actually say something.
+ *
+ * Background is the bar, and it is the only one. Requiring a challenge and at
+ * least one result — as this did — assumed every engagement has a verified
+ * figure to show and a story about what was wrong before. Some do not, and a
+ * publish gate that can only be satisfied by inventing something is worse than
+ * no gate: a study with two verified numbers and one blank heading is honest,
+ * and the schema should let it through.
  */
 export const publishCaseStudyNarrativeSchema = caseStudyNarrativeSchema.extend({
   background: z.string().min(1, 'Background is required to publish.').max(2000),
-  challenge: z.string().min(1, 'The challenge is required to publish.').max(2000),
-  results: z.array(caseStudyResultSchema).min(1, 'Add at least one result.').max(6),
 })
 
 /**

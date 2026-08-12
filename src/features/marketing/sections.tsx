@@ -46,7 +46,17 @@ export function ClientMarquee({ heading = true }: { heading?: boolean }) {
 
 /* ---------------------------------------------------------------------- Metrics */
 
+/**
+ * The "by the numbers" band.
+ *
+ * Renders nothing while `metrics` is empty, which it is: the four figures this
+ * band used to carry were never sourced. The whole section is the numbers —
+ * there is no version of it that works with the claims removed and the heading
+ * left standing — so it is absent rather than hollowed out.
+ */
 export function MetricsRow() {
+  if (metrics.length === 0) return null
+
   return (
     <section className="bg-background py-24 md:py-32">
       <Container>

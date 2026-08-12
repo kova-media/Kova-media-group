@@ -163,6 +163,20 @@ export function CaseStudyEditor({
           />
 
           <Field
+            id="resultsPeriod"
+            label="Results period"
+            hint="The window the figures above cover, e.g. November 2024 – July 2025. Shown under them. Leave blank if there is no stated period."
+          >
+            {(props) => (
+              <Input
+                {...props}
+                value={narrative.resultsPeriod}
+                onChange={(event) => update('resultsPeriod', event.target.value)}
+              />
+            )}
+          </Field>
+
+          <Field
             id="accent"
             label="Accent colour"
             hint="Any CSS colour. Used for this study's figures and card wash."

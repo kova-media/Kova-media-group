@@ -78,6 +78,7 @@ export async function getCaseStudyDetail(slug: string): Promise<CaseStudyView | 
     automation: narrative.automation,
     sms: narrative.sms,
     results: narrative.results,
+    resultsPeriod: narrative.resultsPeriod,
     accent: narrative.accent || DEFAULT_CASE_STUDY_ACCENT,
   }
 }

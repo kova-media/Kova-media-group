@@ -4,7 +4,7 @@ import { ArrowUpRight } from 'lucide-react'
 import { getCaseStudyList } from '@/server/content/site-content'
 import { Container } from '@/components/site/ui'
 import { PageHeader } from '@/components/site/page-header'
-import { Reveal, RevealGroup, RevealItem } from '@/components/site/reveal'
+import { RevealGroup, RevealItem } from '@/components/site/reveal'
 import { FinalCta } from '@/features/marketing/sections'
 
 export const metadata: Metadata = {
@@ -21,7 +21,7 @@ export default async function CaseStudiesPage() {
       <PageHeader
         eyebrow="Case Studies"
         title="Results that compound, brand by brand."
-        description="A closer look at how we rebuild email and SMS into channels our clients can count on. Every number below is tied to revenue."
+        description="A closer look at how we build email and SMS into channels our clients can count on."
       />
 
       <section className="pb-24 sm:pb-32">
@@ -49,33 +49,31 @@ export default async function CaseStudiesPage() {
                       </p>
                     </div>
 
-                    <div className="flex gap-8 border-t border-border pt-6 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-10">
-                      {study.results.slice(0, 2).map((result) => (
-                        <div key={result.label}>
-                          <div
-                            className="text-3xl font-medium tracking-tight sm:text-4xl"
-                            style={{ color: study.accent }}
-                          >
-                            {result.value}
+                    {/* The figures column appears only for studies that have
+                        verified figures. An empty rule beside a study with
+                        none would be an invitation to fill it. */}
+                    {study.results.length > 0 && (
+                      <div className="flex gap-8 border-t border-border pt-6 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-10">
+                        {study.results.slice(0, 2).map((result) => (
+                          <div key={result.label}>
+                            <div
+                              className="text-3xl font-medium tracking-tight sm:text-4xl"
+                              style={{ color: study.accent }}
+                            >
+                              {result.value}
+                            </div>
+                            <div className="mt-2 max-w-[9rem] text-xs leading-relaxed text-muted-foreground">
+                              {result.label}
+                            </div>
                           </div>
-                          <div className="mt-2 max-w-[9rem] text-xs leading-relaxed text-muted-foreground">
-                            {result.label}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </Link>
               </RevealItem>
             ))}
           </RevealGroup>
-
-          <Reveal className="mt-8">
-            <p className="text-center text-sm text-pretty text-muted-foreground">
-              Client names shown reflect brands we&apos;ve partnered with. Specific
-              figures are representative of typical program outcomes.
-            </p>
-          </Reveal>
         </Container>
       </section>
 

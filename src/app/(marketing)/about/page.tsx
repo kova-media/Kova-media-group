@@ -42,24 +42,30 @@ export default async function AboutPage() {
         description="Kova Media Group exists to make email and SMS pull real weight for ecommerce brands. We believe owned channels deserve a specialist, not a checkbox."
       />
 
-      <section className="pb-8">
-        <Container>
-          <Reveal>
-            <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
-              {metrics.map((metric) => (
-                <div key={metric.label} className="bg-card p-8">
-                  <div className="text-4xl font-medium tracking-tight text-primary">
-                    <CountUp value={metric.value} />
+      {/* The figures band renders only when there are verified figures to put
+          in it. It is empty today: the four statistics that used to sit here
+          were never sourced, and a band of numbers is worth nothing if the
+          numbers are not. `values` below carries the page on its own. */}
+      {metrics.length > 0 && (
+        <section className="pb-8">
+          <Container>
+            <Reveal>
+              <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+                {metrics.map((metric) => (
+                  <div key={metric.label} className="bg-card p-8">
+                    <div className="text-4xl font-medium tracking-tight text-primary">
+                      <CountUp value={metric.value} />
+                    </div>
+                    <div className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                      {metric.label}
+                    </div>
                   </div>
-                  <div className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                    {metric.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </Container>
-      </section>
+                ))}
+              </div>
+            </Reveal>
+          </Container>
+        </section>
+      )}
 
       <section className="py-20 sm:py-28">
         <Container>

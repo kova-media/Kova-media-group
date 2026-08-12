@@ -20,7 +20,8 @@
     "postinstall": "prisma generate",
     "verify": "npm run typecheck && npm run lint && npm run test",
     "admin:create": "tsx scripts/create-admin.ts",
-    "db:seed:content": "tsx prisma/seed-content.ts"
+    "db:seed:content": "tsx prisma/seed-content.ts",
+    "db:sync:case-studies": "tsx scripts/sync-case-studies.ts"
   },
   "engines": {
     "node": ">=20.9.0"

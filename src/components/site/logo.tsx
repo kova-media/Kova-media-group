@@ -6,19 +6,28 @@ import { cn } from '@/lib/utils'
 /**
  * The Kova mark.
  *
- * **The real logo is an uploaded asset, not code.** Whatever is set as the logo
- * in Site settings renders here; there is deliberately no hand-drawn glyph
- * approximating the identity, because an approximated logo is worse than an
- * honest wordmark and would have to be unpicked later.
+ * **Nothing here is drawn by hand.** The bundled default is the real Kova Media
+ * Group logotype — the teal equalizer mark and the KOVA / MEDIA GROUP
+ * wordmark — shipped as an asset rather than reconstructed in code, because an
+ * approximated identity is worse than none and would have to be unpicked later.
+ * The only processing applied to it is the ink colour of the lettering: the
+ * supplied file is white-on-transparent for dark grounds, and the light-ground
+ * variant takes the same artwork to the page's foreground ink. The teal is
+ * untouched in both.
  *
- * Until that asset is uploaded this falls back to a plain typographic
- * logotype — the company name, set in the site's own typeface. Dropping the
- * real file in through the admin replaces it everywhere, with no code change.
+ * Whatever is set as the logo in Site settings still wins, so replacing the
+ * file through the admin replaces it everywhere with no code change.
  */
 export type LogoAsset = {
   url: string
   width: number | null
   height: number | null
+}
+
+/** The bundled logotype, per ground. Intrinsic size is the artwork's own box. */
+const DEFAULT_LOGO: Record<'light' | 'dark', LogoAsset> = {
+  light: { url: '/brand/kova-logo.png', width: 267, height: 84 },
+  dark: { url: '/brand/kova-logo-on-dark.png', width: 267, height: 84 },
 }
 
 export function Logo({
@@ -30,37 +39,19 @@ export function Logo({
   tone?: 'light' | 'dark'
   className?: string
 }) {
-  if (asset) {
-    return (
-      <Image
-        src={asset.url}
-        alt="Kova Media Group"
-        width={asset.width ?? 160}
-        height={asset.height ?? 32}
-        priority
-        className={cn('h-7 w-auto object-contain', className)}
-      />
-    )
-  }
+  const logo = asset ?? DEFAULT_LOGO[tone]
 
   return (
-    <span
-      className={cn(
-        'text-[0.95rem] font-semibold tracking-tight',
-        tone === 'dark' ? 'text-background' : 'text-foreground',
-        className,
-      )}
-    >
-      Kova{' '}
-      <span
-        className={cn(
-          'font-normal',
-          tone === 'dark' ? 'text-background/60' : 'text-muted-foreground',
-        )}
-      >
-        Media Group
-      </span>
-    </span>
+    <Image
+      src={logo.url}
+      alt="Kova Media Group"
+      width={logo.width ?? 267}
+      height={logo.height ?? 84}
+      priority
+      /* Tall enough that "MEDIA GROUP" stays legible: at h-7 the sub-line
+         collapses to a smudge. */
+      className={cn('h-9 w-auto object-contain', className)}
+    />
   )
 }
 

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Mail, MessageSquare, ClipboardCheck, PenLine, ArrowRight } from 'lucide-react'
+import { Mail, MessageSquare, ArrowRight } from 'lucide-react'
 import {
   services,
   caseStudies as fallbackCaseStudies,
@@ -13,20 +13,20 @@ import { Reveal, RevealGroup, RevealItem } from '@/components/site/reveal'
 import { FlowDiagram, DashboardCard } from '@/components/site/mockups'
 
 /** One icon per core service, in the order they are defined. */
-const serviceIcons = [Mail, MessageSquare, ClipboardCheck, PenLine]
+const serviceIcons = [Mail, MessageSquare]
 
 /* --------------------------------------------------------------- Services preview */
 
 export function ServicesPreview() {
   /**
-   * The two primary channels only.
+   * Both services — which is the two channels, and nothing else.
    *
-   * Audits and copywriting are real services and live on the services page,
-   * but they support the two channels rather than standing beside them. Showing
-   * four here diluted the "two channels" claim the headline makes — the section
-   * now says the same thing twice, in words and in structure.
+   * The section deliberately mirrors `services` one-for-one rather than slicing
+   * it: the headline claims two channels, and the structure has to say the same
+   * thing. If a third ever appears in the data it should be a considered
+   * decision here too, not something that silently lands in the grid.
    */
-  const primary = services.slice(0, 2)
+  const primary = services
 
   return (
     <section className="bg-surface py-24 md:py-32">

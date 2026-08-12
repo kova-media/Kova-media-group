@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Mail, MessageSquare, ClipboardCheck, PenLine } from 'lucide-react'
+import { Mail, MessageSquare } from 'lucide-react'
 
 import { services } from '@/lib/site-data'
 import { Container, Eyebrow } from '@/components/site/ui'
@@ -10,16 +10,16 @@ import { FinalCta } from '@/features/marketing/sections'
 export const metadata: Metadata = {
   title: 'Services',
   description:
-    'Email marketing, SMS marketing, account audits, and copywriting for direct-to-consumer ecommerce brands.',
+    'Email marketing and SMS marketing for direct-to-consumer ecommerce brands. Two channels, run end to end.',
 }
 
-const ICONS = [Mail, MessageSquare, ClipboardCheck, PenLine]
+const ICONS = [Mail, MessageSquare]
 
 /**
- * Four services, each given a full row rather than a card in a grid.
+ * Two services, each given a full row rather than a card in a grid.
  *
- * The previous version listed ten capabilities as equal tiles, which read as a
- * feature list and made the offer look diffuse. Giving each of the four real
+ * An earlier version listed ten capabilities as equal tiles, which read as a
+ * feature list and made the offer look diffuse. Giving each of the two real
  * services its own band — number, icon, description, and what it includes —
  * communicates more with less, and leaves room for the copy to actually explain
  * the work.
@@ -29,8 +29,8 @@ export default function ServicesPage() {
     <>
       <PageHeader
         eyebrow="Services"
-        title="Four things, done properly."
-        description="We do email and SMS marketing for ecommerce brands, and the audit and copywriting work that makes both perform. Not ten services — four, run in-house."
+        title="Two things, done properly."
+        description="We do email marketing and SMS marketing for ecommerce brands. Not ten services — two, run end to end and in-house."
       />
 
       <section className="pb-24 sm:pb-32">
@@ -97,10 +97,10 @@ export default function ServicesPage() {
                 place in the inbox.
               </p>
               <p className="mt-6 max-w-2xl leading-relaxed text-pretty text-muted-foreground">
-                Platforms are part of the job, not the offer. We manage Klaviyo end to
-                end as part of your programme — the account structure, the data, and the
-                deliverability work behind it — because that is what makes the four
-                services above actually perform.
+                Platforms are part of the job, not the offer. We work in Klaviyo, Privy,
+                Postscript, and many more, and we manage whichever one you are on end to
+                end — the account structure, the data, and the deliverability work
+                behind it — because that is what makes both channels actually perform.
               </p>
             </div>
           </Reveal>

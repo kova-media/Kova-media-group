@@ -29,7 +29,7 @@ export function BookingEmbed({ url }: { url: string }) {
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="group mt-6 inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-[0.95rem] font-medium text-background transition-all duration-300 hover:bg-brand"
+          className="group mt-6 inline-flex items-center gap-2 rounded-full bg-cta px-6 py-3 text-[0.95rem] font-medium text-cta-foreground transition-all duration-300 hover:bg-cta-hover"
         >
           Open the calendar
           <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

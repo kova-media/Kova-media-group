@@ -8,11 +8,11 @@ import { ContactForm } from '@/features/marketing/contact-form/contact-form'
 export const metadata: Metadata = {
   title: 'Contact',
   description:
-    'Book a free call and account audit with Kova Media Group. Find out what your email and SMS program is leaving on the table.',
+    'Book a free strategy call with Kova Media Group. Find out what your email and SMS program is leaving on the table.',
 }
 
 const points = [
-  'A free, no-pressure audit of your email & SMS setup',
+  'A free, no-pressure look at your email & SMS setup',
   'A clear view of the revenue your program is leaving on the table',
   'Straight answers on whether we’re the right fit — no hard sell',
 ]
@@ -29,8 +29,8 @@ export default function ContactPage() {
             </h1>
             <Reveal delay={0.2}>
               <p className="mt-6 max-w-md text-lg leading-relaxed text-pretty text-muted-foreground">
-                Every engagement starts with a free call and account audit. Here&apos;s
-                what you can expect.
+                Every engagement starts with a free call. Here&apos;s what you can
+                expect.
               </p>
             </Reveal>
 

@@ -242,8 +242,9 @@ export function FinalCta() {
               See what your brand is leaving on the table.
             </h2>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-pretty text-background/70">
-              A free call and account audit. You&apos;ll walk away with a clear plan to
-              grow your email and SMS revenue — whether or not we work together.
+              A free call, and a straight read on your email and SMS setup. You&apos;ll
+              walk away with a clear plan to grow that revenue — whether or not we work
+              together.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link

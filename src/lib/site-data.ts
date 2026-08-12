@@ -45,14 +45,15 @@ export type Service = {
 }
 
 /**
- * The four core services.
+ * The two services Kova sells.
  *
- * Deliberately four, not ten. Klaviyo is a platform Kova manages as part of a
- * client's email and SMS programme — not a service in its own right — and the
- * same is true of deliverability, segmentation, automations, campaigns and
- * reporting. Those are how the work gets done, and they belong inside a
- * service's description rather than fragmenting the offer into a grid of
- * capabilities that reads like a feature list.
+ * Deliberately two, not ten. Everything else people ask about — the audit that
+ * opens an engagement, the copy, the deliverability work, segmentation,
+ * automations, campaigns, reporting, and the platforms themselves (Klaviyo,
+ * Privy, Postscript) — is *how* these two channels get run, not a separate
+ * thing to buy. Those belong inside a service's description; promoting them to
+ * catalogue entries makes the offer read as a feature list and dilutes the
+ * two-channel claim the whole site is built on.
  */
 export const services: Service[] = [
   {
@@ -82,33 +83,6 @@ export const services: Service[] = [
       'Launch, restock, and time-sensitive sends',
       'Automated SMS alongside email flows',
       'Timing and frequency strategy',
-    ],
-  },
-  {
-    slug: 'account-audits',
-    title: 'Account Audits',
-    summary:
-      'A clear read on what your programme is doing today, and what it is leaving on the table.',
-    description:
-      'We go through the account properly: structure, list health, every live flow, historic performance, and the gaps between them. You get a prioritised picture of what is working, what is quietly costing you, and what to fix first — as a standalone piece of work or as the opening step of an engagement.',
-    points: [
-      'Account structure and data review',
-      'Flow-by-flow performance analysis',
-      'List health and deliverability check',
-      'A prioritised plan, ordered by revenue impact',
-    ],
-  },
-  {
-    slug: 'copywriting',
-    title: 'Copywriting',
-    summary: 'Words that sound like your brand and give the reader a reason to act.',
-    description:
-      'Subject lines that earn the open, body copy that holds attention, and calls to action that do not shout. We write in your voice across email and SMS, and we test the parts worth testing rather than guessing at what works.',
-    points: [
-      'Brand voice, applied consistently',
-      'Subject-line and preview-text testing',
-      'Story-driven sequences',
-      'Clear, unhyped calls to action',
     ],
   },
 ]
@@ -281,6 +255,6 @@ export const faqs = [
   },
   {
     q: 'How do we get started?',
-    a: 'It starts with a free call and an account audit. You’ll walk away with a clear picture of what your program is leaving on the table, whether or not we work together.',
+    a: 'It starts with a free call. We go through your current email and SMS setup together, and you’ll walk away with a clear picture of what your program is leaving on the table — whether or not we end up working together.',
   },
 ]

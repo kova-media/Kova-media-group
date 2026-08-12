@@ -105,7 +105,7 @@ export function ContactForm({ source }: { source?: string }) {
             </h3>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-pretty text-muted-foreground">
               We&apos;ll review your details and reply within one business day to set up
-              your free account audit.
+              your free call.
             </p>
           </motion.div>
         ) : (
@@ -253,7 +253,7 @@ function SubmitButton() {
       disabled={pending}
       className="group mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-cta px-7 py-3.5 text-sm font-medium text-cta-foreground transition-all hover:bg-cta-hover disabled:opacity-60"
     >
-      {pending ? 'Sending…' : 'Request my free audit'}
+      {pending ? 'Sending…' : 'Request my free call'}
       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
     </button>
   )

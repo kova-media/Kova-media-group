@@ -42,10 +42,13 @@ async function seedSettings() {
       defaultSeoTitle: 'Kova Media Group — Email & SMS marketing for DTC brands',
       defaultSeoDescription:
         'Email and SMS marketing for DTC brands doing $50k+ a month. Kova becomes an extension of your team.',
-      contactEmail: 'hello@kovamediagroup.com',
+      contactEmail: 'damian@kovamediagroup.com',
+      bookingUrl: 'https://calendly.com/damian-kovamediagroup-7lpe/30min',
       navigation: [
-        { label: 'Work', href: '/work' },
-        { label: 'Contact', href: '/contact' },
+        { label: 'Services', href: '/services' },
+        { label: 'Case Studies', href: '/case-studies' },
+        { label: 'Process', href: '/process' },
+        { label: 'About', href: '/about' },
       ],
       footer: {
         tagline: 'Email and SMS marketing, done as part of your team.',

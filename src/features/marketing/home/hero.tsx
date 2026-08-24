@@ -4,10 +4,32 @@ import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
 import { Container, ButtonLink } from '@/components/site/ui'
 import { RevealLines } from '@/components/site/reveal'
-import { DashboardCard, EmailCard, SmsCard } from '@/components/site/mockups'
+import { DashboardCard } from '@/components/site/mockups'
 
 const ease = [0.16, 1, 0.3, 1] as const
 
+/**
+ * The homepage hero.
+ *
+ * What changed and why. The visual column used to be three mockup cards flown
+ * in 3D — `perspective: 1600px`, `preserve-3d`, an entry `rotateX`, and two
+ * siblings rotated a few degrees and stacked on z-10/20/30. That is the
+ * "box behind a box" depth trick, and it was doing the work the typography
+ * should do: it made the composition busy, it made the mockups unreadable at
+ * their rotation, and it is the single most recognisable tell of the current
+ * agency-site house style.
+ *
+ * It is now one artefact, flat, on the grid, with the product surface legible
+ * because that is the actual argument — Kova reports attributed revenue. A
+ * single parallax offset survives, because moving the panel slightly against
+ * the copy as you scroll clarifies which column is fixed and which is content.
+ * There is no rotation and no stack.
+ *
+ * The badge above the headline is gone too. A pill-shaped, dot-prefixed,
+ * uppercase micro-label above an H1 is the eyebrow formula in its purest form.
+ * The same information now sits *below* the CTAs as a plain line of text, where
+ * it qualifies the offer instead of delaying the headline.
+ */
 export function Hero() {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
@@ -15,59 +37,46 @@ export function Hero() {
     offset: ['start start', 'end start'],
   })
 
-  // Parallax + slow rotation driven by scroll.
-  const dashY = useTransform(scrollYProgress, [0, 1], [0, -60])
-  const dashRotate = useTransform(scrollYProgress, [0, 1], [0, -6])
-  const emailY = useTransform(scrollYProgress, [0, 1], [0, -140])
-  const smsY = useTransform(scrollYProgress, [0, 1], [0, 90])
-  const compScale = useTransform(scrollYProgress, [0, 1], [1, 1.04])
+  const panelY = useTransform(scrollYProgress, [0, 1], [0, -48])
 
   return (
     <section ref={ref} className="relative overflow-hidden pt-32 md:pt-40">
-      {/* faint background grid */}
+      {/* Measured grid, masked to the top edge — ruling, not ambient glow. */}
       <div
-        className="pointer-events-none absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_top,black,transparent_75%)] opacity-[0.5]"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[32rem] [mask-image:linear-gradient(to_bottom,black,transparent)] opacity-[0.55]"
         aria-hidden
       >
         <div className="grid-lines h-full w-full" />
       </div>
 
       <Container>
-        <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="grid items-start gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
           {/* Copy */}
-          <div className="max-w-xl">
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease }}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 font-mono text-xs tracking-[0.16em] text-muted-foreground uppercase"
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-brand" aria-hidden />
-              Email &amp; SMS specialists
-            </motion.p>
-
-            <h1 className="tracking-tightest mt-6 text-5xl leading-[1.02] font-semibold text-balance text-foreground md:text-6xl lg:text-[4.25rem]">
+          <div className="max-w-2xl">
+            <h1 className="tracking-tightest text-[3.25rem] leading-[1.02] font-semibold text-balance text-foreground md:text-7xl lg:text-[5rem]">
               <RevealLines
                 lines={['Email & SMS', 'marketing that', 'drives revenue.']}
               />
             </h1>
 
-            <motion.p
+            <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease }}
-              className="mt-7 max-w-lg text-lg leading-relaxed text-pretty text-muted-foreground"
+              className="mt-10 max-w-lg border-l-2 border-brand pl-6"
             >
-              We help ecommerce brands generate more revenue from the customers they
-              already have — through high-performing campaigns, intelligent automations,
-              and strategic SMS.
-            </motion.p>
+              <p className="text-lg leading-relaxed text-pretty text-foreground/80">
+                We help ecommerce brands generate more revenue from the customers they
+                already have — through high-performing campaigns, intelligent
+                automations, and strategic SMS.
+              </p>
+            </motion.div>
 
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.65, ease }}
-              className="mt-9 flex flex-col gap-3 sm:flex-row"
+              className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
             >
               <ButtonLink href="/book" variant="primary" withArrow>
                 Book a strategy call
@@ -76,42 +85,26 @@ export function Hero() {
                 View case studies
               </ButtonLink>
             </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.8, ease }}
+              className="mt-8 text-[0.9375rem] text-muted-foreground"
+            >
+              Email and SMS specialists for direct-to-consumer ecommerce.
+            </motion.p>
           </div>
 
-          {/* Visual composition */}
+          {/* One artefact, flat and legible. */}
           <motion.div
-            style={{ scale: compScale }}
-            className="relative mx-auto h-[440px] w-full max-w-[460px] [perspective:1600px] lg:h-[520px]"
+            style={{ y: panelY }}
+            initial={{ opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.35, ease }}
+            className="hidden lg:block lg:pt-4"
           >
-            <motion.div
-              style={{ y: dashY, rotate: dashRotate }}
-              initial={{ opacity: 0, y: 40, rotateX: 12 }}
-              animate={{ opacity: 1, y: 0, rotateX: 0 }}
-              transition={{ duration: 1, delay: 0.3, ease }}
-              className="absolute top-4 right-0 z-20 [transform-style:preserve-3d]"
-            >
-              <DashboardCard />
-            </motion.div>
-
-            <motion.div
-              style={{ y: emailY }}
-              initial={{ opacity: 0, y: 30, x: -20 }}
-              animate={{ opacity: 1, y: 0, x: 0 }}
-              transition={{ duration: 1, delay: 0.55, ease }}
-              className="absolute bottom-6 left-0 z-10 hidden sm:block"
-            >
-              <EmailCard className="w-[210px] rotate-[-5deg]" />
-            </motion.div>
-
-            <motion.div
-              style={{ y: smsY }}
-              initial={{ opacity: 0, y: 30, x: 20 }}
-              animate={{ opacity: 1, y: 0, x: 0 }}
-              transition={{ duration: 1, delay: 0.7, ease }}
-              className="absolute right-4 -bottom-4 z-30 hidden sm:block"
-            >
-              <SmsCard className="w-[200px] rotate-[4deg]" />
-            </motion.div>
+            <DashboardCard className="ml-auto" />
           </motion.div>
         </div>
       </Container>

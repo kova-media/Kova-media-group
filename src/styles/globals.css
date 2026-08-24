@@ -242,6 +242,18 @@
       linear-gradient(to bottom, var(--border) 1px, transparent 1px);
     background-size: 64px 64px;
   }
+
+  /**
+   * The same ruling on a dark ground. `--border` is a near-white-page value and
+   * disappears on navy, so the light band draws its own lines. Same 64px module
+   * as `.grid-lines`, so the two read as one system across the tonal break.
+   */
+  .grid-lines-light {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
 }
 
 /* ---------------------------------------------------------------------------

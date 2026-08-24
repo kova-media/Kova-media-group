@@ -26,23 +26,22 @@ export default function ProcessPage() {
           <div className="grid gap-16 lg:grid-cols-[1fr_minmax(0,26rem)] lg:gap-20">
             <div>
               <RevealGroup className="flex flex-col">
-                {process.map((item, i) => (
+                {process.map((item) => (
                   <RevealItem key={item.step}>
-                    <div className="group relative flex gap-6 pb-12 last:pb-0">
-                      {i < process.length - 1 && (
-                        <span
-                          className="absolute top-14 bottom-0 left-[1.6rem] w-px bg-border"
-                          aria-hidden
-                        />
-                      )}
-                      <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-full border border-border bg-card font-mono text-sm text-primary shadow-sm">
+                    {/* The step marker was a bordered, shadowed circle on a
+                        connector line: three elements to say "step 2". The
+                        numeral now sits bare in its own column against the rule
+                        that divides the steps, which says the same thing with
+                        one. Numbers are plain — `2`, not `02`. */}
+                    <div className="grid grid-cols-[3rem_1fr] gap-x-6 border-t border-border py-9 last:border-b">
+                      <span className="font-mono text-sm text-brand tabular-nums">
                         {item.step}
-                      </div>
-                      <div className="pt-2">
-                        <h2 className="text-2xl font-medium tracking-tight">
+                      </span>
+                      <div>
+                        <h2 className="text-2xl font-medium tracking-tight text-foreground">
                           {item.title}
                         </h2>
-                        <p className="mt-3 max-w-xl leading-relaxed text-muted-foreground">
+                        <p className="mt-3 max-w-xl leading-relaxed text-pretty text-muted-foreground">
                           {item.description}
                         </p>
                       </div>
@@ -55,7 +54,7 @@ export default function ProcessPage() {
             <div className="lg:sticky lg:top-28 lg:self-start">
               <Reveal>
                 <Eyebrow>What we build</Eyebrow>
-                <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+                <p className="mt-5 leading-relaxed text-pretty text-muted-foreground">
                   A typical automation suite recovers revenue around the clock. Here is
                   a simplified view of the flows we design and connect.
                 </p>

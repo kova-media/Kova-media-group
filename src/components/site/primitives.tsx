@@ -55,17 +55,20 @@ export function Section({
   )
 }
 
-/** The mono, tracked-out label above a heading. Mirrors `Eyebrow` in ui.tsx. */
+/**
+ * The section label. Mirrors `Eyebrow` in ui.tsx — read the note there for why
+ * it is sized and marked the way it is. If one changes, both change.
+ */
 export function Eyebrow({ className, children, ...props }: ComponentProps<'span'>) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-2 font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase',
+        'inline-flex items-center gap-3.5 text-[0.8125rem] leading-none font-medium tracking-[0.08em] text-foreground/65 uppercase',
         className,
       )}
       {...props}
     >
-      <span className="h-1 w-1 rounded-full bg-brand" aria-hidden />
+      <span className="h-px w-7 shrink-0 bg-brand" aria-hidden />
       {children}
     </span>
   )

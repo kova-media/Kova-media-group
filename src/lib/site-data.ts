@@ -207,25 +207,25 @@ export const caseStudies: CaseStudy[] = [
 
 export const process = [
   {
-    step: '01',
+    step: '1',
     title: 'Audit',
     description:
       'We review your entire setup — account structure, list health, flows, and past performance — and pinpoint exactly what’s working, what’s not, and what to fix first.',
   },
   {
-    step: '02',
+    step: '2',
     title: 'Strategy',
     description:
       'We turn the audit into a clear plan: segmentation, a campaign calendar, the flows to build, and the SMS moments worth owning — all tied to revenue goals.',
   },
   {
-    step: '03',
+    step: '3',
     title: 'Execution',
     description:
       'We design, write, and ship. Campaigns go out on a consistent calendar and automations are built, tested, and launched — all in-house.',
   },
   {
-    step: '04',
+    step: '4',
     title: 'Optimization',
     description:
       'We test, measure, and refine every week. Winning ideas scale, weak ones are cut, and the program compounds quarter over quarter.',

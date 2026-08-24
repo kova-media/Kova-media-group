@@ -106,12 +106,8 @@ export default async function CaseStudyPage({
             All case studies
           </Link>
 
-          <div className="mt-8 flex items-center gap-3 font-mono text-xs text-muted-foreground">
-            <span
-              className="h-2 w-2 rounded-full"
-              style={{ backgroundColor: study.accent }}
-              aria-hidden
-            />
+          <div className="mt-8 flex items-center gap-3.5 text-[0.8125rem] font-medium tracking-[0.08em] text-foreground/65 uppercase">
+            <span className="h-px w-7 shrink-0 bg-brand" aria-hidden />
             {study.category}
           </div>
 
@@ -127,21 +123,18 @@ export default async function CaseStudyPage({
           {study.results.length > 0 && (
             <div
               className={cn(
-                'mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border',
+                'mt-14 grid gap-x-12 gap-y-10',
                 // Sized to what exists. A two-metric study in a three-column
                 // grid reads as a missing third, which invites filling it.
                 study.results.length >= 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2',
               )}
             >
               {study.results.map((result) => (
-                <div key={result.label} className="bg-card p-8">
-                  <div
-                    className="text-4xl font-medium tracking-tight sm:text-5xl"
-                    style={{ color: study.accent }}
-                  >
+                <div key={result.label} className="border-t-2 border-brand pt-6">
+                  <div className="text-4xl font-semibold tracking-tight text-foreground tabular-nums sm:text-5xl">
                     <CountUp value={result.value} />
                   </div>
-                  <div className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  <div className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
                     {result.label}
                   </div>
                 </div>
@@ -180,8 +173,7 @@ export default async function CaseStudyPage({
                         className="flex items-start gap-3 text-lg leading-relaxed text-foreground/85"
                       >
                         <span
-                          className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full"
-                          style={{ backgroundColor: study.accent }}
+                          className="mt-3.5 h-px w-4 shrink-0 bg-brand"
                           aria-hidden
                         />
                         {item}
@@ -202,7 +194,7 @@ export default async function CaseStudyPage({
             className="group flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
           >
             <div>
-              <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+              <span className="text-[0.8125rem] font-medium tracking-[0.08em] text-foreground/65 uppercase">
                 Next case study
               </span>
               <div className="mt-2 text-3xl font-medium tracking-tight sm:text-4xl">

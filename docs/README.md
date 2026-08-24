@@ -4,17 +4,18 @@ The source of truth for this application's architecture. If code and these docum
 
 ## Read in this order
 
-| #   | Document                                     | Covers                                                          |
-| --- | -------------------------------------------- | --------------------------------------------------------------- |
-| 1   | [ARCHITECTURE.md](./ARCHITECTURE.md)         | System shape, rendering model, caching, auth, security, budgets |
-| 2   | [DATABASE.md](./DATABASE.md)                 | Schema, Prisma, connections, migrations, RLS, backups           |
-| 3   | [CMS.md](./CMS.md)                           | Content model, section registry, draft/publish, preview, media  |
-| 4   | [FOLDER_STRUCTURE.md](./FOLDER_STRUCTURE.md) | Directory layout, import rules, naming                          |
-| 5   | [CODING_STANDARDS.md](./CODING_STANDARDS.md) | TypeScript, React, styling, motion, testing, Next.js 16 gotchas |
-| 6   | [ROADMAP.md](./ROADMAP.md)                   | Delivery phases and exit criteria                               |
-| 7   | [DECISIONS.md](./DECISIONS.md)               | Architecture decision records                                   |
+| #   | Document                                     | Covers                                                                |
+| --- | -------------------------------------------- | --------------------------------------------------------------------- |
+| 1   | [ARCHITECTURE.md](./ARCHITECTURE.md)         | System shape, rendering model, caching, auth, security, budgets       |
+| 2   | [DATABASE.md](./DATABASE.md)                 | Schema, Prisma, connections, migrations, RLS, backups                 |
+| 3   | [CMS.md](./CMS.md)                           | Content model, section registry, draft/publish, preview, media        |
+| 4   | [FOLDER_STRUCTURE.md](./FOLDER_STRUCTURE.md) | Directory layout, import rules, naming                                |
+| 5   | [CODING_STANDARDS.md](./CODING_STANDARDS.md) | TypeScript, React, styling, motion, testing, Next.js 16 gotchas       |
+| 6   | [DESIGN.md](./DESIGN.md)                     | Visual direction for the marketing site — principles and prohibitions |
+| 7   | [ROADMAP.md](./ROADMAP.md)                   | Delivery phases and exit criteria                                     |
+| 8   | [DECISIONS.md](./DECISIONS.md)               | Architecture decision records                                         |
 
-New to the project? Read 1 and 5 in full, skim the rest, then come back to whichever covers what you are about to build.
+New to the project? Read 1 and 5 in full, skim the rest, then come back to whichever covers what you are about to build. Read 6 before touching any marketing section.
 
 ## The short version
 

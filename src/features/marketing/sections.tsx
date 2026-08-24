@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Plus } from 'lucide-react'
 import { clients, metrics, faqs as fallbackFaqs } from '@/lib/site-data'
-import { Container, Eyebrow, CountUp, ButtonLink } from '@/components/site/ui'
+import { Container, CountUp, ButtonLink } from '@/components/site/ui'
 import { Reveal, RevealGroup, RevealItem } from '@/components/site/reveal'
 import { cn } from '@/lib/utils'
 
@@ -18,7 +18,7 @@ export function ClientMarquee({ heading = true }: { heading?: boolean }) {
       <Container>
         {heading && (
           <Reveal>
-            <p className="mb-10 text-center text-xs font-medium tracking-[0.2em] text-muted-foreground uppercase">
+            <p className="mb-10 text-center text-[0.8125rem] font-medium tracking-[0.08em] text-foreground/65 uppercase">
               Trusted by direct-to-consumer brands
             </p>
           </Reveal>
@@ -60,25 +60,24 @@ export function MetricsRow() {
   return (
     <section className="bg-background py-24 md:py-32">
       <Container>
-        <Reveal className="max-w-2xl">
-          <Eyebrow>By the numbers</Eyebrow>
-          <h2 className="mt-5 text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
+        <Reveal className="max-w-3xl">
+          <h2 className="text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl lg:text-6xl">
             Retention is the highest-ROI channel in ecommerce.
           </h2>
-          <p className="mt-4 text-lg leading-relaxed text-pretty text-muted-foreground">
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-pretty text-muted-foreground">
             Most brands leave that potential on the table. Here is what focused email
             and SMS work has delivered for the brands we partner with.
           </p>
         </Reveal>
 
-        <RevealGroup className="mt-16 grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-4">
+        <RevealGroup className="mt-16 grid grid-cols-2 gap-x-10 gap-y-12 md:mt-20 md:grid-cols-4">
           {metrics.map((m) => (
-            <RevealItem key={m.label} className="border-t border-border-strong pt-6">
+            <RevealItem key={m.label} className="border-t-2 border-brand pt-6">
               <CountUp
                 value={m.value}
-                className="block text-5xl font-semibold tracking-tight text-foreground md:text-6xl"
+                className="block text-5xl font-semibold tracking-tight text-foreground tabular-nums md:text-6xl"
               />
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
                 {m.label}
               </p>
             </RevealItem>
@@ -115,36 +114,39 @@ export function Testimonials({
   return (
     <section className="bg-surface py-24 md:py-32">
       <Container>
-        <Reveal className="max-w-2xl">
-          <Eyebrow>Testimonials</Eyebrow>
-          <h2 className="mt-5 text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
+        <Reveal className="max-w-3xl">
+          <h2 className="text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl lg:text-6xl">
             Trusted by the founders who hired us.
           </h2>
         </Reveal>
+        {/* Quotes are set as quotes, not as cards: a teal rule opens each one,
+            the type is large enough to actually be read, and attribution sits
+            on a single line beneath. Three bordered boxes in a row would put
+            this section in the same shape as every other one on the site. */}
         <RevealGroup
           className={cn(
-            'mt-14 grid gap-6',
+            'mt-14 grid gap-x-12 gap-y-14 md:mt-20',
             // Match the column count to what actually exists: two real quotes
             // in a three-column grid reads as a missing third.
             testimonials.length >= 3
               ? 'md:grid-cols-3'
               : testimonials.length === 2
                 ? 'md:grid-cols-2'
-                : 'max-w-2xl',
+                : 'max-w-3xl',
           )}
         >
           {testimonials.map((t) => (
             <RevealItem
               key={t.quote}
-              className="flex flex-col justify-between rounded-2xl border border-border bg-card p-7 shadow-[var(--shadow-soft)]"
+              className="flex flex-col border-t-2 border-brand pt-7"
             >
-              <p className="text-[1.05rem] leading-relaxed text-pretty text-foreground">
-                &ldquo;{t.quote}&rdquo;
+              <p className="text-xl leading-[1.5] text-pretty text-foreground">
+                {t.quote}
               </p>
-              <div className="mt-8 border-t border-border pt-5">
-                <p className="text-sm font-medium text-foreground">{t.name}</p>
-                <p className="text-sm text-muted-foreground">{t.role}</p>
-              </div>
+              <p className="mt-7 text-[0.9375rem] text-muted-foreground">
+                <span className="font-medium text-foreground">{t.name}</span>
+                {t.role ? `, ${t.role}` : ''}
+              </p>
             </RevealItem>
           ))}
         </RevealGroup>
@@ -180,8 +182,7 @@ export function Faq({
     >
       <Container className="max-w-4xl">
         <Reveal className="mx-auto max-w-2xl text-center">
-          <Eyebrow className="justify-center">FAQ</Eyebrow>
-          <h2 className="mt-5 text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
+          <h2 className="text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
             Questions, answered.
           </h2>
         </Reveal>
@@ -230,50 +231,57 @@ export function Faq({
 
 /* -------------------------------------------------------------------- Final CTA */
 
+/**
+ * The closing CTA, on every page.
+ *
+ * It was a `rounded-3xl` slab floating inside the page margin with a dotted
+ * radial texture and a centred mono micro-label above the headline. Rounding a
+ * container that large just makes it read as one more card, and inset-with-
+ * margin is the shape every SaaS footer-CTA has.
+ *
+ * It is now a genuine full-bleed band in the identity's navy — the brand system
+ * already carries `--navy` as "a dark ground, not the page", and this is the one
+ * place on the site that wants a dark ground. Square edges, edge-to-edge, so it
+ * reads as a structural break in the page rather than a component sitting on
+ * it. The copy is left-aligned against the same grid the rest of the site uses,
+ * which is what makes it feel like part of the document.
+ */
 export function FinalCta() {
   return (
-    <section className="bg-background pt-8 pb-28">
-      <Container>
-        <div className="relative overflow-hidden rounded-3xl bg-foreground px-8 py-20 md:px-16 md:py-28">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-[0.06]"
-            style={{
-              backgroundImage:
-                'radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 70% 60%, white 1px, transparent 1px)',
-              backgroundSize: '48px 48px, 64px 64px',
-            }}
-            aria-hidden
-          />
-          <Reveal className="relative mx-auto max-w-2xl text-center">
-            <p className="font-mono text-xs tracking-[0.2em] text-background/60 uppercase">
-              Book your strategy call
-            </p>
-            <h2 className="mt-6 text-4xl font-semibold tracking-tight text-balance text-background md:text-6xl">
-              See what your brand is leaving on the table.
-            </h2>
-            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-pretty text-background/70">
-              A free call, and a straight read on your email and SMS setup. You&apos;ll
-              walk away with a clear plan to grow that revenue — whether or not we work
-              together.
-            </p>
-            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link
-                href="/book"
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-cta px-7 py-3.5 text-[0.95rem] font-medium text-cta-foreground transition-all duration-300 hover:bg-cta-hover"
-              >
-                Book a strategy call
-              </Link>
-              <ButtonLink
-                href="/case-studies"
-                variant="ghost"
-                className="px-5 py-3.5 text-background/80 hover:text-background"
-                withArrow
-              >
-                View case studies
-              </ButtonLink>
-            </div>
-          </Reveal>
-        </div>
+    <section className="relative overflow-hidden bg-navy py-24 md:py-32">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-64 [mask-image:linear-gradient(to_bottom,black,transparent)] opacity-[0.07]"
+        aria-hidden
+      >
+        <div className="grid-lines-light h-full w-full" />
+      </div>
+      <Container className="relative">
+        <Reveal className="max-w-3xl">
+          <h2 className="text-4xl font-semibold tracking-tight text-balance text-white md:text-5xl lg:text-6xl">
+            See what your brand is leaving on the table.
+          </h2>
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-pretty text-white/70">
+            A free call, and a straight read on your email and SMS setup. You&apos;ll
+            walk away with a clear plan to grow that revenue — whether or not we work
+            together.
+          </p>
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Link
+              href="/book"
+              className="group inline-flex items-center justify-center gap-2 rounded-full bg-cta px-7 py-3.5 text-[0.95rem] font-medium text-cta-foreground transition-all duration-300 hover:bg-cta-hover"
+            >
+              Book a strategy call
+            </Link>
+            <ButtonLink
+              href="/case-studies"
+              variant="ghost"
+              className="px-5 py-3.5 text-white/80 hover:text-white"
+              withArrow
+            >
+              View case studies
+            </ButtonLink>
+          </div>
+        </Reveal>
       </Container>
     </section>
   )

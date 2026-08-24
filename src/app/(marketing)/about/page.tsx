@@ -49,14 +49,16 @@ export default async function AboutPage() {
       {metrics.length > 0 && (
         <section className="pb-8">
           <Container>
+            {/* Figures on rules, not in a gap-px tile mosaic. The mosaic is the
+                bento shape: equal boxes whose only job is to look arranged. */}
             <Reveal>
-              <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
                 {metrics.map((metric) => (
-                  <div key={metric.label} className="bg-card p-8">
-                    <div className="text-4xl font-medium tracking-tight text-primary">
+                  <div key={metric.label} className="border-t-2 border-brand pt-6">
+                    <div className="text-4xl font-semibold tracking-tight text-foreground tabular-nums md:text-5xl">
                       <CountUp value={metric.value} />
                     </div>
-                    <div className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    <div className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
                       {metric.label}
                     </div>
                   </div>
@@ -70,23 +72,28 @@ export default async function AboutPage() {
       <section className="py-20 sm:py-28">
         <Container>
           <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
-            <Reveal>
+            <Reveal className="lg:sticky lg:top-28 lg:self-start">
               <Eyebrow>What we believe</Eyebrow>
-              <p className="mt-6 text-2xl leading-relaxed font-light text-balance text-foreground sm:text-3xl">
+              <p className="mt-7 text-2xl leading-[1.35] font-medium tracking-tight text-balance text-foreground sm:text-3xl">
                 Retention is where great brands are built. We help ecommerce companies
                 turn subscribers into repeat customers — and treat every send like it
                 matters.
               </p>
             </Reveal>
 
-            <RevealGroup className="grid gap-5 sm:grid-cols-2">
+            {/* Four values were four bordered tiles in a 2×2 — the bento shape
+                again, and at that size the body copy was `text-sm` inside a
+                box, which is the small-and-faint problem too. They are now a
+                single ruled column: full measure, readable, and the vertical
+                rhythm does the separating. */}
+            <RevealGroup className="flex flex-col">
               {values.map((value) => (
                 <RevealItem key={value.title}>
-                  <div className="h-full rounded-xl border border-border bg-card p-7">
-                    <h3 className="text-lg font-medium tracking-tight">
+                  <div className="grid gap-x-10 gap-y-3 border-t border-border py-8 last:border-b sm:grid-cols-[13rem_1fr]">
+                    <h3 className="text-lg font-medium tracking-tight text-balance text-foreground">
                       {value.title}
                     </h3>
-                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    <p className="max-w-xl leading-relaxed text-pretty text-muted-foreground">
                       {value.body}
                     </p>
                   </div>

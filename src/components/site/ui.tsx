@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { ArrowRight } from 'lucide-react'
-import { motion, useInView, useMotionValue, animate } from 'motion/react'
+import { useInView, useMotionValue, animate } from 'motion/react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 type ButtonLinkProps = {
@@ -59,6 +59,24 @@ export function Container({
   )
 }
 
+/**
+ * The section label.
+ *
+ * Two things were wrong with the previous version and both are fixed here.
+ *
+ * It was too small and too faint — `text-xs` at `tracking-[0.2em]` in
+ * `muted-foreground` is the "tiny low-contrast label" that reads as refinement
+ * and delivers illegibility. It is now `0.8125rem` at looser weight and higher
+ * contrast, which is readable at arm's length.
+ *
+ * And the leading dot was decoration. It is now a short teal rule — the same
+ * mark that opens interior mastheads and separates section bands, so the accent
+ * carries structure instead of sitting there as a bullet.
+ *
+ * Frequency is the other half of the problem, and it is not solved here: a
+ * label above *every* headline is the formula regardless of how it is drawn.
+ * Most hand-built sections now open straight on the headline. Keep it that way.
+ */
 export function Eyebrow({
   children,
   className,
@@ -69,11 +87,11 @@ export function Eyebrow({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-2 font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase',
+        'inline-flex items-center gap-3.5 text-[0.8125rem] leading-none font-medium tracking-[0.08em] text-foreground/65 uppercase',
         className,
       )}
     >
-      <span className="h-1 w-1 rounded-full bg-brand" aria-hidden />
+      <span className="h-px w-7 shrink-0 bg-brand" aria-hidden />
       {children}
     </span>
   )
@@ -116,21 +134,9 @@ export function CountUp({ value, className }: { value: string; className?: strin
   )
 }
 
-/** Subtle hover lift for cards. */
-export function LiftCard({
-  children,
-  className,
-}: {
-  children: ReactNode
-  className?: string
-}) {
-  return (
-    <motion.div
-      className={className}
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {children}
-    </motion.div>
-  )
-}
+/*
+ * `LiftCard` used to live here — a hover-lift wrapper for the case-study cards.
+ * The cards are gone (rows on a ruled list now), and hover-lift was the tell it
+ * came with. Removed rather than left dead: reintroducing a lift on hover means
+ * reintroducing a card to lift.
+ */

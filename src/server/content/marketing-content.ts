@@ -2,6 +2,8 @@ import 'server-only'
 
 import { draftMode } from 'next/headers'
 
+import { logger } from '@/lib/logger'
+
 import { getBlueprint } from './blueprints'
 import { getDraftPage } from './admin-queries'
 import { getPublishedPage } from './queries'
@@ -41,7 +43,19 @@ export async function getMarketingPage(
   options: { draft?: boolean } = {},
 ): Promise<MarketingPage> {
   const blueprint = getBlueprint(slug)
-  const page = options.draft ? await getDraftPage(slug) : await getPublishedPage(slug)
+
+  // An unreachable database is the same situation as an unseeded one as far as
+  // this page is concerned: render the bundled document rather than 500. Logged
+  // at error level so a misconfigured deploy is loud, not silently stale.
+  let page: Awaited<ReturnType<typeof getPublishedPage>> = null
+
+  try {
+    page = options.draft ? await getDraftPage(slug) : await getPublishedPage(slug)
+  } catch (error) {
+    logger.error(`Could not read the "${slug}" page; falling back to bundled content`, {
+      error,
+    })
+  }
 
   // An existing row with an empty document is treated as "not set up yet"
   // rather than "deliberately blank": publishing a page with no sections at all

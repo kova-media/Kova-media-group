@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 
+import { logger } from '@/lib/logger'
 import { PageView } from '@/features/marketing/page-view'
 import { getDraftPage } from '@/server/content/admin-queries'
 import { getPublishedPage } from '@/server/content/queries'
@@ -27,9 +28,19 @@ async function loadPage(slugSegments: string[]) {
   const slug = slugSegments.join('/')
   const { isEnabled } = await draftMode()
 
-  // Draft Mode bypasses every 'use cache' scope for this request, so the draft
-  // read is always fresh and is never written back to the cache.
-  return isEnabled ? getDraftPage(slug) : getPublishedPage(slug)
+  try {
+    // Draft Mode bypasses every 'use cache' scope for this request, so the
+    // draft read is always fresh and is never written back to the cache.
+    return await (isEnabled ? getDraftPage(slug) : getPublishedPage(slug))
+  } catch (error) {
+    // These pages exist only in the CMS, so an unreachable database means there
+    // is nothing to serve — `notFound()` upstream is the honest answer, and it
+    // keeps a build without a database (or an outage mid-deploy) from failing
+    // outright. `safePublishedPageSlugs` already degrades the same way; this is
+    // the render half of the same guarantee.
+    logger.error(`Could not read the CMS page "${slug}"; serving a 404`, { error })
+    return null
+  }
 }
 
 export async function generateMetadata({

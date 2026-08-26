@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { logger } from '@/lib/logger'
 import {
   caseStudies as fallbackCaseStudies,
   type CaseStudy as CaseStudyView,
@@ -28,8 +29,30 @@ import type { MediaAssetDto } from './types'
  * clone, a new preview environment, or a migration that has not been seeded —
  * none of which should produce a site with an empty work section. The static
  * content is the floor, the database is the override.
+ *
+ * That floor holds for an *unreachable* database too, not only an empty one.
+ * A build with no `DATABASE_URL` — the CI job that holds no secrets — otherwise
+ * dies collecting page data, and an outage mid-deploy takes the whole site with
+ * it. The read is logged at error level when it fails, so a genuinely
+ * misconfigured production build is loud rather than quietly serving the
+ * bundled copy for ever.
  */
 export type { CaseStudyView }
+
+/**
+ * Runs a database read, degrading to `fallback` if it throws.
+ *
+ * Deliberately not silent: the failure is logged at error level so this can
+ * never quietly mask a misconfigured connection.
+ */
+async function read<T>(query: () => Promise<T>, fallback: T, what: string): Promise<T> {
+  try {
+    return await query()
+  } catch (error) {
+    logger.error(`Could not read ${what}; falling back to bundled content`, { error })
+    return fallback
+  }
+}
 
 export type TestimonialView = {
   quote: string
@@ -67,7 +90,7 @@ function resolveLabels(labels: Partial<CaseStudyLabels> | undefined) {
  * Falls back to the bundled studies when nothing is published yet.
  */
 export async function getCaseStudyList(): Promise<CaseStudyView[]> {
-  const published = await getPublishedCaseStudies()
+  const published = await read(() => getPublishedCaseStudies(), [], 'case study list')
 
   if (published.length === 0) return fallbackCaseStudies
 
@@ -95,9 +118,11 @@ export async function getCaseStudyDetail(
 ): Promise<CaseStudyDetailView | null> {
   // Draft Mode reads the unpublished document and bypasses every cache scope
   // for the request, so the admin's Preview shows exactly what Publish would.
-  const study = options.draft
-    ? await getDraftCaseStudy(slug)
-    : await getPublishedCaseStudy(slug)
+  const study = await read(
+    () => (options.draft ? getDraftCaseStudy(slug) : getPublishedCaseStudy(slug)),
+    null,
+    `case study "${slug}"`,
+  )
 
   if (!study) {
     const bundled = fallbackCaseStudies.find((candidate) => candidate.slug === slug)
@@ -165,7 +190,7 @@ export async function getCaseStudySlugs(): Promise<string[]> {
  * render, which is the correct outcome.
  */
 export async function getTestimonialList(): Promise<TestimonialView[]> {
-  const published = await getAllTestimonials()
+  const published = await read(() => getAllTestimonials(), [], 'testimonials')
 
   return published.map((quote) => ({
     quote: quote.quote,

@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { DEFAULT_BOOKING_URL, DEFAULT_NAVIGATION } from '@/lib/constants'
+import { logger } from '@/lib/logger'
 
 import { getSiteSettings } from './queries'
 import { getMediaAssets } from './resolvers'
@@ -39,12 +40,21 @@ export type SiteChrome = {
 const FALLBACK_EMAIL = 'damian@kovamediagroup.com'
 
 export async function getSiteChrome(): Promise<SiteChrome> {
-  const settings = await getSiteSettings()
+  // The header and footer are on every page, so an unreachable database must
+  // degrade to the defaults rather than take the whole site down.
+  let settings: Awaited<ReturnType<typeof getSiteSettings>> = null
+  let media = new Map<string, MediaAssetDto>()
 
-  const logoIds = [settings?.logoId, settings?.logoDarkId].filter((id): id is string =>
-    Boolean(id),
-  )
-  const media = logoIds.length ? await getMediaAssets(logoIds) : new Map()
+  try {
+    settings = await getSiteSettings()
+
+    const logoIds = [settings?.logoId, settings?.logoDarkId].filter(
+      (id): id is string => Boolean(id),
+    )
+    if (logoIds.length) media = await getMediaAssets(logoIds)
+  } catch (error) {
+    logger.error('Could not read site settings; falling back to defaults', { error })
+  }
 
   const navigation =
     settings?.navigation && settings.navigation.length > 0

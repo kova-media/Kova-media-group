@@ -6,7 +6,12 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { ValidatedSection } from '@/server/content/sections/registry'
 
-export type SectionMeta = { type: string; label: string; description: string }
+export type SectionMeta = {
+  type: string
+  label: string
+  description: string
+  group: string
+}
 
 /**
  * Reorder, enable/disable, select and remove.

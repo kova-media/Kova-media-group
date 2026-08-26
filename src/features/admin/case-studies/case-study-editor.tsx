@@ -9,7 +9,13 @@ import { MediaFormField } from '@/features/admin/media/media-form-field'
 import type { MediaAssetDto } from '@/server/content/types'
 import type { ActionResult } from '@/server/actions/result'
 import type { CaseStudyForEdit } from '@/server/content/case-study-queries'
-import type { CaseStudyNarrative } from '@/server/content/schemas/case-study'
+import {
+  DEFAULT_CASE_STUDY_LABELS,
+  type CaseStudyBlock,
+  type CaseStudyCta,
+  type CaseStudyLabels,
+  type CaseStudyNarrative,
+} from '@/server/content/schemas/case-study'
 
 import {
   deleteCaseStudyAction,
@@ -153,8 +159,14 @@ export function CaseStudyEditor({
           <TextBlock
             id="sms"
             label="SMS"
+            hint="Leave empty for an engagement where SMS was not run — the block is dropped rather than shown blank."
             value={narrative.sms}
             onChange={(value) => update('sms', value)}
+          />
+
+          <ExtraBlocks
+            blocks={narrative.blocks}
+            onChange={(value) => update('blocks', value)}
           />
 
           <ResultsEditor
@@ -175,6 +187,16 @@ export function CaseStudyEditor({
               />
             )}
           </Field>
+
+          <BlockHeadings
+            labels={narrative.labels}
+            onChange={(value) => update('labels', value)}
+          />
+
+          <ClosingCtaFields
+            cta={narrative.cta}
+            onChange={(value) => update('cta', value)}
+          />
 
           <Field
             id="accent"
@@ -245,6 +267,21 @@ function StatusBar({
 
       <div className="flex items-center gap-3">
         {message && <span className="text-xs text-ink-600">{message}</span>}
+        {/* Opens the unpublished draft in a new tab, so the editor keeps their
+            place. Same rendering path as the live page — what you see here is
+            what Publish would ship. */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() =>
+            window.open(
+              `/api/preview?type=case-study&slug=${encodeURIComponent(study.slug)}`,
+              '_blank',
+            )
+          }
+        >
+          Preview
+        </Button>
         {study.isLive && (
           <Button
             variant="secondary"
@@ -405,16 +442,18 @@ function DetailsForm({
 function TextBlock({
   id,
   label,
+  hint,
   value,
   onChange,
 }: {
   id: string
   label: string
+  hint?: string
   value: string
   onChange: (value: string) => void
 }) {
   return (
-    <Field id={id} label={label}>
+    <Field id={id} label={label} hint={hint}>
       {(props) => (
         <Textarea
           {...props}
@@ -526,6 +565,255 @@ function ResultsEditor({
         </div>
       )}
     </div>
+  )
+}
+
+/**
+ * Additional labelled blocks.
+ *
+ * The named fields above cover the shape every Kova engagement has had so far.
+ * This is for the one that does not — a heading and a paragraph, added here,
+ * with no code change and no new section type.
+ */
+function ExtraBlocks({
+  blocks,
+  onChange,
+}: {
+  blocks: CaseStudyBlock[]
+  onChange: (blocks: CaseStudyBlock[]) => void
+}) {
+  const move = (from: number, to: number) => {
+    if (to < 0 || to >= blocks.length) return
+    const next = [...blocks]
+    const [moved] = next.splice(from, 1)
+    if (moved) next.splice(to, 0, moved)
+    onChange(next)
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <Label>Extra blocks</Label>
+        <Button
+          variant="secondary"
+          size="sm"
+          disabled={blocks.length >= 6}
+          onClick={() => onChange([...blocks, { label: '', body: '' }])}
+        >
+          Add block
+        </Button>
+      </div>
+      <p className="-mt-1 text-xs text-ink-500">
+        Shown after the blocks above, in this order. A block needs both a heading and
+        text to appear.
+      </p>
+
+      {blocks.map((block, index) => (
+        <div key={index} className="rounded-md border border-border bg-paper-sunk p-3">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs text-ink-500">#{index + 1}</span>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label={`Move extra block ${index + 1} up`}
+                disabled={index === 0}
+                onClick={() => move(index, index - 1)}
+              >
+                ↑
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label={`Move extra block ${index + 1} down`}
+                disabled={index === blocks.length - 1}
+                onClick={() => move(index, index + 1)}
+              >
+                ↓
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label={`Remove extra block ${index + 1}`}
+                onClick={() => onChange(blocks.filter((_, i) => i !== index))}
+              >
+                Remove
+              </Button>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Input
+              value={block.label}
+              aria-label={`Extra block ${index + 1} heading`}
+              placeholder="Deliverability"
+              maxLength={40}
+              onChange={(event) =>
+                onChange(
+                  blocks.map((item, i) =>
+                    i === index ? { ...item, label: event.target.value } : item,
+                  ),
+                )
+              }
+            />
+            <Textarea
+              rows={4}
+              value={block.body}
+              aria-label={`Extra block ${index + 1} text`}
+              onChange={(event) =>
+                onChange(
+                  blocks.map((item, i) =>
+                    i === index ? { ...item, body: event.target.value } : item,
+                  ),
+                )
+              }
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+const LABEL_FIELDS: { key: keyof CaseStudyLabels; caption: string }[] = [
+  { key: 'background', caption: 'Background block' },
+  { key: 'challenge', caption: 'Challenge block' },
+  { key: 'design', caption: 'Design block' },
+  { key: 'automation', caption: 'Automation block' },
+  { key: 'sms', caption: 'SMS block' },
+  { key: 'strategy', caption: 'Strategy list' },
+  { key: 'next', caption: 'Next-study link' },
+]
+
+/** Heading overrides. Blank means "use the wording shown as the placeholder". */
+function BlockHeadings({
+  labels,
+  onChange,
+}: {
+  labels: CaseStudyLabels
+  onChange: (labels: CaseStudyLabels) => void
+}) {
+  return (
+    <fieldset className="rounded-md border border-border p-4">
+      <legend className="px-1 text-sm font-medium text-ink-800">Block headings</legend>
+      <p className="mb-3 text-xs text-ink-500">
+        Optional. Leave a box empty to keep the wording shown in it.
+      </p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {LABEL_FIELDS.map(({ key, caption }) => (
+          <div key={key} className="flex flex-col gap-1.5">
+            <Label htmlFor={`label-${key}`}>{caption}</Label>
+            <Input
+              id={`label-${key}`}
+              value={labels[key] ?? ''}
+              placeholder={DEFAULT_CASE_STUDY_LABELS[key]}
+              maxLength={40}
+              onChange={(event) => onChange({ ...labels, [key]: event.target.value })}
+            />
+          </div>
+        ))}
+      </div>
+    </fieldset>
+  )
+}
+
+/**
+ * The closing band for this study only.
+ *
+ * Left empty — which is the default — the study uses the site-wide closing copy
+ * from Pages → Case studies, so changing it there reaches every study at once.
+ */
+function ClosingCtaFields({
+  cta,
+  onChange,
+}: {
+  cta: CaseStudyCta
+  onChange: (cta: CaseStudyCta) => void
+}) {
+  return (
+    <fieldset className="rounded-md border border-border p-4">
+      <legend className="px-1 text-sm font-medium text-ink-800">
+        Closing call to action
+      </legend>
+      <p className="mb-3 text-xs text-ink-500">
+        Optional. With the headline empty this study shows the site-wide closing band
+        from Pages → Case studies.
+      </p>
+      <div className="flex flex-col gap-3">
+        <Field id="cta-heading" label="Headline">
+          {(props) => (
+            <Input
+              {...props}
+              value={cta.heading}
+              maxLength={200}
+              onChange={(event) => onChange({ ...cta, heading: event.target.value })}
+            />
+          )}
+        </Field>
+        <Field id="cta-body" label="Paragraph">
+          {(props) => (
+            <Textarea
+              {...props}
+              rows={2}
+              value={cta.body}
+              maxLength={400}
+              onChange={(event) => onChange({ ...cta, body: event.target.value })}
+            />
+          )}
+        </Field>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field id="cta-primary-label" label="Main button text">
+            {(props) => (
+              <Input
+                {...props}
+                value={cta.primaryLabel}
+                maxLength={60}
+                onChange={(event) =>
+                  onChange({ ...cta, primaryLabel: event.target.value })
+                }
+              />
+            )}
+          </Field>
+          <Field id="cta-primary-href" label="Main button link">
+            {(props) => (
+              <Input
+                {...props}
+                value={cta.primaryHref}
+                placeholder="/book"
+                maxLength={300}
+                onChange={(event) =>
+                  onChange({ ...cta, primaryHref: event.target.value })
+                }
+              />
+            )}
+          </Field>
+          <Field id="cta-secondary-label" label="Second button text">
+            {(props) => (
+              <Input
+                {...props}
+                value={cta.secondaryLabel}
+                maxLength={60}
+                onChange={(event) =>
+                  onChange({ ...cta, secondaryLabel: event.target.value })
+                }
+              />
+            )}
+          </Field>
+          <Field id="cta-secondary-href" label="Second button link">
+            {(props) => (
+              <Input
+                {...props}
+                value={cta.secondaryHref}
+                placeholder="/case-studies"
+                maxLength={300}
+                onChange={(event) =>
+                  onChange({ ...cta, secondaryHref: event.target.value })
+                }
+              />
+            )}
+          </Field>
+        </div>
+      </div>
+    </fieldset>
   )
 }
 

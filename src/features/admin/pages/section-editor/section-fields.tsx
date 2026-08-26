@@ -273,3 +273,147 @@ export function RepeaterField<T>({
     </div>
   )
 }
+
+/**
+ * A list of plain lines — bullet points, client names, things to expect.
+ *
+ * Deliberately not a `RepeaterField` of one-field objects: those render a
+ * bordered card per row with its own header, which for a list of short lines is
+ * far more furniture than the content. This is one input per line with the same
+ * add / move / remove controls.
+ */
+export function StringListField({
+  label,
+  hint,
+  items,
+  onChange,
+  addLabel = 'Add',
+  placeholder,
+  max,
+  maxLength,
+}: {
+  label: string
+  hint?: string
+  items: string[]
+  onChange: (items: string[]) => void
+  addLabel?: string
+  placeholder?: string
+  max?: number
+  maxLength?: number
+}) {
+  const move = (from: number, to: number) => {
+    if (to < 0 || to >= items.length) return
+    const next = [...items]
+    const [moved] = next.splice(from, 1)
+    if (moved !== undefined) next.splice(to, 0, moved)
+    onChange(next)
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <Label>{label}</Label>
+        <Button
+          variant="secondary"
+          size="sm"
+          disabled={max !== undefined && items.length >= max}
+          onClick={() => onChange([...items, ''])}
+        >
+          {addLabel}
+        </Button>
+      </div>
+
+      {hint && <p className="-mt-1 text-xs text-ink-500">{hint}</p>}
+
+      {items.length === 0 && <p className="text-xs text-ink-500">Nothing added yet.</p>}
+
+      {items.map((item, index) => (
+        <div key={index} className="flex items-center gap-1.5">
+          <Input
+            value={item}
+            aria-label={`${label} ${index + 1}`}
+            placeholder={placeholder}
+            maxLength={maxLength}
+            onChange={(event) => {
+              const next = [...items]
+              next[index] = event.target.value
+              onChange(next)
+            }}
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Move ${label} ${index + 1} up`}
+            disabled={index === 0}
+            onClick={() => move(index, index - 1)}
+          >
+            ↑
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Move ${label} ${index + 1} down`}
+            disabled={index === items.length - 1}
+            onClick={() => move(index, index + 1)}
+          >
+            ↓
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-label={`Remove ${label} ${index + 1}`}
+            onClick={() => onChange(items.filter((_, i) => i !== index))}
+          >
+            Remove
+          </Button>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/**
+ * A call to action: the words on the button and where it goes.
+ *
+ * Unlike `LinkField` there is no "remove" — both halves are always present and
+ * clearing them is how you hide the button. That is one fewer state to explain,
+ * and it matches how the renderer decides (a CTA missing either half is not
+ * drawn).
+ */
+export function CtaField({
+  label,
+  hint,
+  value,
+  onChange,
+}: {
+  label: string
+  hint?: string
+  value: { label: string; href: string } | undefined
+  onChange: (value: { label: string; href: string }) => void
+}) {
+  const current = value ?? { label: '', href: '' }
+
+  return (
+    <fieldset className="rounded-md border border-border p-3">
+      <legend className="px-1 text-xs font-medium text-ink-700">{label}</legend>
+      <div className="grid grid-cols-2 gap-3">
+        <TextField
+          label="Button text"
+          maxLength={60}
+          value={current.label}
+          onChange={(next) => onChange({ ...current, label: next })}
+        />
+        <TextField
+          label="Goes to"
+          value={current.href}
+          placeholder="/book"
+          maxLength={300}
+          onChange={(next) => onChange({ ...current, href: next })}
+        />
+      </div>
+      <p className="mt-2 text-xs text-ink-500">
+        {hint ?? 'Leave both boxes empty to hide this button.'}
+      </p>
+    </fieldset>
+  )
+}

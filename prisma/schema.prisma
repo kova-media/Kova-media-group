@@ -203,6 +203,9 @@ model SiteSettings {
   logoDarkId            String?
   socialLinks           Json     @default("[]")
   navigation            Json     @default("[]")
+  /// { ctaLabel, ctaHref } — the header's call to action. Validated by siteHeaderSchema.
+  header                Json     @default("{}")
+  /// { tagline, description, note, columns[] } — validated by siteFooterSchema.
   footer                Json     @default("{}")
   updatedAt             DateTime @updatedAt
 }

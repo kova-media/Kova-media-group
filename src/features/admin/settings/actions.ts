@@ -7,6 +7,7 @@ import { prisma } from '@/db/prisma'
 import { ok, parseInput, unexpected, type ActionResult } from '@/server/actions/result'
 import { requireAdmin } from '@/server/auth/dal'
 import { cacheTags } from '@/server/cache/tags'
+import { siteFooterSchema, siteHeaderSchema } from '@/server/content/schemas/settings'
 
 /**
  * Site settings.
@@ -30,12 +31,31 @@ const settingsSchema = z.object({
     .trim()
     .min(1, 'An SEO description is required.')
     .max(320),
-  tagline: z.string().trim().max(200),
   logoId: z.string().trim().max(64),
   logoDarkId: z.string().trim().max(64),
   defaultSeoImageId: z.string().trim().max(64),
   navigation: z.array(linkSchema).max(10),
+  header: siteHeaderSchema,
+  footer: siteFooterSchema,
 })
+
+/**
+ * Footer columns arrive as one JSON string.
+ *
+ * The editor never sees it — the form renders labelled boxes and serialises
+ * them on submit. Columns hold a nested list of links, and parallel `getAll()`
+ * arrays cannot express two levels of nesting without an index-encoding scheme
+ * that is far more fragile than one round trip through JSON. It is validated by
+ * `siteFooterSchema` immediately either way.
+ */
+function parseJson(value: FormDataEntryValue | null): unknown {
+  if (typeof value !== 'string' || !value.trim()) return undefined
+  try {
+    return JSON.parse(value)
+  } catch {
+    return undefined
+  }
+}
 
 export async function saveSiteSettings(
   _previous: ActionResult | null,
@@ -56,11 +76,20 @@ export async function saveSiteSettings(
     bookingUrl: formData.get('bookingUrl'),
     defaultSeoTitle: formData.get('defaultSeoTitle'),
     defaultSeoDescription: formData.get('defaultSeoDescription'),
-    tagline: formData.get('tagline') ?? '',
     logoId: formData.get('logoId') ?? '',
     logoDarkId: formData.get('logoDarkId') ?? '',
     defaultSeoImageId: formData.get('defaultSeoImageId') ?? '',
     navigation,
+    header: {
+      ctaLabel: formData.get('headerCtaLabel') ?? '',
+      ctaHref: formData.get('headerCtaHref') ?? '',
+    },
+    footer: {
+      description: formData.get('footerDescription') ?? '',
+      tagline: formData.get('footerTagline') ?? '',
+      note: formData.get('footerNote') ?? '',
+      columns: parseJson(formData.get('footerColumns')) ?? [],
+    },
   })
 
   if (!parsed.ok) return parsed.result
@@ -80,7 +109,8 @@ export async function saveSiteSettings(
         logoId: data.logoId || null,
         logoDarkId: data.logoDarkId || null,
         navigation: data.navigation,
-        footer: { tagline: data.tagline },
+        header: data.header,
+        footer: data.footer,
         // Kova runs no social accounts. Kept empty rather than exposed as an
         // editable list that would only invite dead links.
         socialLinks: [],

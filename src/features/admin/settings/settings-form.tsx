@@ -8,7 +8,13 @@ import { MediaFormField } from '@/features/admin/media/media-form-field'
 import type { ActionResult } from '@/server/actions/result'
 import type { MediaAssetDto } from '@/server/content/types'
 
+import type {
+  SiteFooterContent,
+  SiteHeaderContent,
+} from '@/server/content/schemas/settings'
+
 import { saveSiteSettings } from './actions'
+import { FooterColumnsEditor } from './footer-columns-editor'
 
 export type SettingsFormValues = {
   siteName: string
@@ -16,8 +22,9 @@ export type SettingsFormValues = {
   bookingUrl: string
   defaultSeoTitle: string
   defaultSeoDescription: string
-  tagline: string
   navigation: { label: string; href: string }[]
+  header: Required<SiteHeaderContent>
+  footer: Required<SiteFooterContent>
 }
 
 export function SettingsForm({
@@ -60,15 +67,14 @@ export function SettingsForm({
             hint="Optional. Falls back to the logo above."
           />
 
-          <Field id="siteName" label="Site name" error={errors?.siteName?.[0]}>
+          <Field
+            id="siteName"
+            label="Site name"
+            hint="Used in the copyright line and as the fallback wordmark."
+            error={errors?.siteName?.[0]}
+          >
             {(props) => (
               <Input {...props} name="siteName" defaultValue={values.siteName} />
-            )}
-          </Field>
-
-          <Field id="tagline" label="Footer tagline" error={errors?.tagline?.[0]}>
-            {(props) => (
-              <Input {...props} name="tagline" defaultValue={values.tagline} />
             )}
           </Field>
         </div>
@@ -158,6 +164,81 @@ export function SettingsForm({
               No links configured — the site falls back to its default navigation.
             </p>
           )}
+        </div>
+
+        <div className="mt-6 grid gap-5 border-t border-border pt-5 sm:grid-cols-2">
+          <Field
+            id="headerCtaLabel"
+            label="Header button text"
+            hint="The button at the top right of every page."
+          >
+            {(props) => (
+              <Input
+                {...props}
+                name="headerCtaLabel"
+                defaultValue={values.header.ctaLabel}
+              />
+            )}
+          </Field>
+
+          <Field id="headerCtaHref" label="Header button link">
+            {(props) => (
+              <Input
+                {...props}
+                name="headerCtaHref"
+                defaultValue={values.header.ctaHref}
+              />
+            )}
+          </Field>
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-border bg-card p-6">
+        <h2 className="mb-5 text-lg font-medium text-ink-950">Footer</h2>
+
+        <div className="flex flex-col gap-5">
+          <Field
+            id="footerDescription"
+            label="Paragraph under the logo"
+            error={errors?.footer?.[0]}
+          >
+            {(props) => (
+              <Textarea
+                {...props}
+                name="footerDescription"
+                rows={3}
+                defaultValue={values.footer.description}
+              />
+            )}
+          </Field>
+
+          <FooterColumnsEditor columns={values.footer.columns} />
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field
+              id="footerNote"
+              label="After the copyright line"
+              hint="Follows “© 2026 Kova Media Group.”"
+            >
+              {(props) => (
+                <Input {...props} name="footerNote" defaultValue={values.footer.note} />
+              )}
+            </Field>
+
+            <Field
+              id="footerTagline"
+              label="Closing line"
+              hint="The small line at the bottom right of the footer."
+            >
+              {(props) => (
+                <Input
+                  {...props}
+                  name="footerTagline"
+                  defaultValue={values.footer.tagline}
+                />
+              )}
+            </Field>
+          </div>
         </div>
       </section>
 

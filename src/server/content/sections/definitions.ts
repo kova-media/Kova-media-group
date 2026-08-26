@@ -10,6 +10,13 @@ import {
 } from './types'
 
 /**
+ * The designed marketing bands live next door and are re-exported here, so the
+ * registry keeps reading exactly one module (`Object.values(definitions)`) and
+ * the two catalogues stay legible apart.
+ */
+export * from './marketing-definitions'
+
+/**
  * The V1 section catalogue (CMS.md §3.5).
  *
  * Derived from the story the homepage needs to tell — claim, credibility,
@@ -35,6 +42,7 @@ export const heroSection = defineSection({
   type: 'HERO',
   label: 'Hero',
   description: 'The claim. Full-width opening statement with a primary call to action.',
+  group: 'Utility sections',
   maxPerPage: 1,
   schema: heroFields,
   publishSchema: heroFields.extend({ headline: requiredText(160) }),
@@ -45,6 +53,7 @@ export const logoStripSection = defineSection({
   type: 'LOGO_STRIP',
   label: 'Logo strip',
   description: 'Immediate credibility. Real client logos, drawn from the library.',
+  group: 'Utility sections',
   schema: z.object({
     caption: z.string().max(120).optional(),
     /** Empty means "all published logos, in their configured order". */
@@ -57,6 +66,7 @@ export const proofMetricsSection = defineSection({
   type: 'PROOF_METRICS',
   label: 'Proof metrics',
   description: 'Structured numbers with labels and timeframes.',
+  group: 'Utility sections',
   schema: z.object({
     eyebrow: eyebrowSchema,
     heading: z.string().max(160).optional(),
@@ -96,6 +106,7 @@ export const narrativeSection = defineSection({
   type: 'NARRATIVE',
   label: 'Narrative',
   description: 'Long-form positioning copy, optionally paired with media.',
+  group: 'Utility sections',
   schema: z.object({
     eyebrow: eyebrowSchema,
     heading: z.string().max(200).optional(),
@@ -121,6 +132,7 @@ export const serviceDetailSection = defineSection({
   type: 'SERVICE_DETAIL',
   label: 'Service detail',
   description: 'Email or SMS capability, told as outcomes rather than deliverables.',
+  group: 'Utility sections',
   schema: serviceDetailFields,
   publishSchema: serviceDetailFields.extend({ heading: requiredText(200) }),
   defaults: { heading: '', body: [], outcomes: [] },
@@ -130,6 +142,7 @@ export const emailGallerySection = defineSection({
   type: 'EMAIL_GALLERY',
   label: 'Email gallery',
   description: 'Real email designs from the library.',
+  group: 'Utility sections',
   schema: z.object({
     eyebrow: eyebrowSchema,
     heading: z.string().max(160).optional(),
@@ -148,6 +161,7 @@ export const caseStudyFeatureSection = defineSection({
   type: 'CASE_STUDY_FEATURE',
   label: 'Case study — feature',
   description: 'One case study, given room to breathe.',
+  group: 'Utility sections',
   schema: caseStudyFeatureFields,
   publishSchema: caseStudyFeatureFields.extend({
     caseStudyId: requiredText(64),
@@ -159,6 +173,7 @@ export const caseStudyGridSection = defineSection({
   type: 'CASE_STUDY_GRID',
   label: 'Case study — grid',
   description: 'Several case studies together.',
+  group: 'Utility sections',
   schema: z.object({
     eyebrow: eyebrowSchema,
     heading: z.string().max(160).optional(),
@@ -176,6 +191,7 @@ export const testimonialFeatureSection = defineSection({
   type: 'TESTIMONIAL_FEATURE',
   label: 'Testimonial — feature',
   description: 'A single quote at scale.',
+  group: 'Utility sections',
   schema: testimonialFeatureFields,
   publishSchema: testimonialFeatureFields.extend({
     testimonialId: requiredText(64),
@@ -187,6 +203,7 @@ export const testimonialGridSection = defineSection({
   type: 'TESTIMONIAL_GRID',
   label: 'Testimonial — grid',
   description: 'Several quotes together.',
+  group: 'Utility sections',
   schema: z.object({
     eyebrow: eyebrowSchema,
     heading: z.string().max(160).optional(),
@@ -209,6 +226,7 @@ export const partnershipSection = defineSection({
   type: 'PARTNERSHIP',
   label: 'Partnership',
   description: 'The "extension of your team" argument.',
+  group: 'Utility sections',
   schema: partnershipFields,
   publishSchema: partnershipFields.extend({ heading: requiredText(200) }),
   defaults: { heading: '', body: [], points: [] },
@@ -218,6 +236,7 @@ export const faqSection = defineSection({
   type: 'FAQ',
   label: 'FAQ',
   description: 'Objection handling, before the booking decision.',
+  group: 'Utility sections',
   schema: z.object({
     eyebrow: eyebrowSchema,
     heading: z.string().max(160).optional(),
@@ -251,6 +270,7 @@ export const ctaSection = defineSection({
   type: 'CTA',
   label: 'Call to action',
   description: 'The booking ask.',
+  group: 'Utility sections',
   schema: ctaFields,
   publishSchema: ctaFields.extend({ heading: requiredText(200) }),
   defaults: {
@@ -263,6 +283,7 @@ export const richTextSection = defineSection({
   type: 'RICH_TEXT',
   label: 'Rich text',
   description: 'Prose for legal and utility pages.',
+  group: 'Utility sections',
   schema: z.object({
     heading: z.string().max(200).optional(),
     body: richTextSchema.default([]),

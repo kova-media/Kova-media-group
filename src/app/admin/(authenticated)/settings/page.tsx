@@ -20,7 +20,7 @@ export default async function SettingsPage() {
     <>
       <AdminPageHeader
         title="Settings"
-        description="Brand, contact details, navigation, and SEO defaults."
+        description="Brand, contact details, navigation, footer, and SEO defaults."
       />
       <SettingsForm
         values={{
@@ -29,8 +29,9 @@ export default async function SettingsPage() {
           bookingUrl: settings.bookingUrl,
           defaultSeoTitle: settings.defaultSeoTitle,
           defaultSeoDescription: settings.defaultSeoDescription,
-          tagline: settings.tagline,
           navigation: settings.navigation,
+          header: settings.header,
+          footer: settings.footer,
         }}
         media={{
           logo: pick(settings.logoId),

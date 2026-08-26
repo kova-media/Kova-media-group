@@ -290,8 +290,6 @@ const socialLinksSchema = z
   .array(z.object({ label: z.string(), href: z.string() }))
   .catch([])
 
-const footerSchema = z.object({ tagline: z.string().optional() }).catch({})
-
 type SettingsRow = {
   siteName: string
   defaultSeoTitle: string
@@ -303,6 +301,7 @@ type SettingsRow = {
   logoDarkId: string | null
   socialLinks: unknown
   navigation: unknown
+  header: unknown
   footer: unknown
 }
 
@@ -318,6 +317,10 @@ export function toSiteSettings(row: SettingsRow): SiteSettingsDto {
     logoDarkId: row.logoDarkId,
     socialLinks: socialLinksSchema.parse(row.socialLinks),
     navigation: navigationSchema.parse(row.navigation),
-    footer: footerSchema.parse(row.footer),
+    // Passed through untouched. The chrome schemas in `schemas/settings.ts`
+    // own the shape of these two blobs, and validating them twice — once here
+    // with a thinner guess and once there — is how the two drift.
+    header: row.header,
+    footer: row.footer,
   }
 }

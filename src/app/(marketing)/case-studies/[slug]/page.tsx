@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { draftMode } from 'next/headers'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
@@ -8,9 +9,11 @@ import {
   getCaseStudySlugs,
 } from '@/server/content/site-content'
 import { cn } from '@/lib/utils'
+import { MediaImage } from '@/components/media/media-image'
 import { Container, Eyebrow, CountUp } from '@/components/site/ui'
 import { Reveal, RevealLines } from '@/components/site/reveal'
 import { FinalCta } from '@/features/marketing/sections'
+import { getMarketingPage } from '@/server/content/marketing-content'
 
 /**
  * Prerenders every published case study at build time (ADR-017). Reads the
@@ -27,13 +30,19 @@ export async function generateStaticParams() {
   }))
 }
 
+/** Published normally; the unpublished draft under Draft Mode (CMS.md §5). */
+async function loadStudy(slug: string) {
+  const { isEnabled } = await draftMode()
+  return getCaseStudyDetail(slug, { draft: isEnabled })
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const study = await getCaseStudyDetail(slug)
+  const study = await loadStudy(slug)
 
   // `notFound()` here rather than only in the page body. Metadata is resolved
   // before the response starts streaming, so this is what makes a missing case
@@ -66,12 +75,31 @@ export default async function CaseStudyPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const [study, caseStudies] = await Promise.all([
-    getCaseStudyDetail(slug),
+  const [study, caseStudies, indexPage] = await Promise.all([
+    loadStudy(slug),
     getCaseStudyList(),
+    getMarketingPage('case-studies'),
   ])
 
   if (!study) notFound()
+
+  // The site-wide closing band, taken from the case study index page so the two
+  // never drift. Falls back to nothing rather than to hard-coded copy.
+  const sharedCtaSection = indexPage.sections.find(
+    (section) => section.type === 'FINAL_CTA' && section.isEnabled,
+  )
+  const sharedCtaData = (sharedCtaSection?.data ?? {}) as {
+    heading?: string
+    body?: string
+    primaryCta?: { label: string; href: string }
+    secondaryCta?: { label: string; href: string }
+  }
+  const sharedCta = {
+    heading: sharedCtaData.heading ?? '',
+    body: sharedCtaData.body ?? '',
+    primaryCta: sharedCtaData.primaryCta,
+    secondaryCta: sharedCtaData.secondaryCta,
+  }
 
   // Wraps around to the first study after the last one. `study` exists, so the
   // list is non-empty and the modulo always lands on a real entry — the
@@ -84,15 +112,36 @@ export default async function CaseStudyPage({
    *
    * Not every engagement has a verified answer for every heading, and an SMS
    * block on an email-only engagement would claim a channel Kova did not run.
-   * Fewer blocks is the correct outcome; filling them is not.
+   * Fewer blocks is the correct outcome; filling them is not. The headings
+   * themselves come from the CMS and fall back to the designed defaults.
    */
   const blocks = [
-    { label: 'Background', body: study.background },
-    { label: 'The challenge', body: study.challenge },
-    { label: 'Design', body: study.design },
-    { label: 'Automation', body: study.automation },
-    { label: 'SMS', body: study.sms },
+    { label: study.labels.background, body: study.background },
+    { label: study.labels.challenge, body: study.challenge },
+    { label: study.labels.design, body: study.design },
+    { label: study.labels.automation, body: study.automation },
+    { label: study.labels.sms, body: study.sms },
+    ...study.blocks,
   ].filter((block) => block.body.trim().length > 0)
+
+  /**
+   * The closing band.
+   *
+   * A study overrides it only when the ask genuinely differs; otherwise the
+   * site-wide copy from Admin → Pages → Case studies is used, so a change there
+   * reaches every study without editing each one.
+   */
+  const closing = study.cta.heading.trim()
+    ? {
+        heading: study.cta.heading,
+        body: study.cta.body,
+        primaryCta: { label: study.cta.primaryLabel, href: study.cta.primaryHref },
+        secondaryCta: {
+          label: study.cta.secondaryLabel,
+          href: study.cta.secondaryHref,
+        },
+      }
+    : sharedCta
 
   return (
     <>
@@ -144,6 +193,20 @@ export default async function CaseStudyPage({
           {study.results.length > 0 && study.resultsPeriod && (
             <p className="mt-4 text-sm text-muted-foreground">{study.resultsPeriod}</p>
           )}
+
+          {/* Only when a hero image has actually been chosen in the admin. No
+              study has one today, so nothing about the page changes until one
+              is uploaded — and there is no placeholder frame in the meantime. */}
+          {study.heroImage && (
+            <Reveal className="mt-14">
+              <MediaImage
+                asset={study.heroImage}
+                sizes="(max-width: 1024px) 100vw, 1200px"
+                priority
+                className="w-full"
+              />
+            </Reveal>
+          )}
           <div className="pb-16" />
         </Container>
       </section>
@@ -165,7 +228,7 @@ export default async function CaseStudyPage({
             {study.strategy.length > 0 && (
               <Reveal>
                 <div className="grid gap-4 sm:grid-cols-[8rem_1fr] sm:gap-8">
-                  <Eyebrow>Strategy</Eyebrow>
+                  <Eyebrow>{study.labels.strategy}</Eyebrow>
                   <ul className="flex flex-col gap-3">
                     {study.strategy.map((item) => (
                       <li
@@ -195,7 +258,7 @@ export default async function CaseStudyPage({
           >
             <div>
               <span className="text-[0.8125rem] font-medium tracking-[0.08em] text-foreground/65 uppercase">
-                Next case study
+                {study.labels.next}
               </span>
               <div className="mt-2 text-3xl font-medium tracking-tight sm:text-4xl">
                 {next.brand}
@@ -206,7 +269,7 @@ export default async function CaseStudyPage({
         </Container>
       </section>
 
-      <FinalCta />
+      <FinalCta {...closing} />
     </>
   )
 }

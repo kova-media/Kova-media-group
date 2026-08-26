@@ -23,7 +23,9 @@ export async function resolvePreviewTarget(
       select: { slug: true },
     })
 
-    return caseStudy ? { path: `/work/${caseStudy.slug}` } : null
+    // `/case-studies/…`, not `/work/…`: the route was renamed and this was
+    // left behind, so every case study preview redirected to a 404.
+    return caseStudy ? { path: `/case-studies/${caseStudy.slug}` } : null
   }
 
   const page = await prisma.page.findUnique({

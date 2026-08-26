@@ -1,0 +1,719 @@
+'use client'
+
+import {
+  CtaField,
+  NumberField,
+  RepeaterField,
+  StringListField,
+  TextAreaField,
+  TextField,
+} from './section-fields'
+
+/**
+ * The editing screens for the designed marketing bands.
+ *
+ * Hand-written, not generated from the Zod schema. A generated form produces a
+ * key/value editor — `heading`, `body`, `points[0]` — and these are the screens
+ * the owner opens every week. Field order, wording and hints are the difference
+ * between a CMS someone uses and one they avoid, so they are chosen rather than
+ * derived. The schema stays the source of truth for validation either way.
+ *
+ * Every hint says what the field *does on the page*, in the words someone who
+ * has never seen the code would use.
+ */
+
+type FormProps = {
+  data: Record<string, unknown>
+  onChange: (data: Record<string, unknown>) => void
+}
+
+const str = (value: unknown): string => (typeof value === 'string' ? value : '')
+const arr = <T,>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : [])
+const strs = (value: unknown): string[] =>
+  arr<unknown>(value).filter((item): item is string => typeof item === 'string')
+const cta = (value: unknown) =>
+  value && typeof value === 'object'
+    ? {
+        label: str((value as Record<string, unknown>)['label']),
+        href: str((value as Record<string, unknown>)['href']),
+      }
+    : { label: '', href: '' }
+
+const set = ({ data, onChange }: FormProps, key: string, value: unknown): void =>
+  onChange({ ...data, [key]: value })
+
+/* --------------------------------------------------------------- Page header */
+
+export function PageHeaderForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <TextField
+        label="Page label"
+        hint="The small word beside the headline that tells a visitor where they are — “About”, “Services”."
+        maxLength={40}
+        value={str(data['eyebrow'])}
+        onChange={(value) => set(props, 'eyebrow', value)}
+      />
+      <TextAreaField
+        label="Headline"
+        rows={2}
+        maxLength={200}
+        hint="The main sentence at the top of the page."
+        value={str(data['title'])}
+        onChange={(value) => set(props, 'title', value)}
+      />
+      <TextAreaField
+        label="Intro paragraph"
+        maxLength={400}
+        hint="Optional. Sits under the headline."
+        value={str(data['description'])}
+        onChange={(value) => set(props, 'description', value)}
+      />
+    </div>
+  )
+}
+
+/* ----------------------------------------------------------------- Home hero */
+
+export function HomeHeroForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <TextAreaField
+        label="Headline"
+        rows={3}
+        maxLength={200}
+        hint="Press Enter where you want the headline to break onto a new line. Each line animates in on its own."
+        value={str(data['headline'])}
+        onChange={(value) => set(props, 'headline', value)}
+      />
+      <TextAreaField
+        label="Supporting paragraph"
+        maxLength={400}
+        hint="The paragraph under the headline."
+        value={str(data['subhead'])}
+        onChange={(value) => set(props, 'subhead', value)}
+      />
+      <CtaField
+        label="Main button"
+        value={cta(data['primaryCta'])}
+        onChange={(value) => set(props, 'primaryCta', value)}
+      />
+      <CtaField
+        label="Second button"
+        value={cta(data['secondaryCta'])}
+        onChange={(value) => set(props, 'secondaryCta', value)}
+      />
+      <p className="text-xs text-ink-500">
+        The animated panels beside the headline are part of the design and are not
+        editable here.
+      </p>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------ Client marquee */
+
+export function ClientMarqueeForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <TextField
+        label="Label above the names"
+        hint="Optional. Leave empty to show just the names."
+        maxLength={120}
+        value={str(data['caption'])}
+        onChange={(value) => set(props, 'caption', value)}
+      />
+      <StringListField
+        label="Client names"
+        hint="Shown in the scrolling row. The whole band disappears if this is empty."
+        addLabel="Add name"
+        placeholder="Zilkee"
+        max={30}
+        maxLength={60}
+        items={strs(data['clients'])}
+        onChange={(value) => set(props, 'clients', value)}
+      />
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------- Figures band */
+
+type Figure = { value: string; label: string }
+
+export function MetricsBandForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <TextAreaField
+        label="Headline"
+        rows={2}
+        maxLength={200}
+        value={str(data['heading'])}
+        onChange={(value) => set(props, 'heading', value)}
+      />
+      <TextAreaField
+        label="Supporting paragraph"
+        maxLength={400}
+        value={str(data['body'])}
+        onChange={(value) => set(props, 'body', value)}
+      />
+      <RepeaterField<Figure>
+        label="Figures"
+        addLabel="Add figure"
+        max={6}
+        items={arr<Figure>(data['metrics'])}
+        createItem={() => ({ value: '', label: '' })}
+        onChange={(next) => set(props, 'metrics', next)}
+        renderItem={(figure, update) => (
+          <div className="flex flex-col gap-3">
+            <TextField
+              label="Figure"
+              hint="Written exactly as it should appear — “+44.5%”, “$334.7K”, “3x”. The number counts up; the rest stays."
+              maxLength={24}
+              value={figure.value}
+              onChange={(value) => update({ ...figure, value })}
+            />
+            <TextField
+              label="What it measures"
+              maxLength={90}
+              value={figure.label}
+              onChange={(value) => update({ ...figure, label: value })}
+            />
+          </div>
+        )}
+      />
+      <p className="text-xs text-ink-500">
+        With no figures the whole band is hidden — the section is the numbers, so it is
+        better absent than empty. Only add figures you can stand behind.
+      </p>
+    </div>
+  )
+}
+
+/* --------------------------------------------------------- Services overview */
+
+type OverviewService = {
+  title: string
+  summary: string
+  points: string[]
+  href: string
+}
+
+export function ServicesOverviewForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <TextAreaField
+        label="Headline"
+        rows={2}
+        maxLength={200}
+        value={str(data['heading'])}
+        onChange={(value) => set(props, 'heading', value)}
+      />
+      <TextAreaField
+        label="Supporting paragraph"
+        maxLength={400}
+        value={str(data['body'])}
+        onChange={(value) => set(props, 'body', value)}
+      />
+      <RepeaterField<OverviewService>
+        label="Services"
+        addLabel="Add service"
+        max={6}
+        items={arr<OverviewService>(data['services'])}
+        createItem={() => ({ title: '', summary: '', points: [], href: '/services' })}
+        onChange={(next) => set(props, 'services', next)}
+        renderItem={(service, update) => (
+          <div className="flex flex-col gap-3">
+            <TextField
+              label="Service name"
+              maxLength={80}
+              value={service.title}
+              onChange={(value) => update({ ...service, title: value })}
+            />
+            <TextAreaField
+              label="One-line summary"
+              rows={2}
+              maxLength={320}
+              value={service.summary}
+              onChange={(value) => update({ ...service, summary: value })}
+            />
+            <StringListField
+              label="Bullet points"
+              hint="Up to four are shown on the homepage."
+              addLabel="Add point"
+              max={8}
+              maxLength={120}
+              items={service.points ?? []}
+              onChange={(value) => update({ ...service, points: value })}
+            />
+            <TextField
+              label="Links to"
+              maxLength={300}
+              placeholder="/services"
+              value={service.href}
+              onChange={(value) => update({ ...service, href: value })}
+            />
+          </div>
+        )}
+      />
+    </div>
+  )
+}
+
+/* ---------------------------------------------------------------- Work index */
+
+export function WorkIndexForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <TextField
+        label="Small label"
+        hint="Sits on the rule above the headline — “Selected work”."
+        maxLength={40}
+        value={str(data['eyebrow'])}
+        onChange={(value) => set(props, 'eyebrow', value)}
+      />
+      <TextField
+        label="Link to all work"
+        hint="The link on the right of that rule. Leave empty to hide it."
+        maxLength={40}
+        value={str(data['allWorkLabel'])}
+        onChange={(value) => set(props, 'allWorkLabel', value)}
+      />
+      <TextAreaField
+        label="Headline"
+        rows={2}
+        maxLength={200}
+        value={str(data['heading'])}
+        onChange={(value) => set(props, 'heading', value)}
+      />
+      <TextAreaField
+        label="Supporting paragraph"
+        maxLength={400}
+        value={str(data['body'])}
+        onChange={(value) => set(props, 'body', value)}
+      />
+      <NumberField
+        label="How many to show"
+        hint="Between 1 and 6."
+        value={typeof data['limit'] === 'number' ? (data['limit'] as number) : 3}
+        onChange={(value) => set(props, 'limit', Math.min(6, Math.max(1, value)))}
+      />
+      <p className="text-xs text-ink-500">
+        The studies themselves — names, figures, summaries — are edited under Case
+        studies. Which ones appear here is their “Feature on the homepage” setting and
+        their order.
+      </p>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------- Process */
+
+type Step = { title: string; description: string }
+
+function StepsRepeater({
+  items,
+  onChange,
+}: {
+  items: Step[]
+  onChange: (items: Step[]) => void
+}) {
+  return (
+    <RepeaterField<Step>
+      label="Steps"
+      addLabel="Add step"
+      max={8}
+      items={items}
+      createItem={() => ({ title: '', description: '' })}
+      onChange={onChange}
+      renderItem={(step, update) => (
+        <div className="flex flex-col gap-3">
+          <TextField
+            label="Step name"
+            maxLength={80}
+            value={step.title}
+            onChange={(value) => update({ ...step, title: value })}
+          />
+          <TextAreaField
+            label="What happens"
+            rows={3}
+            maxLength={600}
+            value={step.description}
+            onChange={(value) => update({ ...step, description: value })}
+          />
+        </div>
+      )}
+    />
+  )
+}
+
+export function ProcessStepsForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <TextAreaField
+        label="Headline"
+        rows={2}
+        maxLength={200}
+        value={str(data['heading'])}
+        onChange={(value) => set(props, 'heading', value)}
+      />
+      <TextAreaField
+        label="Supporting paragraph"
+        maxLength={400}
+        value={str(data['body'])}
+        onChange={(value) => set(props, 'body', value)}
+      />
+      <StepsRepeater
+        items={arr<Step>(data['steps'])}
+        onChange={(next) => set(props, 'steps', next)}
+      />
+      <p className="text-xs text-ink-500">
+        Steps are numbered automatically, so reordering them here renumbers them on the
+        page. The diagram beside them is part of the design.
+      </p>
+    </div>
+  )
+}
+
+export function ProcessDetailForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <StepsRepeater
+        items={arr<Step>(data['steps'])}
+        onChange={(next) => set(props, 'steps', next)}
+      />
+      <TextField
+        label="Label above the diagram"
+        maxLength={40}
+        value={str(data['asideEyebrow'])}
+        onChange={(value) => set(props, 'asideEyebrow', value)}
+      />
+      <TextAreaField
+        label="Paragraph above the diagram"
+        maxLength={400}
+        value={str(data['asideBody'])}
+        onChange={(value) => set(props, 'asideBody', value)}
+      />
+    </div>
+  )
+}
+
+/* ----------------------------------------------------------------- Statement */
+
+export function StatementForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <TextAreaField
+        label="Statement"
+        rows={5}
+        maxLength={800}
+        hint="One paragraph, set large and alone on the page."
+        value={str(data['statement'])}
+        onChange={(value) => set(props, 'statement', value)}
+      />
+      <CtaField
+        label="Button"
+        value={cta(data['cta'])}
+        onChange={(value) => set(props, 'cta', value)}
+      />
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------- Testimonials */
+
+export function TestimonialsForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <TextAreaField
+        label="Headline"
+        rows={2}
+        maxLength={200}
+        value={str(data['heading'])}
+        onChange={(value) => set(props, 'heading', value)}
+      />
+      <p className="text-xs text-ink-500">
+        The quotes come from Library → Testimonials, in their configured order. While
+        there are none the whole band is hidden, which is deliberate — a quote has to be
+        a real one from a real client.
+      </p>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ Final CTA */
+
+export function FinalCtaForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <TextAreaField
+        label="Headline"
+        rows={2}
+        maxLength={200}
+        value={str(data['heading'])}
+        onChange={(value) => set(props, 'heading', value)}
+      />
+      <TextAreaField
+        label="Supporting paragraph"
+        maxLength={400}
+        value={str(data['body'])}
+        onChange={(value) => set(props, 'body', value)}
+      />
+      <CtaField
+        label="Main button"
+        value={cta(data['primaryCta'])}
+        onChange={(value) => set(props, 'primaryCta', value)}
+      />
+      <CtaField
+        label="Second button"
+        value={cta(data['secondaryCta'])}
+        onChange={(value) => set(props, 'secondaryCta', value)}
+      />
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------------- Values */
+
+type Value = { title: string; body: string }
+
+export function ValuesForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <TextField
+        label="Small label"
+        maxLength={40}
+        value={str(data['eyebrow'])}
+        onChange={(value) => set(props, 'eyebrow', value)}
+      />
+      <TextAreaField
+        label="Standing statement"
+        rows={4}
+        maxLength={600}
+        hint="The larger paragraph in the left-hand column."
+        value={str(data['statement'])}
+        onChange={(value) => set(props, 'statement', value)}
+      />
+      <RepeaterField<Value>
+        label="Beliefs"
+        addLabel="Add belief"
+        max={8}
+        items={arr<Value>(data['items'])}
+        createItem={() => ({ title: '', body: '' })}
+        onChange={(next) => set(props, 'items', next)}
+        renderItem={(item, update) => (
+          <div className="flex flex-col gap-3">
+            <TextField
+              label="Heading"
+              maxLength={90}
+              value={item.title}
+              onChange={(value) => update({ ...item, title: value })}
+            />
+            <TextAreaField
+              label="Body"
+              rows={3}
+              maxLength={600}
+              value={item.body}
+              onChange={(value) => update({ ...item, body: value })}
+            />
+          </div>
+        )}
+      />
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------- Services list */
+
+type DetailedService = {
+  title: string
+  summary: string
+  description: string
+  points: string[]
+}
+
+export function ServicesListForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <TextField
+        label="Heading above the bullet list"
+        hint="Repeated for every service — “What that includes”."
+        maxLength={60}
+        value={str(data['includesLabel'])}
+        onChange={(value) => set(props, 'includesLabel', value)}
+      />
+      <RepeaterField<DetailedService>
+        label="Services"
+        addLabel="Add service"
+        max={6}
+        items={arr<DetailedService>(data['services'])}
+        createItem={() => ({ title: '', summary: '', description: '', points: [] })}
+        onChange={(next) => set(props, 'services', next)}
+        renderItem={(service, update) => (
+          <div className="flex flex-col gap-3">
+            <TextField
+              label="Service name"
+              maxLength={80}
+              value={service.title}
+              onChange={(value) => update({ ...service, title: value })}
+            />
+            <TextAreaField
+              label="One-line summary"
+              rows={2}
+              maxLength={320}
+              hint="The larger sentence directly under the name."
+              value={service.summary}
+              onChange={(value) => update({ ...service, summary: value })}
+            />
+            <TextAreaField
+              label="Full description"
+              rows={5}
+              maxLength={1200}
+              value={service.description}
+              onChange={(value) => update({ ...service, description: value })}
+            />
+            <StringListField
+              label="What it includes"
+              addLabel="Add point"
+              max={10}
+              maxLength={120}
+              items={service.points ?? []}
+              onChange={(value) => update({ ...service, points: value })}
+            />
+          </div>
+        )}
+      />
+    </div>
+  )
+}
+
+export function ServicesClosingForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <TextField
+        label="Small label"
+        hint="The word in the narrow left column — “How”."
+        maxLength={40}
+        value={str(data['label'])}
+        onChange={(value) => set(props, 'label', value)}
+      />
+      <TextAreaField
+        label="Statement"
+        rows={4}
+        maxLength={600}
+        value={str(data['statement'])}
+        onChange={(value) => set(props, 'statement', value)}
+      />
+      <TextAreaField
+        label="Follow-on paragraph"
+        rows={5}
+        maxLength={900}
+        value={str(data['body'])}
+        onChange={(value) => set(props, 'body', value)}
+      />
+    </div>
+  )
+}
+
+/* ---------------------------------------------------------- Case study index */
+
+export function CaseStudyListForm() {
+  return (
+    <p className="text-sm text-ink-600">
+      This band lists every published case study, in the order set under Case studies.
+      There is nothing to write here — edit the studies themselves under{' '}
+      <span className="font-medium text-ink-900">Case studies</span>.
+    </p>
+  )
+}
+
+/* ------------------------------------------------------------------- Contact */
+
+export function ContactIntroForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <TextField
+        label="Small label"
+        maxLength={40}
+        value={str(data['eyebrow'])}
+        onChange={(value) => set(props, 'eyebrow', value)}
+      />
+      <TextAreaField
+        label="Headline"
+        rows={3}
+        maxLength={200}
+        hint="Press Enter where the headline should break onto a new line."
+        value={str(data['headline'])}
+        onChange={(value) => set(props, 'headline', value)}
+      />
+      <TextAreaField
+        label="Supporting paragraph"
+        maxLength={400}
+        value={str(data['body'])}
+        onChange={(value) => set(props, 'body', value)}
+      />
+      <StringListField
+        label="What to expect"
+        addLabel="Add point"
+        max={6}
+        maxLength={200}
+        items={strs(data['points'])}
+        onChange={(value) => set(props, 'points', value)}
+      />
+      <TextField
+        label="Reply-time note"
+        hint="The line beside the clock icon."
+        maxLength={120}
+        value={str(data['responseNote'])}
+        onChange={(value) => set(props, 'responseNote', value)}
+      />
+      <p className="text-xs text-ink-500">
+        The email address shown here is the contact email in Settings, and the enquiry
+        form beside it is fixed.
+      </p>
+    </div>
+  )
+}
+
+/* ---------------------------------------------------------------------- Book */
+
+export function BookDetailsForm(props: FormProps) {
+  const { data } = props
+  return (
+    <div className="flex flex-col gap-4">
+      <StringListField
+        label="What to expect"
+        addLabel="Add point"
+        max={6}
+        maxLength={200}
+        items={strs(data['points'])}
+        onChange={(value) => set(props, 'points', value)}
+      />
+      <TextField
+        label="Text before the email address"
+        maxLength={120}
+        value={str(data['writeFirstLabel'])}
+        onChange={(value) => set(props, 'writeFirstLabel', value)}
+      />
+      <p className="text-xs text-ink-500">
+        The calendar itself comes from the booking link in Settings, and the email
+        address from the contact email there.
+      </p>
+    </div>
+  )
+}

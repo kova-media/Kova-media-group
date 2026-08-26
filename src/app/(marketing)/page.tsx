@@ -1,52 +1,33 @@
-import { Hero } from '@/features/marketing/home/hero'
-import {
-  ClientMarquee,
-  MetricsRow,
-  Testimonials,
-  Faq,
-  FinalCta,
-} from '@/features/marketing/sections'
-import {
-  ServicesPreview,
-  FeaturedCaseStudies,
-  ProcessPreview,
-  AboutPreview,
-} from '@/features/marketing/home/sections'
-import { getFaqItems } from '@/server/content/faq'
-import { getCaseStudyList, getTestimonialList } from '@/server/content/site-content'
+import type { Metadata } from 'next'
+
+import { MarketingSections } from '@/features/marketing/marketing-sections'
+import { loadMarketingPage } from '@/server/content/marketing-content'
 
 /**
  * The homepage.
  *
- * The composition is the v0 design and is fixed — the sections and their order
- * are a designed narrative, not a CMS-arranged page. What the CMS controls is
- * the *content* inside them: the case studies, the quotes, the FAQ.
+ * The composition is a designed narrative and every band is a component nobody
+ * can restyle from the admin — but the order of those bands, and every word,
+ * figure and link inside them, is CMS content. Editing it is Admin → Pages →
+ * Homepage.
  *
- * Everything is read in parallel from cached, tag-invalidated queries, so a
- * warm cache performs no database work at all.
+ * The document is read once here and once in `generateMetadata`; both go
+ * through the same cached, tag-invalidated query, so a warm cache performs no
+ * database work at all.
  */
-export default async function HomePage() {
-  const [caseStudies, quotes, faqItems] = await Promise.all([
-    getCaseStudyList(),
-    getTestimonialList(),
-    getFaqItems(),
-  ])
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await loadMarketingPage('home')
 
-  return (
-    <>
-      <Hero />
-      <ClientMarquee />
-      <MetricsRow />
-      <ServicesPreview />
-      <FeaturedCaseStudies studies={caseStudies} />
-      <ProcessPreview />
-      <AboutPreview />
-      <Testimonials quotes={quotes} />
-      {/* The testimonials band above is conditional, so the FAQ takes over its
-          tone when it is absent — otherwise About and the FAQ stack as two
-          identical bands and the alternating rhythm breaks. */}
-      <Faq items={faqItems} tone={quotes.length > 0 ? 'background' : 'surface'} />
-      <FinalCta />
-    </>
-  )
+  return {
+    // Absolute: the root layout's `%s — Kova Media Group` template would
+    // otherwise append the brand to a title that already carries it.
+    title: { absolute: page.seo.title },
+    description: page.seo.description,
+  }
+}
+
+export default async function HomePage() {
+  const page = await loadMarketingPage('home')
+
+  return <MarketingSections page={page} />
 }

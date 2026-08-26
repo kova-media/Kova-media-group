@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { Container, ButtonLink } from '@/components/site/ui'
 import { RevealLines } from '@/components/site/reveal'
 import { DashboardCard, EmailCard, SmsCard } from '@/components/site/mockups'
+import { hasCta, type Cta } from '@/features/marketing/sections'
 
 const ease = [0.16, 1, 0.3, 1] as const
 
@@ -40,8 +41,28 @@ const BEAT_MS = 5200
  * from zero leaves the content invisible for anyone whose JavaScript is slow or
  * blocked, which is the failure mode CODING_STANDARDS warns about. The tilt
  * stays: a static transform is geometry, not motion.
+ *
+ * The words come from the CMS; everything above does not. The headline arrives
+ * as one string and is split on its line breaks, because the line-by-line
+ * reveal makes those breaks real content — an editor decides where the headline
+ * turns by pressing Enter, which is a thing anyone understands, and never
+ * touches the animation that reveals it.
  */
-export function Hero() {
+export function Hero({
+  headline,
+  subhead,
+  primaryCta,
+  secondaryCta,
+}: {
+  headline?: string
+  subhead?: string
+  primaryCta?: Cta
+  secondaryCta?: Cta
+}) {
+  const lines = (headline ?? '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
   const ref = useRef<HTMLDivElement>(null)
   const reduced = useReducedMotion()
   const still = reduced === true
@@ -79,36 +100,42 @@ export function Hero() {
         <div className="grid items-center gap-16 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
           {/* Copy */}
           <div className="max-w-xl">
-            <h1 className="tracking-tightest text-[3.25rem] leading-[1.02] font-semibold text-balance text-foreground md:text-6xl lg:text-[4.5rem]">
-              <RevealLines
-                lines={['Email & SMS', 'marketing that', 'drives revenue.']}
-              />
-            </h1>
+            {lines.length > 0 && (
+              <h1 className="tracking-tightest text-[3.25rem] leading-[1.02] font-semibold text-balance text-foreground md:text-6xl lg:text-[4.5rem]">
+                <RevealLines lines={lines} />
+              </h1>
+            )}
 
-            <motion.p
-              initial={still ? false : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5, ease }}
-              className="mt-8 max-w-lg text-lg leading-relaxed text-pretty text-muted-foreground"
-            >
-              We help ecommerce brands generate more revenue from the customers they
-              already have — through high-performing campaigns, intelligent automations,
-              and strategic SMS.
-            </motion.p>
+            {subhead?.trim() && (
+              <motion.p
+                initial={still ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.5, ease }}
+                className="mt-8 max-w-lg text-lg leading-relaxed text-pretty text-muted-foreground"
+              >
+                {subhead}
+              </motion.p>
+            )}
 
-            <motion.div
-              initial={still ? false : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.65, ease }}
-              className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
-            >
-              <ButtonLink href="/book" variant="primary" withArrow>
-                Book a strategy call
-              </ButtonLink>
-              <ButtonLink href="/case-studies" variant="secondary">
-                View case studies
-              </ButtonLink>
-            </motion.div>
+            {(hasCta(primaryCta) || hasCta(secondaryCta)) && (
+              <motion.div
+                initial={still ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.65, ease }}
+                className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
+              >
+                {hasCta(primaryCta) && (
+                  <ButtonLink href={primaryCta.href} variant="primary" withArrow>
+                    {primaryCta.label}
+                  </ButtonLink>
+                )}
+                {hasCta(secondaryCta) && (
+                  <ButtonLink href={secondaryCta.href} variant="secondary">
+                    {secondaryCta.label}
+                  </ButtonLink>
+                )}
+              </motion.div>
+            )}
           </div>
 
           {/* Composition.

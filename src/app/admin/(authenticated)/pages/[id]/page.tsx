@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 
+import { PageSettingsForm } from '@/features/admin/pages/page-settings-form'
 import { SectionEditor } from '@/features/admin/pages/section-editor/section-editor'
 import { AdminPageHeader } from '@/features/admin/shell/admin-shell'
 import { getPageForEdit } from '@/server/content/admin-queries'
@@ -39,7 +40,10 @@ export default async function EditPage({ params }: PageProps<'/admin/pages/[id]'
 
   if (!page) notFound()
 
-  const media = await getMediaByIdsForAdmin(collectMediaIds(page.draft.content))
+  // The document's images and the page's own share image, in one read.
+  const ids = collectMediaIds(page.draft.content)
+  if (page.seoImageId) ids.push(page.seoImageId)
+  const media = await getMediaByIdsForAdmin(ids)
 
   return (
     <>
@@ -47,11 +51,17 @@ export default async function EditPage({ params }: PageProps<'/admin/pages/[id]'
         title={page.title}
         description={`/${page.slug}${page.hasUnpublishedChanges ? ' · unpublished changes' : ''}`}
       />
-      <SectionEditor
-        page={page}
-        catalogue={[...sectionCatalogue]}
-        initialMedia={media}
-      />
+      <div className="flex flex-col gap-4">
+        <PageSettingsForm
+          page={page}
+          seoImage={media.find((asset) => asset.id === page.seoImageId) ?? null}
+        />
+        <SectionEditor
+          page={page}
+          catalogue={[...sectionCatalogue]}
+          initialMedia={media}
+        />
+      </div>
     </>
   )
 }

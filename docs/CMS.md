@@ -1,7 +1,7 @@
 # CMS
 
 **Status:** Authoritative for the content model and editorial workflow.
-**Last reviewed:** 2026-08-06
+**Last reviewed:** 2026-08-26
 
 ---
 
@@ -30,16 +30,16 @@ Every editable field is a deliberate decision made by engineering. When the edit
 
 ## 2. Content entities
 
-| Entity              | Purpose                                        | Publishable                    |
-| ------------------- | ---------------------------------------------- | ------------------------------ |
-| `Page`              | A URL with an ordered list of sections         | Yes (draft/published document) |
-| `CaseStudy`         | Long-form client story with structured metrics | Yes (draft/published document) |
-| `Testimonial`       | Reusable quote, referenced by sections         | Simple flag                    |
-| `PartnerLogo`       | Client/partner mark for logo strips            | Simple flag                    |
-| `EmailExample`      | A real email design, shown in galleries        | Simple flag                    |
-| `MediaAsset`        | An uploaded file and its derived metadata      | n/a                            |
-| `SiteSettings`      | Nav, footer, defaults, contact details         | Immediate                      |
-| `ContactSubmission` | Inbound lead                                   | n/a (read-only)                |
+| Entity              | Purpose                                                    | Publishable                    |
+| ------------------- | ---------------------------------------------------------- | ------------------------------ |
+| `Page`              | A URL with an ordered list of sections                     | Yes (draft/published document) |
+| `CaseStudy`         | Long-form client story with structured metrics             | Yes (draft/published document) |
+| `Testimonial`       | Reusable quote, referenced by sections                     | Simple flag                    |
+| `PartnerLogo`       | Client/partner mark for logo strips                        | Simple flag                    |
+| `EmailExample`      | A real email design, shown in galleries                    | Simple flag                    |
+| `MediaAsset`        | An uploaded file and its derived metadata                  | n/a                            |
+| `SiteSettings`      | Nav, header CTA, footer content, defaults, contact details | Immediate                      |
+| `ContactSubmission` | Inbound lead                                               | n/a (read-only)                |
 
 Publishable entities carry two content documents: `draftContent` (edited) and `publishedContent` (served). "Simple flag" entities have an `isPublished` boolean and are referenced by id from within those documents.
 
@@ -126,36 +126,84 @@ Unknown types render nothing rather than crashing. A published document referenc
 
 ### 3.4 Adding a section type
 
-1. Add `src/server/content/sections/definitions/<name>.ts` with schema + defaults, and register it in `registry.ts`.
-2. Build the React component in `src/features/sections/<name>/` and register it in `src/features/sections/registry.tsx`.
-3. Add a bespoke admin form only if the schema-derived form is insufficient.
+For a designed marketing band:
 
-Three steps, no migration, all in code, all reviewed. The friction that protects design quality is **having to write a component** — a designed layout cannot be conjured from the admin. An enum migration added ceremony without adding safety, so it is gone.
+1. Build the component in `src/features/marketing/**`. It takes its content as
+   props and renders nothing when it has none.
+2. Add the type to `SECTION_TYPES` and a definition to
+   `sections/marketing-definitions.ts` (schema, publish schema, defaults, group).
+3. Map the type to the component in `features/marketing/marketing-sections.tsx`.
+4. Write its admin form in `admin/pages/section-editor/marketing-forms.tsx` and
+   add the case to `section-form.tsx`.
 
-### 3.5 Initial section catalogue (V1)
+Four steps, no migration, all in code, all reviewed. The friction that protects design quality is **having to write a component** — a designed layout cannot be conjured from the admin. An enum migration added ceremony without adding safety, so it is gone.
 
-Derived from the story the homepage needs to tell, not from a template checklist.
+Forms are hand-written rather than derived from the schema. A generated form is a key/value editor, and these are the screens the owner opens every week: field order, wording and hints are the difference between a CMS someone uses and one they avoid.
 
-| Type                  | Role in the narrative                                                |
-| --------------------- | -------------------------------------------------------------------- |
-| `HERO`                | The claim. Headline, subhead, primary CTA, optional supporting media |
-| `LOGO_STRIP`          | Immediate credibility. Real client logos                             |
-| `PROOF_METRICS`       | Structured numbers with labels and timeframes                        |
-| `NARRATIVE`           | Long-form positioning copy with optional media                       |
-| `SERVICE_DETAIL`      | Email or SMS capability, told as outcomes rather than deliverables   |
-| `EMAIL_GALLERY`       | Real email designs from `EmailExample`                               |
-| `CASE_STUDY_FEATURE`  | One case study, given room to breathe                                |
-| `CASE_STUDY_GRID`     | Several case studies                                                 |
-| `TESTIMONIAL_FEATURE` | A single quote at scale                                              |
-| `TESTIMONIAL_GRID`    | Several quotes                                                       |
-| `PARTNERSHIP`         | The "extension of your team" argument                                |
-| `FAQ`                 | Objection handling before the booking decision                       |
-| `CTA`                 | The booking ask                                                      |
-| `RICH_TEXT`           | Prose for legal and utility pages                                    |
+### 3.5 The section catalogue
 
-Notably absent, per the design brief: process diagrams, fake dashboards, generic feature grids, pricing tables.
+Two groups, and the split matters.
 
-### 3.6 Section data references other entities by id
+**Marketing sections** are the designed bands of the public site. Each one is a
+component in `src/features/marketing/**` that a designer wrote; the section type
+is that component's _content_ and nothing else. They are defined in
+`sections/marketing-definitions.ts`, edited through the hand-written forms in
+`admin/pages/section-editor/marketing-forms.tsx`, and rendered by the single
+mapping in `features/marketing/marketing-sections.tsx`.
+
+| Type                | The band it fills                                                |
+| ------------------- | ---------------------------------------------------------------- |
+| `PAGE_HEADER`       | Interior-page masthead: label, headline, intro                   |
+| `HOME_HERO`         | The homepage opening — animated headline, paragraph, two buttons |
+| `CLIENT_MARQUEE`    | The scrolling row of client names                                |
+| `METRICS_BAND`      | A headline over a row of figures. Absent while it holds none     |
+| `SERVICES_OVERVIEW` | The channels as ruled rows, pointing at the services page        |
+| `WORK_INDEX`        | Featured case studies as a ruled list                            |
+| `PROCESS_STEPS`     | Engagement steps beside the automation diagram (homepage)        |
+| `PROCESS_DETAIL`    | The full step list with a sticky diagram column                  |
+| `STATEMENT`         | One paragraph set large, alone, with an optional button          |
+| `TESTIMONIALS`      | Quotes from the library. Absent while there are none             |
+| `FINAL_CTA`         | The full-bleed navy closing band                                 |
+| `VALUES`            | A standing statement beside a ruled list of beliefs              |
+| `SERVICES_LIST`     | Each service given a full band                                   |
+| `SERVICES_CLOSING`  | A short label beside a large statement, under a teal rule        |
+| `CASE_STUDY_LIST`   | Every published study as a numbered index                        |
+| `CONTACT_INTRO`     | Contact copy and details, with the enquiry form beside it        |
+| `BOOK_DETAILS`      | What to expect from the call, beside the scheduler               |
+
+**Utility sections** are the original generic catalogue, used by the legal and
+utility pages that render through the `[...slug]` catch-all.
+
+| Type                                             | Role                                  |
+| ------------------------------------------------ | ------------------------------------- |
+| `HERO`, `LOGO_STRIP`, `PROOF_METRICS`            | Generic opening, credibility, numbers |
+| `NARRATIVE`, `SERVICE_DETAIL`, `PARTNERSHIP`     | Prose and outcome lists               |
+| `EMAIL_GALLERY`, `TESTIMONIAL_*`, `CASE_STUDY_*` | Library-driven blocks                 |
+| `FAQ`, `CTA`, `RICH_TEXT`                        | Questions, the ask, and legal prose   |
+
+`FAQ` is shared: the homepage's accordion and the `/faq` page read the same
+section type, flattening its rich-text answers to paragraphs.
+
+Notably absent, per the design brief: process diagrams as content, fake
+dashboards, generic feature grids, pricing tables.
+
+### 3.6 The designed marketing pages
+
+`/`, `/about`, `/services`, `/process`, `/case-studies`, `/contact` and `/book`
+are real route files **and** CMS pages. The route reads its `Page` row by slug
+and hands the sections to `MarketingSections`; it holds no copy of its own.
+
+Their default documents live in `src/server/content/blueprints.ts` and are the
+floor the site renders from when the database has nothing — a fresh clone or a
+new preview environment still shows a complete site. `prisma/seed-content.ts`
+promotes them into the CMS; from that point the database is authoritative and
+the seed is a no-op. It never overwrites a page whose document already contains
+marketing sections, so an edit made in the admin always survives a re-run.
+
+These pages are `isSystem`, so their slugs cannot be changed from the admin: the
+slug is wired to a route file and changing it would 404 the page.
+
+### 3.7 Section data references other entities by id
 
 A `TESTIMONIAL_GRID` section stores `{ testimonialIds: string[] }`, not copies of the quotes. A media field stores `{ mediaId }`, not a resolved URL. The renderer resolves these through separately cached, separately tagged functions:
 
@@ -167,7 +215,7 @@ getPublishedPage(slug)        → cacheTag('page:home')
 
 Each resolver is its own cache entry with its own tag, so editing one testimonial invalidates that testimonial — not every page that shows it. On a cache hit the whole page still costs zero database reads.
 
-### 3.7 Rich text
+### 3.8 Rich text
 
 `RICH_TEXT` stores a **structured node tree**, not HTML:
 
@@ -424,7 +472,8 @@ Desktop-first. shadcn/ui throughout (see `DECISIONS.md` ADR-008 — the public s
   /media                Grid, upload, alt-text editing, usage
   /submissions          Inbox
   /submissions/[id]     Detail, status, notes
-  /settings             Site settings, navigation, footer, SEO defaults
+  /settings             Site name, logos, contact, booking link, navigation,
+                        header CTA, footer columns and copy, SEO defaults
 ```
 
 Editor behaviour that matters:

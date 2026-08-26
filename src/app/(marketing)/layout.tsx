@@ -36,7 +36,12 @@ export default async function MarketingLayout({ children }: LayoutProps<'/'>) {
         Skip to content
       </a>
 
-      <SiteHeader logo={chrome.logo} />
+      <SiteHeader
+        logo={chrome.logo}
+        navigation={chrome.navigation}
+        ctaLabel={chrome.header.ctaLabel}
+        ctaHref={chrome.header.ctaHref}
+      />
       <main id="main">{children}</main>
       <SiteFooter />
 

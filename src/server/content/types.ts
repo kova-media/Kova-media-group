@@ -113,7 +113,9 @@ export type SiteSettingsDto = {
   logoDarkId: string | null
   socialLinks: { label: string; href: string }[]
   navigation: { label: string; href: string }[]
-  footer: { tagline?: string }
+  /** Raw JSON blobs, validated by `schemas/settings.ts` where they are read. */
+  header: unknown
+  footer: unknown
 }
 
 /** Admin list rows. Derived status, never stored (DATABASE.md §4.2). */

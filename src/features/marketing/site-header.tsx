@@ -6,11 +6,27 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { nav } from '@/lib/site-data'
 import { LogoLink, type LogoAsset } from '@/components/site/logo'
 import { ButtonLink } from '@/components/site/ui'
 
-export function SiteHeader({ logo }: { logo?: LogoAsset | null }) {
+/**
+ * Navigation labels and the call to action come from Site settings; everything
+ * else about this component — the scroll transition, the active-item spring,
+ * the mobile sheet — does not, and is not exposed anywhere.
+ */
+export function SiteHeader({
+  logo,
+  navigation,
+  ctaLabel,
+  ctaHref,
+}: {
+  logo?: LogoAsset | null
+  navigation: { label: string; href: string }[]
+  ctaLabel: string
+  ctaHref: string
+}) {
+  const nav = navigation
+  const hasCta = Boolean(ctaLabel.trim() && ctaHref.trim())
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
@@ -63,11 +79,13 @@ export function SiteHeader({ logo }: { logo?: LogoAsset | null }) {
             })}
           </nav>
 
-          <div className="hidden md:block">
-            <ButtonLink href="/book" variant="primary" withArrow>
-              Book a call
-            </ButtonLink>
-          </div>
+          {hasCta && (
+            <div className="hidden md:block">
+              <ButtonLink href={ctaHref} variant="primary" withArrow>
+                {ctaLabel}
+              </ButtonLink>
+            </div>
+          )}
 
           <button
             type="button"
@@ -107,11 +125,18 @@ export function SiteHeader({ logo }: { logo?: LogoAsset | null }) {
                   {item.label}
                 </Link>
               ))}
-              <div className="pt-2" onClick={() => setOpen(false)}>
-                <ButtonLink href="/book" variant="primary" className="w-full" withArrow>
-                  Book a call
-                </ButtonLink>
-              </div>
+              {hasCta && (
+                <div className="pt-2" onClick={() => setOpen(false)}>
+                  <ButtonLink
+                    href={ctaHref}
+                    variant="primary"
+                    className="w-full"
+                    withArrow
+                  >
+                    {ctaLabel}
+                  </ButtonLink>
+                </div>
+              )}
             </nav>
           </motion.div>
         )}

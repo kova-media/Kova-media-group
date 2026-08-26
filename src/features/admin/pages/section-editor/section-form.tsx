@@ -4,6 +4,25 @@ import type { MediaAssetDto } from '@/server/content/types'
 import type { SectionType } from '@/server/content/sections/types'
 
 import { MediaField } from '../../media/media-field'
+import {
+  BookDetailsForm,
+  CaseStudyListForm,
+  ClientMarqueeForm,
+  ContactIntroForm,
+  FinalCtaForm,
+  HomeHeroForm,
+  MetricsBandForm,
+  PageHeaderForm,
+  ProcessDetailForm,
+  ProcessStepsForm,
+  ServicesClosingForm,
+  ServicesListForm,
+  ServicesOverviewForm,
+  StatementForm,
+  TestimonialsForm,
+  ValuesForm,
+  WorkIndexForm,
+} from './marketing-forms'
 import { RichTextField } from './rich-text-field'
 import {
   LinkField,
@@ -377,6 +396,43 @@ function ReferenceForm({
 
 export function SectionForm({ type, ...props }: FormProps & { type: SectionType }) {
   switch (type) {
+    // ------------------------------------------------------------- Marketing
+    case 'PAGE_HEADER':
+      return <PageHeaderForm {...props} />
+    case 'HOME_HERO':
+      return <HomeHeroForm {...props} />
+    case 'CLIENT_MARQUEE':
+      return <ClientMarqueeForm {...props} />
+    case 'METRICS_BAND':
+      return <MetricsBandForm {...props} />
+    case 'SERVICES_OVERVIEW':
+      return <ServicesOverviewForm {...props} />
+    case 'WORK_INDEX':
+      return <WorkIndexForm {...props} />
+    case 'PROCESS_STEPS':
+      return <ProcessStepsForm {...props} />
+    case 'PROCESS_DETAIL':
+      return <ProcessDetailForm {...props} />
+    case 'STATEMENT':
+      return <StatementForm {...props} />
+    case 'TESTIMONIALS':
+      return <TestimonialsForm {...props} />
+    case 'FINAL_CTA':
+      return <FinalCtaForm {...props} />
+    case 'VALUES':
+      return <ValuesForm {...props} />
+    case 'SERVICES_LIST':
+      return <ServicesListForm {...props} />
+    case 'SERVICES_CLOSING':
+      return <ServicesClosingForm {...props} />
+    case 'CASE_STUDY_LIST':
+      return <CaseStudyListForm />
+    case 'CONTACT_INTRO':
+      return <ContactIntroForm {...props} />
+    case 'BOOK_DETAILS':
+      return <BookDetailsForm {...props} />
+
+    // --------------------------------------------------------------- Utility
     case 'HERO':
       return <HeroForm {...props} />
     case 'LOGO_STRIP':

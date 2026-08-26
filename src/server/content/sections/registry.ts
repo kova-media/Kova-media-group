@@ -46,6 +46,7 @@ export const sectionCatalogue = SECTION_TYPES.map((type) => {
     label: definition.label,
     description: definition.description,
     maxPerPage: definition.maxPerPage,
+    group: definition.group ?? 'Utility sections',
   }
 })
 

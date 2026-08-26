@@ -7,19 +7,30 @@ loadEnv({ path: '.env.local' })
 loadEnv({ path: '.env' })
 
 import { PrismaClient } from '../src/generated/prisma/client'
-import { caseStudies, faqs } from '../src/lib/site-data'
+import type { Prisma } from '../src/generated/prisma/client'
+import { caseStudies } from '../src/lib/site-data'
+import { PAGE_BLUEPRINTS } from '../src/server/content/blueprints'
+import {
+  DEFAULT_SITE_FOOTER,
+  DEFAULT_SITE_HEADER,
+} from '../src/server/content/schemas/settings'
+import { SECTION_TYPES } from '../src/server/content/sections/types'
 
 /**
- * Moves the real Kova content out of `site-data.ts` and into the CMS.
+ * Puts the real Kova content into the CMS.
  *
- * `site-data.ts` stays in the repository as the fallback the public site uses
- * when a table is empty — a fresh clone or preview environment still renders a
- * complete site. This script promotes that same content into the database so
- * the owner can edit it without touching code.
+ * The bundled copy in `blueprints.ts` and `site-data.ts` stays in the
+ * repository as the floor the public site renders from when a table is empty —
+ * a fresh clone or preview environment still shows a complete site. This script
+ * promotes that content into the database so the owner can edit every word of
+ * it from the admin without touching code.
  *
- * Idempotent: every write is an upsert on a stable key, and existing rows are
- * left alone. Running it twice changes nothing, and it will never overwrite an
- * edit made through the admin.
+ * **Idempotent, and it never overwrites an edit made in the admin.** A page is
+ * written only when it does not exist, or when the document it holds contains
+ * none of the designed marketing sections — which is true exactly once, for the
+ * placeholder documents left over from before the marketing pages were
+ * CMS-driven. After that the database is authoritative and this script is a
+ * no-op.
  */
 const connectionString = process.env['DIRECT_URL']
 
@@ -32,6 +43,20 @@ const prisma = new PrismaClient({
 })
 
 const SEED_AUTHOR = 'seed:content'
+
+/** The designed bands. A document holding none of them predates this system. */
+const MARKETING_TYPES = new Set<string>(
+  SECTION_TYPES.slice(0, SECTION_TYPES.indexOf('HERO')),
+)
+
+function isMarketingDocument(value: unknown): boolean {
+  const sections = (value as { sections?: unknown })?.sections
+  if (!Array.isArray(sections)) return false
+
+  return sections.some((section) =>
+    MARKETING_TYPES.has((section as { type?: string })?.type ?? ''),
+  )
+}
 
 async function seedCaseStudies() {
   let created = 0
@@ -55,6 +80,7 @@ async function seedCaseStudies() {
         automation: study.automation,
         sms: study.sms,
         results: study.results,
+        resultsPeriod: study.resultsPeriod ?? '',
         accent: study.accent,
       },
     }
@@ -62,7 +88,7 @@ async function seedCaseStudies() {
     // Seeded live: these are the real, already-public case studies, and a site
     // that ships with an empty work section is worse than one that ships with
     // the content it already has. Editing and republishing works normally.
-    const created_ = await prisma.caseStudy.create({
+    const row = await prisma.caseStudy.create({
       data: {
         slug: study.slug,
         clientName: study.brand,
@@ -84,7 +110,7 @@ async function seedCaseStudies() {
     await prisma.contentRevision.create({
       data: {
         entityType: 'caseStudy',
-        entityId: created_.id,
+        entityId: row.id,
         content,
         action: 'published',
         createdBy: SEED_AUTHOR,
@@ -98,66 +124,140 @@ async function seedCaseStudies() {
 }
 
 /**
- * The FAQ lives on a CMS page so it can be edited with the section editor that
- * already exists, rather than needing a bespoke table.
+ * The designed marketing pages.
+ *
+ * Seeded published, because these pages are already live — the site rendered
+ * this exact copy from the components before it was content. Publishing them as
+ * drafts would take the marketing site down until someone pressed a button.
  */
-async function seedFaqPage() {
-  const existing = await prisma.page.findUnique({
-    where: { slug: 'faq' },
-    select: { id: true },
-  })
+async function seedMarketingPages() {
+  const written: string[] = []
+  const skipped: string[] = []
 
-  if (existing) return 0
+  for (const blueprint of PAGE_BLUEPRINTS) {
+    const existing = await prisma.page.findUnique({
+      where: { slug: blueprint.slug },
+      select: { id: true, draftContent: true, publishedContent: true },
+    })
 
-  const content = {
-    sections: [
-      {
-        id: 'faq-main',
-        type: 'FAQ',
-        isEnabled: true,
-        data: {
-          heading: 'Questions, answered.',
-          items: faqs.map((item) => ({
-            question: item.q,
-            answer: [
-              {
-                type: 'paragraph' as const,
-                children: [{ type: 'text' as const, text: item.a }],
-              },
-            ],
-          })),
-        },
+    if (
+      existing &&
+      (isMarketingDocument(existing.draftContent) ||
+        isMarketingDocument(existing.publishedContent))
+    ) {
+      skipped.push(blueprint.slug)
+      continue
+    }
+
+    // Prisma's JSON input type wants an index signature; the document has a
+    // typed shape. It is validated by `pageContentSchema` on every read, so the
+    // cast here is at the database boundary only.
+    const content = blueprint.content as unknown as Prisma.InputJsonValue
+    const now = new Date()
+
+    const row = existing
+      ? await prisma.page.update({
+          where: { id: existing.id },
+          data: {
+            title: blueprint.title,
+            isSystem: true,
+            draftContent: content,
+            publishedContent: content,
+            publishedAt: now,
+            publishedBy: SEED_AUTHOR,
+            draftVersion: { increment: 1 },
+            seoTitle: blueprint.seoTitle,
+            seoDescription: blueprint.seoDescription,
+          },
+          select: { id: true },
+        })
+      : await prisma.page.create({
+          data: {
+            slug: blueprint.slug,
+            title: blueprint.title,
+            // System pages own a real route file, so their slug is structural
+            // and the admin must not let anyone change it.
+            isSystem: true,
+            draftContent: content,
+            publishedContent: content,
+            publishedAt: now,
+            publishedBy: SEED_AUTHOR,
+            seoTitle: blueprint.seoTitle,
+            seoDescription: blueprint.seoDescription,
+          },
+          select: { id: true },
+        })
+
+    await prisma.contentRevision.create({
+      data: {
+        entityType: 'page',
+        entityId: row.id,
+        content,
+        action: 'published',
+        createdBy: SEED_AUTHOR,
       },
-    ],
+    })
+
+    written.push(blueprint.slug)
   }
 
-  await prisma.page.create({
+  return { written, skipped }
+}
+
+/**
+ * Header and footer content.
+ *
+ * Written only when the blobs are still empty, so a footer edited in the admin
+ * survives a re-run.
+ */
+async function seedChrome() {
+  const settings = await prisma.siteSettings.findUnique({
+    where: { id: 'singleton' },
+    select: { header: true, footer: true },
+  })
+
+  if (!settings) return false
+
+  const footer = (settings.footer ?? {}) as Record<string, unknown>
+  const header = (settings.header ?? {}) as Record<string, unknown>
+
+  const needsFooter = !Array.isArray(footer['columns'])
+  const needsHeader = typeof header['ctaLabel'] !== 'string'
+
+  if (!needsFooter && !needsHeader) return false
+
+  await prisma.siteSettings.update({
+    where: { id: 'singleton' },
     data: {
-      slug: 'faq',
-      title: 'FAQ',
-      isSystem: true,
-      seoTitle: 'Frequently asked questions',
-      seoDescription:
-        'Common questions about working with Kova Media Group on email and SMS marketing.',
-      draftContent: content,
-      publishedContent: content,
-      publishedAt: new Date(),
-      publishedBy: SEED_AUTHOR,
+      ...(needsHeader
+        ? { header: DEFAULT_SITE_HEADER as unknown as Prisma.InputJsonValue }
+        : {}),
+      ...(needsFooter
+        ? { footer: DEFAULT_SITE_FOOTER as unknown as Prisma.InputJsonValue }
+        : {}),
     },
   })
 
-  return 1
+  return true
 }
 
 async function main() {
-  const [studies, faqPage] = [await seedCaseStudies(), await seedFaqPage()]
+  const studies = await seedCaseStudies()
+  const pages = await seedMarketingPages()
+  const chrome = await seedChrome()
 
-  console.log(`Content seed complete: ${studies} case studies, ${faqPage} FAQ page.`)
+  console.log(`Case studies created: ${studies}`)
+  console.log(
+    `Marketing pages written: ${pages.written.join(', ') || 'none'}` +
+      (pages.skipped.length
+        ? ` (left alone, already CMS-managed: ${pages.skipped.join(', ')})`
+        : ''),
+  )
+  console.log(`Header/footer content: ${chrome ? 'seeded' : 'already set'}`)
   console.log(
     'Testimonials are deliberately not seeded — every quote on the site must be ' +
       'a real one, added through the admin.',
   )
-  console.log('(Existing rows are never modified — re-running is a no-op.)')
 }
 
 main()

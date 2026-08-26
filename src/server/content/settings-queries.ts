@@ -4,6 +4,13 @@ import { prisma } from '@/db/prisma'
 import { requireAdmin } from '@/server/auth/dal'
 import { DEFAULT_BOOKING_URL, DEFAULT_NAVIGATION } from '@/lib/constants'
 
+import {
+  parseSiteFooter,
+  parseSiteHeader,
+  type SiteFooterContent,
+  type SiteHeaderContent,
+} from './schemas/settings'
+
 /**
  * Site settings for the admin form. Uncached — reads cookies via
  * `requireAdmin()`, so it must never sit inside a `'use cache'` scope.
@@ -18,8 +25,9 @@ export type SiteSettingsForEdit = {
   bookingUrl: string
   defaultSeoTitle: string
   defaultSeoDescription: string
-  tagline: string
   navigation: { label: string; href: string }[]
+  header: Required<SiteHeaderContent>
+  footer: Required<SiteFooterContent>
   logoId: string | null
   logoDarkId: string | null
   defaultSeoImageId: string | null
@@ -32,7 +40,6 @@ export async function getSiteSettingsForEdit(): Promise<SiteSettingsForEdit> {
     where: { id: 'singleton' },
   })
 
-  const footer = (settings?.footer ?? {}) as { tagline?: string }
   const navigation = Array.isArray(settings?.navigation)
     ? (settings.navigation as { label: string; href: string }[])
     : [...DEFAULT_NAVIGATION]
@@ -43,8 +50,12 @@ export async function getSiteSettingsForEdit(): Promise<SiteSettingsForEdit> {
     bookingUrl: settings?.bookingUrl ?? DEFAULT_BOOKING_URL,
     defaultSeoTitle: settings?.defaultSeoTitle ?? '',
     defaultSeoDescription: settings?.defaultSeoDescription ?? '',
-    tagline: footer.tagline ?? '',
     navigation,
+    // Defaults are applied here rather than in the form, so the editor always
+    // sees the values the site is actually using — including before Settings
+    // has been saved once.
+    header: parseSiteHeader(settings?.header),
+    footer: parseSiteFooter(settings?.footer),
     logoId: settings?.logoId ?? null,
     logoDarkId: settings?.logoDarkId ?? null,
     defaultSeoImageId: settings?.defaultSeoImageId ?? null,

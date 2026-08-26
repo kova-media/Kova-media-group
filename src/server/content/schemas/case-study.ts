@@ -33,6 +33,67 @@ export type CaseStudyResult = z.infer<typeof caseStudyResultSchema>
 /** Fallback accent when a study has none. Matches the brand blue. */
 export const DEFAULT_CASE_STUDY_ACCENT = 'oklch(0.55 0.19 262)'
 
+/**
+ * The heading each fixed block renders under.
+ *
+ * Editable because they are words on the page, and the rule for this work is
+ * that no displayed text requires a deploy to change. They are *not* free-form
+ * structure: the blocks and their order stay fixed, and a heading left blank
+ * falls back to the default below rather than rendering an unlabelled slab.
+ */
+export const caseStudyLabelsSchema = z.object({
+  background: z.string().max(40).default(''),
+  challenge: z.string().max(40).default(''),
+  design: z.string().max(40).default(''),
+  automation: z.string().max(40).default(''),
+  sms: z.string().max(40).default(''),
+  strategy: z.string().max(40).default(''),
+  next: z.string().max(40).default(''),
+})
+
+export type CaseStudyLabels = z.infer<typeof caseStudyLabelsSchema>
+
+export const DEFAULT_CASE_STUDY_LABELS: Required<CaseStudyLabels> = {
+  background: 'Background',
+  challenge: 'The challenge',
+  design: 'Design',
+  automation: 'Automation',
+  sms: 'SMS',
+  strategy: 'Strategy',
+  next: 'Next case study',
+}
+
+/**
+ * An additional labelled block, rendered after the fixed ones.
+ *
+ * The named fields cover the shape every Kova engagement has had so far. This
+ * is the escape hatch for the one that does not — a heading and a paragraph,
+ * added in the admin, with no new section type required.
+ */
+export const caseStudyBlockSchema = z.object({
+  label: z.string().max(40).default(''),
+  body: z.string().max(2000).default(''),
+})
+
+export type CaseStudyBlock = z.infer<typeof caseStudyBlockSchema>
+
+/**
+ * The closing call to action for a single study.
+ *
+ * Blank by default, and blank means "use the site-wide closing band". A study
+ * only overrides it when the ask genuinely differs.
+ */
+export const caseStudyCtaSchema = z.object({
+  heading: z.string().max(200).default(''),
+  body: z.string().max(400).default(''),
+  primaryLabel: z.string().max(60).default(''),
+  primaryHref: z.string().max(300).default(''),
+  secondaryLabel: z.string().max(60).default(''),
+  secondaryHref: z.string().max(300).default(''),
+})
+
+export type CaseStudyCta = z.infer<typeof caseStudyCtaSchema>
+
 export const caseStudyNarrativeSchema = z.object({
   background: z.string().max(2000).default(''),
   challenge: z.string().max(2000).default(''),
@@ -40,6 +101,11 @@ export const caseStudyNarrativeSchema = z.object({
   design: z.string().max(2000).default(''),
   automation: z.string().max(2000).default(''),
   sms: z.string().max(2000).default(''),
+  blocks: z.array(caseStudyBlockSchema).max(6).default([]),
+  // Parsed rather than `{}`: Zod returns a default value verbatim without
+  // re-validating it, so `{}` would reach the renderer missing every key.
+  labels: caseStudyLabelsSchema.default(() => caseStudyLabelsSchema.parse({})),
+  cta: caseStudyCtaSchema.default(() => caseStudyCtaSchema.parse({})),
   results: z.array(caseStudyResultSchema).max(6).default([]),
   /**
    * The window the results cover, e.g. 'November 2024 – July 2025'.

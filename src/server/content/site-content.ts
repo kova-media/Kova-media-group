@@ -1,10 +1,7 @@
 import 'server-only'
 
 import { logger } from '@/lib/logger'
-import {
-  caseStudies as fallbackCaseStudies,
-  type CaseStudy as CaseStudyView,
-} from '@/lib/site-data'
+import type { CaseStudy as CaseStudyView } from '@/lib/site-data'
 
 import { getDraftCaseStudy } from './admin-queries'
 import { getPublishedCaseStudies, getPublishedCaseStudy } from './queries'
@@ -25,17 +22,17 @@ import type { MediaAssetDto } from './types'
  * expect**, so the design layer never learns that a database exists. The CMS
  * fills those shapes; it does not get to change them.
  *
- * **Fallback to `site-data.ts` is deliberate.** An empty table means a fresh
- * clone, a new preview environment, or a migration that has not been seeded —
- * none of which should produce a site with an empty work section. The static
- * content is the floor, the database is the override.
+ * **There is no content fallback.** The database is the single source of truth
+ * for what is published, and an empty table means the section renders nothing.
+ * Substituting bundled copy for missing CMS content is the failure mode this
+ * whole system exists to prevent: the owner deletes a case study, the site keeps
+ * showing it, and the admin looks broken. Absent is the honest answer.
  *
- * That floor holds for an *unreachable* database too, not only an empty one.
- * A build with no `DATABASE_URL` — the CI job that holds no secrets — otherwise
- * dies collecting page data, and an outage mid-deploy takes the whole site with
- * it. The read is logged at error level when it fails, so a genuinely
- * misconfigured production build is loud rather than quietly serving the
- * bundled copy for ever.
+ * An *unreachable* database is a different thing from an empty one, and it is
+ * still caught: the read is logged at error level and degrades to nothing for
+ * that request, so an outage costs a thinner page rather than a 500. The catch
+ * sits outside the `'use cache'` scope, so a failure is never written to the
+ * cache and the next request retries.
  */
 export type { CaseStudyView }
 
@@ -85,14 +82,13 @@ function resolveLabels(labels: Partial<CaseStudyLabels> | undefined) {
 }
 
 /**
- * Published case studies, newest and featured first.
+ * Published case studies, featured first, then by position.
  *
- * Falls back to the bundled studies when nothing is published yet.
+ * An empty result is an empty result: the bands that read this render nothing
+ * rather than showing studies the owner has unpublished or deleted.
  */
 export async function getCaseStudyList(): Promise<CaseStudyView[]> {
   const published = await read(() => getPublishedCaseStudies(), [], 'case study list')
-
-  if (published.length === 0) return fallbackCaseStudies
 
   return published.map((study) => ({
     slug: study.slug,
@@ -124,25 +120,9 @@ export async function getCaseStudyDetail(
     `case study "${slug}"`,
   )
 
-  if (!study) {
-    const bundled = fallbackCaseStudies.find((candidate) => candidate.slug === slug)
-    if (!bundled) return null
-
-    return {
-      ...bundled,
-      labels: resolveLabels(undefined),
-      blocks: [],
-      cta: {
-        heading: '',
-        body: '',
-        primaryLabel: '',
-        primaryHref: '',
-        secondaryLabel: '',
-        secondaryHref: '',
-      },
-      heroImage: null,
-    }
-  }
+  // Unpublished, deleted, or never existed — all the same to a visitor, and all
+  // a 404. There is deliberately no bundled study to fall back to.
+  if (!study) return null
 
   const { narrative } = study
 

@@ -56,6 +56,7 @@ const referenceCollectors: Partial<
   HERO: (data) => ({ media: mediaIds(data['media']) }),
   NARRATIVE: (data) => ({ media: mediaIds(data['media']) }),
   SERVICE_DETAIL: (data) => ({ media: mediaIds(data['media']) }),
+  PARTNER_BADGES: (data) => ({ media: badgeMediaIds(data['badges']) }),
   LOGO_STRIP: (data) => ({ logos: stringArray(data['logoIds']) }),
   EMAIL_GALLERY: (data) => ({ emailExamples: stringArray(data['exampleIds']) }),
   TESTIMONIAL_FEATURE: (data) => ({
@@ -81,6 +82,19 @@ function stringArray(value: unknown): string[] {
 
 function stringOrNothing(value: unknown): string[] {
   return typeof value === 'string' && value.length > 0 ? [value] : []
+}
+
+/** Each badge holds its own optional media reference. */
+function badgeMediaIds(value: unknown): string[] {
+  const parsed = z
+    .array(z.object({ media: z.object({ mediaId: z.string() }).optional() }))
+    .safeParse(value)
+
+  if (!parsed.success) return []
+
+  return parsed.data
+    .map((badge) => badge.media?.mediaId)
+    .filter((id): id is string => Boolean(id))
 }
 
 function mediaIds(value: unknown): string[] {
@@ -206,14 +220,29 @@ export async function validateForPublish(draft: unknown): Promise<PublishValidat
   return { ok: true, content }
 }
 
+/**
+ * Turns validation issues into something an editor can act on.
+ *
+ * The audience is a business owner looking at a page that will not publish, so
+ * the message has to name the section and say what to do. "Required" on its own
+ * is a dead end when the honest answer is often "you did not want this band at
+ * all" — hiding a section is the supported way to leave one out, and nothing
+ * else in the interface says so at the moment it matters.
+ */
 export function describeIssues(issues: PublishIssue[]): string {
   const described = issues
     .slice(0, 3)
     .map((issue) =>
-      issue.sectionLabel ? `${issue.sectionLabel}: ${issue.message}` : issue.message,
+      issue.sectionLabel ? `${issue.sectionLabel} — ${issue.message}` : issue.message,
     )
 
   const suffix = issues.length > 3 ? ` (and ${issues.length - 3} more)` : ''
+  const named = issues.some((issue) => issue.sectionLabel)
 
-  return `Cannot publish — ${described.join('; ')}${suffix}`
+  return (
+    `Not published yet — ${described.join('; ')}${suffix}.` +
+    (named
+      ? ' Fill the field in, or hide that section if you do not want it on the page.'
+      : '')
+  )
 }

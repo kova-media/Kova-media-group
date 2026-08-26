@@ -177,6 +177,18 @@ export async function unpublishPage(input: unknown): Promise<ActionResult> {
   if (!parsed.ok) return parsed.result
 
   try {
+    // A system page owns a real route. Unpublishing one turns a main page of
+    // the site into a 404, which is never what someone meant to do from a
+    // button next to "Publish". Hide a section instead.
+    const existing = await getPageForEdit(parsed.data.pageId)
+    if (!existing) return fail('That page no longer exists.')
+
+    if (existing.isSystem) {
+      return fail(
+        'This is one of the site’s main pages, so it cannot be taken offline — that would turn its URL into a “page not found”. To remove something from it, hide or delete the individual section instead.',
+      )
+    }
+
     const page = await unpublishPageContent(parsed.data.pageId, admin.adminId)
 
     updateTag(cacheTags.page(page.slug))

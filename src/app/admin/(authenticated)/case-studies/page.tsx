@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import { buttonClasses } from '@/components/ui/button'
+import { CaseStudyOrder } from '@/features/admin/case-studies/case-study-order'
 import { AdminPageHeader } from '@/features/admin/shell/admin-shell'
 import { listCaseStudies } from '@/server/content/admin-queries'
 import type { PageStatus } from '@/server/content/types'
@@ -87,6 +88,12 @@ export default async function CaseStudiesIndex() {
           </p>
         )}
       </div>
+      <CaseStudyOrder
+        studies={studies.map((study) => ({
+          id: study.id,
+          clientName: study.clientName,
+        }))}
+      />
     </>
   )
 }

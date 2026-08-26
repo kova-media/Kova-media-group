@@ -13,6 +13,7 @@ import {
   HomeHeroForm,
   MetricsBandForm,
   PageHeaderForm,
+  PartnerBadgesForm,
   ProcessDetailForm,
   ProcessStepsForm,
   ServicesClosingForm,
@@ -421,6 +422,8 @@ export function SectionForm({ type, ...props }: FormProps & { type: SectionType 
       return <FinalCtaForm {...props} />
     case 'VALUES':
       return <ValuesForm {...props} />
+    case 'PARTNER_BADGES':
+      return <PartnerBadgesForm {...props} />
     case 'SERVICES_LIST':
       return <ServicesListForm {...props} />
     case 'SERVICES_CLOSING':

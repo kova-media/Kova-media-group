@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 
 import { MarketingSections } from '@/features/marketing/marketing-sections'
 import { loadMarketingPage } from '@/server/content/marketing-content'
@@ -11,12 +12,15 @@ import { loadMarketingPage } from '@/server/content/marketing-content'
  * figure and link inside them, is CMS content. Editing it is Admin → Pages →
  * Homepage.
  *
- * The document is read once here and once in `generateMetadata`; both go
- * through the same cached, tag-invalidated query, so a warm cache performs no
- * database work at all.
+ * There is no bundled copy behind this. If the page is not published the route
+ * 404s rather than rendering something from code, because a site that keeps
+ * showing content the owner removed is worse than one that visibly needs
+ * publishing.
  */
 export async function generateMetadata(): Promise<Metadata> {
   const page = await loadMarketingPage('home')
+
+  if (!page.exists) notFound()
 
   return {
     // Absolute: the root layout's `%s — Kova Media Group` template would
@@ -28,6 +32,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   const page = await loadMarketingPage('home')
+
+  if (!page.exists) notFound()
 
   return <MarketingSections page={page} />
 }

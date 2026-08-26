@@ -24,6 +24,7 @@ export const SECTION_TYPES = [
   'TESTIMONIALS',
   'FINAL_CTA',
   'VALUES',
+  'PARTNER_BADGES',
   'SERVICES_LIST',
   'SERVICES_CLOSING',
   'PROCESS_DETAIL',
@@ -100,7 +101,9 @@ export const requiredText = (max: number) =>
   z
     .string()
     .max(max)
-    .refine((value) => value.trim().length > 0, { message: 'This field is required.' })
+    .refine((value) => value.trim().length > 0, {
+      message: 'this needs some text before the page can go live',
+    })
 
 export function defineSection<S extends z.ZodType>(
   definition: SectionDefinition<S>,

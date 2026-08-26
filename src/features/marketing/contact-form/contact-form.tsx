@@ -45,10 +45,40 @@ function Field({
   )
 }
 
+/**
+ * The designed wording, used when the CMS field is blank. These are the one
+ * place a fallback is right: a form whose button says nothing is broken, not
+ * "cleanly absent", and the visitor is mid-conversion.
+ */
+const DEFAULT_SUBMIT_LABEL = 'Request my free call'
+const DEFAULT_SUCCESS_HEADING = 'Thanks — we’ll be in touch.'
+const DEFAULT_SUCCESS_BODY =
+  'We’ll review your details and reply within one business day to set up your free call.'
+
 const inputClass =
   'w-full rounded-lg border border-border bg-card px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-foreground/40 focus:ring-2 focus:ring-brand/15 aria-[invalid=true]:border-destructive'
 
-export function ContactForm({ source }: { source?: string }) {
+/**
+ * The enquiry form.
+ *
+ * The fields themselves are fixed — they are wired to validation, to the
+ * notification email and to the submissions inbox, so they are structure rather
+ * than copy. The three strings a business owner actually wants to change are
+ * not: the button, and what the visitor reads after sending. Those come from
+ * the CMS, with the designed wording as the fallback so an empty field never
+ * produces a blank button.
+ */
+export function ContactForm({
+  source,
+  submitLabel,
+  successHeading,
+  successBody,
+}: {
+  source?: string
+  submitLabel?: string
+  successHeading?: string
+  successBody?: string
+}) {
   const [state, formAction] = useActionState<
     ActionResult<ContactSubmitResult> | null,
     FormData
@@ -101,11 +131,10 @@ export function ContactForm({ source }: { source?: string }) {
               <Check className="h-7 w-7" />
             </span>
             <h3 className="mt-6 text-2xl font-medium tracking-tight">
-              Thanks — we&apos;ll be in touch.
+              {successHeading?.trim() || DEFAULT_SUCCESS_HEADING}
             </h3>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-pretty text-muted-foreground">
-              We&apos;ll review your details and reply within one business day to set up
-              your free call.
+              {successBody?.trim() || DEFAULT_SUCCESS_BODY}
             </p>
           </motion.div>
         ) : (
@@ -231,7 +260,7 @@ export function ContactForm({ source }: { source?: string }) {
               </p>
             )}
 
-            <SubmitButton />
+            <SubmitButton label={submitLabel} />
           </motion.form>
         )}
       </AnimatePresence>
@@ -244,7 +273,7 @@ export function ContactForm({ source }: { source?: string }) {
  * inside — the hook returns nothing useful when called from the component that
  * renders the `<form>` itself.
  */
-function SubmitButton() {
+function SubmitButton({ label }: { label?: string }) {
   const { pending } = useFormStatus()
 
   return (
@@ -253,7 +282,7 @@ function SubmitButton() {
       disabled={pending}
       className="group mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-cta px-7 py-3.5 text-sm font-medium text-cta-foreground transition-all hover:bg-cta-hover disabled:opacity-60"
     >
-      {pending ? 'Sending…' : 'Request my free call'}
+      {pending ? 'Sending…' : label?.trim() || DEFAULT_SUBMIT_LABEL}
       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
     </button>
   )

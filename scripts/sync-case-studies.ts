@@ -7,7 +7,7 @@ loadEnv({ path: '.env.local' })
 loadEnv({ path: '.env' })
 
 import { PrismaClient } from '../src/generated/prisma/client'
-import { caseStudies } from '../src/lib/site-data'
+import { caseStudies } from '../prisma/seed-case-studies'
 
 /**
  * Forces the published case studies back to the bundled content.

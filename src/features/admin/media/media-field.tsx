@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/field'
 import type { MediaAssetDto } from '@/server/content/types'
 
+import { AltTextEditor } from './alt-text-editor'
 import { MediaPickerDialog } from './media-picker-dialog'
 
 export type MediaRef = { mediaId: string; altOverride?: string }
@@ -67,9 +68,6 @@ export function MediaField({
                 ? `${asset.width}×${asset.height}`
                 : 'Dimensions unknown'}
             </p>
-            <p className="mt-1 truncate text-xs text-ink-500">
-              {asset.alt ? `Alt: ${asset.alt}` : 'No alt text set'}
-            </p>
             <div className="mt-2 flex gap-2">
               <Button variant="secondary" size="sm" onClick={() => setPickerOpen(true)}>
                 Replace
@@ -84,6 +82,14 @@ export function MediaField({
         <Button variant="secondary" size="sm" onClick={() => setPickerOpen(true)}>
           Choose image
         </Button>
+      )}
+
+      {asset && (
+        <AltTextEditor
+          key={asset.id}
+          asset={asset}
+          onSaved={(alt) => registerAsset({ ...asset, alt })}
+        />
       )}
 
       {isPickerOpen && (

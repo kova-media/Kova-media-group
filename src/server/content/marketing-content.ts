@@ -4,13 +4,14 @@ import { draftMode } from 'next/headers'
 
 import { logger } from '@/lib/logger'
 
-import { getBlueprint } from './blueprints'
 import { getDraftPage } from './admin-queries'
 import { getPublishedPage } from './queries'
 import type { RichText } from './schemas/rich-text'
 import type { PageContent } from './schemas/page'
+import { getMediaAssets } from './resolvers'
 import { getCaseStudyList, getTestimonialList } from './site-content'
 import type { CaseStudyView, TestimonialView } from './site-content'
+import type { MediaAssetDto } from './types'
 
 /**
  * The bridge between the CMS and the designed marketing routes.
@@ -20,12 +21,20 @@ import type { CaseStudyView, TestimonialView } from './site-content'
  * The route asks for its page by slug and hands the sections to the renderer;
  * it does not know any of the copy.
  *
- * **The blueprint is the floor, the database is the override.** When a page has
- * never been seeded — a fresh clone, a new preview environment, a migration
- * that has not run — the bundled document in `blueprints.ts` renders instead of
- * an empty page. That is the same rule `site-content.ts` already applies to
- * case studies, and it is what keeps a missing row from taking the marketing
- * site down.
+ * **The database is the only source of published content.** There is no
+ * render-time fallback to the bundled documents in `blueprints.ts`: those exist
+ * to *seed* the CMS, and once seeded the admin is authoritative. A page with no
+ * sections renders no sections.
+ *
+ * That is the whole point. If a component quietly substituted its own copy for
+ * missing CMS content, the owner would delete a paragraph, see it still on the
+ * site, and correctly conclude the admin does not work. An empty page is a
+ * visible, fixable problem; a page silently serving code is not.
+ *
+ * An *unreachable* database is caught separately — logged at error level and
+ * treated as "no content for this request", so an outage costs a thin page
+ * rather than a 500. The catch sits outside the `'use cache'` scope, so nothing
+ * wrong is ever written to the cache.
  */
 export type MarketingPage = {
   slug: string
@@ -34,70 +43,45 @@ export type MarketingPage = {
   sections: PageContent['sections']
   /** True when the document came from `draftContent` (preview). */
   isDraft: boolean
-  /** True when nothing in the database matched and the bundled copy is showing. */
-  isFallback: boolean
+  /** False when no such page is published. The route turns this into a 404. */
+  exists: boolean
 }
 
 export async function getMarketingPage(
   slug: string,
   options: { draft?: boolean } = {},
 ): Promise<MarketingPage> {
-  const blueprint = getBlueprint(slug)
-
-  // An unreachable database is the same situation as an unseeded one as far as
-  // this page is concerned: render the bundled document rather than 500. Logged
-  // at error level so a misconfigured deploy is loud, not silently stale.
   let page: Awaited<ReturnType<typeof getPublishedPage>> = null
 
   try {
     page = options.draft ? await getDraftPage(slug) : await getPublishedPage(slug)
   } catch (error) {
-    logger.error(`Could not read the "${slug}" page; falling back to bundled content`, {
-      error,
-    })
+    // An outage, not an editorial decision. Logged loudly; treated as "nothing
+    // to show for this request" rather than allowed to take the page down.
+    logger.error(`Could not read the "${slug}" page`, { error })
   }
 
-  // An existing row with an empty document is treated as "not set up yet"
-  // rather than "deliberately blank": publishing a page with no sections at all
-  // is not something an editor does on purpose, and rendering a bare header and
-  // footer would look like an outage.
-  const hasContent = (page?.content.sections.length ?? 0) > 0
-
-  if (page && hasContent) {
-    return {
-      slug: page.slug,
-      title: page.title,
-      seo: {
-        title: page.seo.title ?? blueprint?.seoTitle ?? page.title,
-        description: page.seo.description ?? blueprint?.seoDescription ?? '',
-      },
-      sections: page.content.sections,
-      isDraft: page.isDraft,
-      isFallback: false,
-    }
-  }
-
-  if (!blueprint) {
+  if (!page) {
     return {
       slug,
-      title: page?.title ?? '',
-      seo: { title: page?.seo.title ?? page?.title ?? '', description: '' },
+      title: '',
+      seo: { title: '', description: '' },
       sections: [],
       isDraft: Boolean(options.draft),
-      isFallback: true,
+      exists: false,
     }
   }
 
   return {
-    slug: blueprint.slug,
-    title: blueprint.title,
+    slug: page.slug,
+    title: page.title,
     seo: {
-      title: page?.seo.title ?? blueprint.seoTitle,
-      description: page?.seo.description ?? blueprint.seoDescription,
+      title: page.seo.title ?? page.title,
+      description: page.seo.description ?? '',
     },
-    sections: blueprint.content.sections,
-    isDraft: Boolean(options.draft),
-    isFallback: true,
+    sections: page.content.sections,
+    isDraft: page.isDraft,
+    exists: true,
   }
 }
 
@@ -124,9 +108,38 @@ export async function loadMarketingPage(slug: string): Promise<MarketingPage> {
 export type MarketingReferences = {
   caseStudies: CaseStudyView[]
   testimonials: TestimonialView[]
+  /** Every image the visible sections point at, keyed by id. */
+  media: Map<string, MediaAssetDto>
 }
 
 const CASE_STUDY_SECTIONS = new Set(['WORK_INDEX', 'CASE_STUDY_LIST'])
+
+/**
+ * Media ids anywhere in a section's data.
+ *
+ * Walks rather than reading known keys, so a new section type with an image
+ * field resolves without anyone remembering to update this — the failure mode
+ * otherwise is an image that is configured, validates, publishes, and silently
+ * does not appear.
+ */
+function collectMediaIds(sections: PageContent['sections']): string[] {
+  const ids = new Set<string>()
+
+  const walk = (value: unknown) => {
+    if (!value || typeof value !== 'object') return
+    if (Array.isArray(value)) {
+      value.forEach(walk)
+      return
+    }
+    for (const [key, nested] of Object.entries(value)) {
+      if (key === 'mediaId' && typeof nested === 'string' && nested) ids.add(nested)
+      else walk(nested)
+    }
+  }
+
+  sections.forEach((section) => walk(section.data))
+  return [...ids]
+}
 
 export async function resolveMarketingReferences(
   sections: PageContent['sections'],
@@ -136,13 +149,17 @@ export async function resolveMarketingReferences(
     CASE_STUDY_SECTIONS.has(section.type),
   )
   const needsTestimonials = enabled.some((section) => section.type === 'TESTIMONIALS')
+  const mediaIds = collectMediaIds(enabled)
 
-  const [caseStudies, testimonials] = await Promise.all([
+  const [caseStudies, testimonials, media] = await Promise.all([
     needsCaseStudies ? getCaseStudyList() : Promise.resolve([]),
     needsTestimonials ? getTestimonialList() : Promise.resolve([]),
+    mediaIds.length
+      ? getMediaAssets(mediaIds)
+      : Promise.resolve(new Map<string, MediaAssetDto>()),
   ])
 
-  return { caseStudies, testimonials }
+  return { caseStudies, testimonials, media }
 }
 
 /**

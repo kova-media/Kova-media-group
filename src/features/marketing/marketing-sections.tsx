@@ -20,6 +20,7 @@ import {
   BookDetails,
   CaseStudyIndex,
   ContactIntro,
+  PartnerBadges,
   ProcessDetail,
   ServicesClosing,
   ServicesList,
@@ -264,6 +265,20 @@ function MarketingSection({
         />
       )
 
+    case 'PARTNER_BADGES': {
+      const badges = list<{
+        media?: { mediaId?: string }
+        name?: string
+        href?: string
+      }>(data['badges']).map((badge) => ({
+        asset: badge.media?.mediaId ? refs.media.get(badge.media.mediaId) : undefined,
+        name: str(badge.name),
+        href: str(badge.href),
+      }))
+
+      return <PartnerBadges label={str(data['label'])} badges={badges} />
+    }
+
     case 'SERVICES_LIST':
       return (
         <ServicesList
@@ -301,6 +316,9 @@ function MarketingSection({
           body={str(data['body'])}
           points={strings(data['points'])}
           responseNote={str(data['responseNote'])}
+          submitLabel={str(data['submitLabel'])}
+          successHeading={str(data['successHeading'])}
+          successBody={str(data['successBody'])}
           contactEmail={contactEmail}
         />
       )

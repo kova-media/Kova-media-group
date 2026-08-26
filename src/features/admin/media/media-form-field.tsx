@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/field'
 import type { MediaAssetDto } from '@/server/content/types'
 
+import { AltTextEditor } from './alt-text-editor'
 import { MediaPickerDialog } from './media-picker-dialog'
 
 /**
@@ -73,6 +74,14 @@ export function MediaFormField({
           )}
         </div>
       </div>
+
+      {asset && (
+        <AltTextEditor
+          key={asset.id}
+          asset={asset}
+          onSaved={(alt) => setAsset({ ...asset, alt })}
+        />
+      )}
 
       {isPickerOpen && (
         <MediaPickerDialog

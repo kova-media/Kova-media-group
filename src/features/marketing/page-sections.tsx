@@ -5,6 +5,7 @@ import { ArrowUpRight, Check, Clock, Mail, MessageSquare } from 'lucide-react'
 import { Container, Eyebrow } from '@/components/site/ui'
 import { Reveal, RevealGroup, RevealItem, RevealLines } from '@/components/site/reveal'
 import { FlowDiagram } from '@/components/site/mockups'
+import { MediaImage, type ImageAsset } from '@/components/media/media-image'
 import { BookingEmbed } from '@/features/marketing/booking-embed'
 import { ContactForm } from '@/features/marketing/contact-form/contact-form'
 import type { CaseStudy } from '@/lib/site-data'
@@ -70,6 +71,90 @@ export function ValuesBand({
               </RevealItem>
             ))}
           </RevealGroup>
+        </div>
+      </Container>
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------ Partner badges */
+
+export type PartnerBadge = {
+  asset: ImageAsset | undefined
+  name: string
+  href: string
+}
+
+/**
+ * Certification badges, as a credential line rather than a logo wall.
+ *
+ * A row of marks under a hairline, set at reading size beside a quiet label —
+ * the same move the footer column headings use. The temptation with badges is
+ * to make them a band of their own with a heading and a grid, which is the
+ * "trusted by" logo wall DESIGN.md rejects and which also overstates them:
+ * these are credentials, and credentials belong in small type near the bottom
+ * of an argument, not shouted at the top of one.
+ *
+ * Official artwork is rendered as supplied. Badges carry brand rules about
+ * colour and clear space, so there is no filter, no tint and no hover
+ * treatment — only a height cap, which every badge programme permits.
+ *
+ * Renders nothing until artwork exists. That is not just graceful degradation:
+ * a partner badge is a claim about a current commercial relationship, and the
+ * site must not make it before someone has put the real asset in the library.
+ */
+export function PartnerBadges({
+  label,
+  badges,
+}: {
+  label?: string
+  badges?: PartnerBadge[]
+}) {
+  const shown = (badges ?? []).filter((badge) => badge.asset)
+
+  if (shown.length === 0) return null
+
+  return (
+    <section className="pb-20 sm:pb-28">
+      <Container>
+        <div className="grid gap-x-10 gap-y-6 border-t border-border pt-8 sm:grid-cols-[13rem_1fr]">
+          {label?.trim() ? (
+            <h2 className="text-[0.8125rem] font-medium tracking-[0.08em] text-foreground/65 uppercase">
+              {label}
+            </h2>
+          ) : (
+            <span />
+          )}
+
+          <ul className="flex flex-wrap items-center gap-x-10 gap-y-6">
+            {shown.map((badge, index) => {
+              const image = (
+                <MediaImage
+                  asset={badge.asset}
+                  altOverride={badge.name}
+                  sizes="200px"
+                  className="h-10 w-auto object-contain"
+                />
+              )
+
+              return (
+                <li key={`${badge.name}-${index}`}>
+                  {badge.href.trim() ? (
+                    <a
+                      href={badge.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block transition-opacity duration-300 hover:opacity-80"
+                    >
+                      {image}
+                    </a>
+                  ) : (
+                    image
+                  )}
+                </li>
+              )
+            })}
+          </ul>
         </div>
       </Container>
     </section>
@@ -378,6 +463,9 @@ export function ContactIntro({
   body,
   points,
   responseNote,
+  submitLabel,
+  successHeading,
+  successBody,
   contactEmail,
 }: {
   eyebrow?: string
@@ -385,6 +473,9 @@ export function ContactIntro({
   body?: string
   points?: string[]
   responseNote?: string
+  submitLabel?: string
+  successHeading?: string
+  successBody?: string
   contactEmail: string
 }) {
   const lines = (headline ?? '')
@@ -451,7 +542,11 @@ export function ContactIntro({
           </div>
 
           <Reveal delay={0.2}>
-            <ContactForm />
+            <ContactForm
+              submitLabel={submitLabel}
+              successHeading={successHeading}
+              successBody={successBody}
+            />
           </Reveal>
         </div>
       </Container>

@@ -8,7 +8,7 @@ loadEnv({ path: '.env' })
 
 import { PrismaClient } from '../src/generated/prisma/client'
 import type { Prisma } from '../src/generated/prisma/client'
-import { caseStudies } from '../src/lib/site-data'
+import { caseStudies } from './seed-case-studies'
 import { PAGE_BLUEPRINTS } from '../src/server/content/blueprints'
 import {
   DEFAULT_SITE_FOOTER,
@@ -241,9 +241,70 @@ async function seedChrome() {
   return true
 }
 
+/**
+ * Adds a blueprint section to a page that predates it.
+ *
+ * `seedMarketingPages` deliberately never touches a page the admin already
+ * owns, which is right — but it means a section added to a blueprint after the
+ * first seed can never reach the site, and the owner has to know to add it by
+ * hand. This closes that gap for the one case it is safe: a section type the
+ * page does not have at all is appended, in its blueprint position. A section
+ * the page already has is left exactly as the editor left it.
+ */
+async function backfillSections() {
+  const added: string[] = []
+
+  for (const blueprint of PAGE_BLUEPRINTS) {
+    const existing = await prisma.page.findUnique({
+      where: { slug: blueprint.slug },
+      select: { id: true, draftContent: true, publishedContent: true },
+    })
+
+    if (!existing) continue
+
+    const draft = (existing.draftContent ?? {}) as { sections?: unknown }
+    const sections = Array.isArray(draft.sections) ? [...draft.sections] : []
+    const present = new Set(
+      sections.map((section) => (section as { type?: string })?.type),
+    )
+
+    const missing = blueprint.content.sections.filter(
+      (section) => !present.has(section.type),
+    )
+
+    if (missing.length === 0) continue
+
+    for (const section of missing) {
+      const at = blueprint.content.sections.indexOf(section)
+      sections.splice(Math.min(at, sections.length), 0, section)
+      added.push(`${blueprint.slug}/${section.type}`)
+    }
+
+    const content = { sections } as unknown as Prisma.InputJsonValue
+
+    // Published as well as drafted: these sections render nothing until they
+    // are given content, so shipping them costs nothing and leaving the live
+    // page a section behind the draft would show as a phantom "unpublished
+    // changes" badge the owner cannot explain.
+    await prisma.page.update({
+      where: { id: existing.id },
+      data: {
+        draftContent: content,
+        draftVersion: { increment: 1 },
+        ...(existing.publishedContent
+          ? { publishedContent: content, publishedAt: new Date() }
+          : {}),
+      },
+    })
+  }
+
+  return added
+}
+
 async function main() {
   const studies = await seedCaseStudies()
   const pages = await seedMarketingPages()
+  const backfilled = await backfillSections()
   const chrome = await seedChrome()
 
   console.log(`Case studies created: ${studies}`)
@@ -254,6 +315,7 @@ async function main() {
         : ''),
   )
   console.log(`Header/footer content: ${chrome ? 'seeded' : 'already set'}`)
+  console.log(`Sections backfilled: ${backfilled.join(', ') || 'none'}`)
   console.log(
     'Testimonials are deliberately not seeded — every quote on the site must be ' +
       'a real one, added through the admin.',

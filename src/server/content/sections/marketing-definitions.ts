@@ -1,6 +1,13 @@
 import { z } from 'zod'
 
-import { ctaSchema, defineSection, requiredText, textList } from './types'
+import {
+  ctaSchema,
+  defineSection,
+  hrefSchema,
+  mediaRefSchema,
+  requiredText,
+  textList,
+} from './types'
 
 /**
  * The marketing catalogue — one definition per designed band of the public
@@ -338,6 +345,57 @@ export const valuesSection = defineSection({
   defaults: { eyebrow: '', statement: '', items: [] },
 })
 
+/* ---------------------------------------------------------- Partner badges */
+
+/**
+ * Certification badges — Shopify Partner, Klaviyo Partner and the like.
+ *
+ * Images only, from the media library. There is deliberately no way to type a
+ * partner's *name* as text and have it render: a badge is a claim about a
+ * current commercial relationship, and the proof that the relationship exists is
+ * possessing the official asset. A section that could render "Shopify Partner"
+ * as a word would let the site make that claim without one.
+ *
+ * The band renders nothing until at least one badge has an image, so the
+ * section can sit on the page waiting for assets without asserting anything.
+ */
+const partnerBadge = z.object({
+  /** The official asset. Without it the badge is not drawn. */
+  media: mediaRefSchema.optional(),
+  /** Used as the image's alt text, e.g. "Shopify Partner". */
+  name: z.string().max(60).default(''),
+  /** Optional link to the partner directory listing. */
+  href: hrefSchema.default(''),
+})
+
+export const partnerBadgesSection = defineSection({
+  type: 'PARTNER_BADGES',
+  label: 'Partner badges',
+  description:
+    'Official certification badges — Shopify Partner, Klaviyo Partner. Hidden until you add the artwork.',
+  group: MARKETING,
+  maxPerPage: 1,
+  schema: z.object({
+    label: z.string().max(60).default(''),
+    badges: z.array(partnerBadge).max(4).default([]),
+  }),
+  publishSchema: z.object({
+    label: z.string().max(60).default(''),
+    // A badge with artwork must say what it is — that string is its alt text,
+    // and an unlabelled badge is unreadable to a screen reader.
+    badges: z
+      .array(
+        partnerBadge.refine((badge) => !badge.media || badge.name.trim().length > 0, {
+          message: 'give this badge a name — it is read aloud in place of the image',
+          path: ['name'],
+        }),
+      )
+      .max(4)
+      .default([]),
+  }),
+  defaults: { label: '', badges: [] },
+})
+
 /* ------------------------------------------------------------ Services list */
 
 const detailedService = z.object({
@@ -405,6 +463,10 @@ const contactIntroFields = z.object({
   body: z.string().max(400).default(''),
   points: textList(6, 200),
   responseNote: z.string().max(120).default(''),
+  /** The form's button and the message shown after a successful send. */
+  submitLabel: z.string().max(60).default(''),
+  successHeading: z.string().max(120).default(''),
+  successBody: z.string().max(320).default(''),
 })
 
 export const contactIntroSection = defineSection({
@@ -422,6 +484,9 @@ export const contactIntroSection = defineSection({
     body: '',
     points: [],
     responseNote: '',
+    submitLabel: '',
+    successHeading: '',
+    successBody: '',
   },
 })
 

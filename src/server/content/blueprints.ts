@@ -1,14 +1,14 @@
 import type { PageContent } from './schemas/page'
 
 /**
- * The default content document for every designed marketing page.
+ * The starting content for every designed marketing page.
  *
- * This file is what the public site renders when the database has nothing for a
- * page — a fresh clone, a new preview environment, a migration that has not been
- * seeded. It is **not** a second copy of the content that the site normally
- * shows: `prisma/seed-marketing.ts` writes these documents into the CMS, and
- * from that moment the database is the source of truth and the admin can change
- * every word here without a deploy.
+ * **Seed input only.** `prisma/seed-content.ts` writes these documents into the
+ * CMS once; from that moment the database is the source of truth and the admin
+ * can change every word without a deploy. Nothing on the public site reads this
+ * file — a page with no published document 404s rather than rendering from
+ * code, because a site that keeps showing copy the owner deleted is the exact
+ * failure this system exists to prevent.
  *
  * Two rules govern what belongs in it.
  *
@@ -189,6 +189,11 @@ const about: PageBlueprint = {
           },
         ],
       }),
+      // Credentials, placed after the argument rather than before it, and
+      // shipped empty: the official Shopify and Klaviyo badge artwork is not in
+      // the media library yet, and the band renders nothing until it is. No
+      // partner status is asserted anywhere until a real badge is uploaded.
+      section('about', 'PARTNER_BADGES', { label: '', badges: [] }),
       section('about', 'TESTIMONIALS', {
         heading: 'Trusted by the founders who hired us.',
       }),
@@ -455,6 +460,3 @@ const BY_SLUG = new Map(PAGE_BLUEPRINTS.map((blueprint) => [blueprint.slug, blue
 export function getBlueprint(slug: string): PageBlueprint | undefined {
   return BY_SLUG.get(slug)
 }
-
-/** The slugs that have a designed route of their own, not the catch-all. */
-export type MarketingSlug = (typeof PAGE_BLUEPRINTS)[number]['slug']

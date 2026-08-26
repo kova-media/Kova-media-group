@@ -1,5 +1,8 @@
 'use client'
 
+import { MediaField } from '@/features/admin/media/media-field'
+import type { MediaAssetDto } from '@/server/content/types'
+
 import {
   CtaField,
   NumberField,
@@ -25,6 +28,12 @@ import {
 type FormProps = {
   data: Record<string, unknown>
   onChange: (data: Record<string, unknown>) => void
+}
+
+/** The image-bearing forms also need the media map and the picker's callback. */
+type MediaFormProps = FormProps & {
+  media: Map<string, MediaAssetDto>
+  registerAsset: (asset: MediaAssetDto) => void
 }
 
 const str = (value: unknown): string => (typeof value === 'string' ? value : '')
@@ -535,6 +544,72 @@ export function ValuesForm(props: FormProps) {
   )
 }
 
+/* ------------------------------------------------------------ Partner badges */
+
+type Badge = { media?: { mediaId: string }; name: string; href: string }
+
+export function PartnerBadgesForm({ media, registerAsset, ...props }: MediaFormProps) {
+  const { data } = props
+
+  return (
+    <div className="flex flex-col gap-4">
+      <TextField
+        label="Label"
+        hint="The small heading beside the badges. Optional — leave empty for badges alone."
+        maxLength={60}
+        value={str(data['label'])}
+        onChange={(value) => set(props, 'label', value)}
+      />
+
+      <RepeaterField<Badge>
+        label="Badges"
+        addLabel="Add badge"
+        max={4}
+        items={arr<Badge>(data['badges'])}
+        createItem={() => ({ name: '', href: '' })}
+        onChange={(next) => set(props, 'badges', next)}
+        renderItem={(badge, update) => (
+          <div className="flex flex-col gap-3">
+            <TextField
+              label="Name"
+              hint="Read aloud in place of the image, e.g. “Shopify Partner”."
+              maxLength={60}
+              value={badge.name}
+              onChange={(value) => update({ ...badge, name: value })}
+            />
+            <MediaField
+              label="Badge artwork"
+              value={badge.media}
+              media={media}
+              registerAsset={registerAsset}
+              onChange={(value) =>
+                update({
+                  ...badge,
+                  ...(value ? { media: value } : { media: undefined }),
+                })
+              }
+            />
+            <TextField
+              label="Links to"
+              hint="Optional — usually your listing in the partner directory."
+              maxLength={300}
+              placeholder="https://…"
+              value={badge.href}
+              onChange={(value) => update({ ...badge, href: value })}
+            />
+          </div>
+        )}
+      />
+
+      <p className="text-xs text-ink-500">
+        Use the official artwork supplied by each partner programme. A badge with no
+        artwork is not shown, and the whole row disappears when none of them have any —
+        so nothing claims a partnership until you have uploaded the real badge.
+      </p>
+    </div>
+  )
+}
+
 /* ------------------------------------------------------------- Services list */
 
 type DetailedService = {
@@ -682,9 +757,30 @@ export function ContactIntroForm(props: FormProps) {
         value={str(data['responseNote'])}
         onChange={(value) => set(props, 'responseNote', value)}
       />
+      <TextField
+        label="Form button"
+        hint="The button that sends the enquiry."
+        maxLength={60}
+        value={str(data['submitLabel'])}
+        onChange={(value) => set(props, 'submitLabel', value)}
+      />
+      <TextField
+        label="After sending — heading"
+        maxLength={120}
+        value={str(data['successHeading'])}
+        onChange={(value) => set(props, 'successHeading', value)}
+      />
+      <TextAreaField
+        label="After sending — message"
+        maxLength={320}
+        value={str(data['successBody'])}
+        onChange={(value) => set(props, 'successBody', value)}
+      />
       <p className="text-xs text-ink-500">
-        The email address shown here is the contact email in Settings, and the enquiry
-        form beside it is fixed.
+        The email address shown here is the contact email in Settings. The form&rsquo;s
+        own fields are fixed — they are wired to the enquiry inbox and the notification
+        email. Leave the three boxes above empty to keep the wording shown on the site
+        today.
       </p>
     </div>
   )

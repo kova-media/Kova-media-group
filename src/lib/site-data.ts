@@ -1,30 +1,11 @@
 /**
- * Bundled content — the floor the public site renders from when the database
- * has nothing.
+ * The shape a case study takes once it has left the server.
  *
- * Almost everything that used to live here is now CMS content: the homepage
- * and interior-page copy moved to `src/server/content/blueprints.ts`, and the
- * navigation, footer and site-wide CTA labels moved to Site settings. What
- * remains is the case study set, which `site-content.ts` still falls back to,
- * and the handful of constants that describe the business itself.
- *
- * Editing this file does **not** change the live site once the CMS has been
- * seeded. Change content in the admin; change this only to move the floor.
+ * A **type only**. There is no bundled case study content in `src/` any more:
+ * the public site reads published studies from the CMS and shows nothing when
+ * there are none. The starting data for the three real studies lives in
+ * `prisma/seed-case-studies.ts`, which is seed input and is never rendered.
  */
-export const site = {
-  name: 'Kova Media Group',
-  shortName: 'Kova',
-  email: 'damian@kovamediagroup.com',
-  /**
-   * The single conversion action for the whole site.
-   *
-   * Kova runs no social accounts, so there are deliberately no social links
-   * anywhere — a footer column of dead icons costs credibility.
-   */
-  bookingUrl: 'https://calendly.com/damian-kovamediagroup-7lpe/30min',
-  tagline: 'Email & SMS marketing that drives revenue.',
-}
-
 export type CaseStudy = {
   slug: string
   brand: string
@@ -64,73 +45,3 @@ export type CaseStudy = {
  * `sms` is empty for the two email-only engagements. Claiming a channel Kova
  * did not run for a client is the same class of error as inventing a number.
  */
-export const caseStudies: CaseStudy[] = [
-  {
-    slug: 'zilkee',
-    brand: 'Zilkee',
-    category: 'Tech',
-    summary:
-      'Rebuilt the retention program around stronger flows, campaigns, segmentation, and SMS.',
-    background:
-      'Zilkee is a technology brand selling data-recovery hardware direct to consumers. Kova runs its email and SMS program.',
-    challenge: '',
-    strategy: [
-      'Rebuilt the automated flows',
-      'Put campaigns on a consistent calendar',
-      'Reworked segmentation around how customers actually buy',
-      'Added SMS as a second owned channel',
-    ],
-    design: '',
-    automation:
-      'Automations carry the program. Across November 2024 to July 2025 they accounted for 74% of attributed revenue, with email automation revenue rising from $114.6K to $132.7K. Attributed revenue over that window reached $334.7K, up 44.5%, and average order value rose from $83.05 to $120.97.',
-    sms: 'SMS went from a marginal contribution to a substantial one over the same window, growing from $20.2K to $128.4K.',
-    results: [
-      { value: '+44.5%', label: 'Attributed revenue' },
-      { value: '+45.7%', label: 'Average order value' },
-    ],
-    resultsPeriod: 'November 2024 – July 2025',
-    accent: 'oklch(0.55 0.19 262)',
-  },
-  {
-    slug: 'tiny-explorings',
-    brand: 'Tiny Explorings',
-    category: "Children's Shoes",
-    summary:
-      'Built a retention program around thoughtful campaigns, automations, and a strong understanding of the brand and its customers.',
-    background:
-      'Tiny Explorings is a children’s shoe brand. Kova ran its email program.',
-    challenge: '',
-    strategy: [
-      'Campaigns written in the brand’s own voice',
-      'Automations for the moments that repeat for every customer',
-      'Planning grounded in a close understanding of the brand and its customers',
-    ],
-    design: '',
-    automation:
-      'Automations ran alongside the campaign calendar, covering the points in the customer relationship that recur for every customer.',
-    sms: '',
-    results: [],
-    accent: 'oklch(0.62 0.14 40)',
-  },
-  {
-    slug: 'livora',
-    brand: 'Livora',
-    category: 'Beauty',
-    summary:
-      'Built a focused email program for a women’s razor brand, with campaigns, automations, and ongoing optimization.',
-    background:
-      'Livora is a beauty brand selling razors for women. Kova ran its email program.',
-    challenge: '',
-    strategy: [
-      'A campaign calendar the brand could keep to',
-      'Automations for the recurring moments in the customer relationship',
-      'Ongoing testing and refinement of what was already live',
-    ],
-    design: '',
-    automation:
-      'Automations handled the recurring moments in the customer relationship, leaving the campaign calendar free for what was genuinely new.',
-    sms: '',
-    results: [],
-    accent: 'oklch(0.58 0.12 155)',
-  },
-]

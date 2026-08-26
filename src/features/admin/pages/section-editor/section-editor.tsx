@@ -169,7 +169,9 @@ export function SectionEditor({
           >
             Preview
           </Button>
-          {page.isLive && (
+          {/* Never offered for a system page: it owns a real route, and taking
+              it offline would turn a main URL into a 404. */}
+          {page.isLive && !page.isSystem && (
             <Button
               variant="secondary"
               size="sm"

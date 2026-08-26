@@ -14,7 +14,6 @@ import {
   DEFAULT_SITE_FOOTER,
   DEFAULT_SITE_HEADER,
 } from '../src/server/content/schemas/settings'
-import { SECTION_TYPES } from '../src/server/content/sections/types'
 
 /**
  * Puts the real Kova content into the CMS.
@@ -44,18 +43,21 @@ const prisma = new PrismaClient({
 
 const SEED_AUTHOR = 'seed:content'
 
-/** The designed bands. A document holding none of them predates this system. */
-const MARKETING_TYPES = new Set<string>(
-  SECTION_TYPES.slice(0, SECTION_TYPES.indexOf('HERO')),
-)
-
-function isMarketingDocument(value: unknown): boolean {
+/**
+ * Does this page already hold content someone would miss?
+ *
+ * The rule used to be "does it contain a *marketing* section type", which
+ * quietly excluded the FAQ and the legal pages — their documents are a single
+ * `FAQ` or `RICH_TEXT` block. Running the seed after adding those pages to the
+ * blueprint therefore overwrote three pages of real content with an empty
+ * masthead. Recovered from the live site, but the rule was the bug: a seed must
+ * never be able to destroy content, and "any sections at all" is the only test
+ * that guarantees it. A page with an empty document is the sole case that is
+ * safe to write, and it is the only case seeding was ever for.
+ */
+function hasContent(value: unknown): boolean {
   const sections = (value as { sections?: unknown })?.sections
-  if (!Array.isArray(sections)) return false
-
-  return sections.some((section) =>
-    MARKETING_TYPES.has((section as { type?: string })?.type ?? ''),
-  )
+  return Array.isArray(sections) && sections.length > 0
 }
 
 async function seedCaseStudies() {
@@ -142,8 +144,7 @@ async function seedMarketingPages() {
 
     if (
       existing &&
-      (isMarketingDocument(existing.draftContent) ||
-        isMarketingDocument(existing.publishedContent))
+      (hasContent(existing.draftContent) || hasContent(existing.publishedContent))
     ) {
       skipped.push(blueprint.slug)
       continue

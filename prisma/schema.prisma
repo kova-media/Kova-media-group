@@ -109,6 +109,12 @@ model ContentRevision {
 
 // ---------------------------------------------------------------------------
 // Content library — referenced by id from section data, resolved at render time
+//
+// `PartnerLogo` and `EmailExample` were removed: neither had a public surface.
+// Partner *badges* store a media id on the section itself, and the client strip
+// is a list of names, so a logo record had nothing to render into; the email
+// gallery had no admin screen at all. Both tables were empty. A record type
+// that can be created and never appears is worse than a missing feature.
 // ---------------------------------------------------------------------------
 
 model Testimonial {
@@ -128,33 +134,7 @@ model Testimonial {
   @@index([isPublished, position])
 }
 
-model PartnerLogo {
-  id          String   @id @default(cuid())
-  name        String
-  mediaId     String
-  href        String?
-  isPublished Boolean  @default(false)
-  position    Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 
-  @@index([isPublished, position])
-}
-
-model EmailExample {
-  id          String   @id @default(cuid())
-  title       String
-  clientName  String?
-  mediaId     String
-  category    String?
-  caseStudyId String?
-  isPublished Boolean  @default(false)
-  position    Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([isPublished, position])
-}
 
 // ---------------------------------------------------------------------------
 // Media

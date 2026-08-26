@@ -13,7 +13,22 @@ import { ArrowUpRight } from 'lucide-react'
  * sets no cookies of ours, and the site carries no analytics that would require
  * consent (ADR-018).
  */
-export function BookingEmbed({ url }: { url: string }) {
+export function BookingEmbed({
+  url,
+  title,
+  fallbackNote,
+  fallbackAction,
+  notLoadingLabel,
+  openInTabLabel,
+}: {
+  url: string
+  title?: string
+  fallbackNote?: string
+  fallbackAction?: string
+  notLoadingLabel?: string
+  openInTabLabel?: string
+}) {
+  const heading = title?.trim() || 'Book a strategy call'
   const isCalendly = /(^|\.)calendly\.com$/.test(safeHost(url))
 
   // A booking URL that is not a Calendly link (or is malformed) cannot be
@@ -21,17 +36,19 @@ export function BookingEmbed({ url }: { url: string }) {
   if (!isCalendly) {
     return (
       <div className="flex flex-col items-start rounded-2xl border border-border bg-card p-8 shadow-[var(--shadow-soft)]">
-        <p className="text-lg font-medium text-foreground">Book a strategy call</p>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Choose a time that works for you.
-        </p>
+        <p className="text-lg font-medium text-foreground">{heading}</p>
+        {fallbackNote?.trim() && (
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            {fallbackNote}
+          </p>
+        )}
         <a
           href={url}
           target="_blank"
           rel="noopener noreferrer"
           className="group mt-6 inline-flex items-center gap-2 rounded-full bg-cta px-6 py-3 text-[0.95rem] font-medium text-cta-foreground transition-all duration-300 hover:bg-cta-hover"
         >
-          Open the calendar
+          {fallbackAction?.trim() || 'Open the calendar'}
           <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </a>
       </div>
@@ -45,7 +62,7 @@ export function BookingEmbed({ url }: { url: string }) {
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)]">
         <iframe
           src={embedUrl}
-          title="Book a strategy call with Kova Media Group"
+          title={heading}
           // Tall enough that Calendly's own layout never scrolls internally on
           // desktop, which is where the embed feels most like part of the page.
           //
@@ -65,14 +82,14 @@ export function BookingEmbed({ url }: { url: string }) {
         renders, so the conversion path never dead-ends.
       */}
       <p className="mt-4 text-center text-sm text-muted-foreground">
-        Calendar not loading?{' '}
+        {notLoadingLabel?.trim() || 'Calendar not loading?'}{' '}
         <a
           href={url}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 text-foreground underline decoration-border-strong underline-offset-4 transition-colors hover:decoration-foreground"
         >
-          Open it in a new tab
+          {openInTabLabel?.trim() || 'Open it in a new tab'}
           <ArrowUpRight className="h-3.5 w-3.5" />
         </a>
       </p>

@@ -34,17 +34,23 @@ export function Logo({
   asset,
   tone = 'light',
   className,
+  siteName = 'Kova Media Group',
 }: {
   asset?: LogoAsset | null
   tone?: 'light' | 'dark'
   className?: string
+  /**
+   * From Site settings. The default is the last-resort value for a render that
+   * has no chrome to hand; it is never what a configured site shows.
+   */
+  siteName?: string
 }) {
   const logo = asset ?? DEFAULT_LOGO[tone]
 
   return (
     <Image
       src={logo.url}
-      alt="Kova Media Group"
+      alt={siteName}
       width={logo.width ?? 267}
       height={logo.height ?? 84}
       priority
@@ -59,18 +65,20 @@ export function LogoLink({
   asset,
   tone = 'light',
   className,
+  siteName = 'Kova Media Group',
 }: {
   asset?: LogoAsset | null
   tone?: 'light' | 'dark'
   className?: string
+  siteName?: string
 }) {
   return (
     <Link
       href="/"
-      aria-label="Kova Media Group, home"
+      aria-label={`${siteName}, home`}
       className={cn('group inline-flex items-center gap-2.5 rounded-sm', className)}
     >
-      <Logo asset={asset} tone={tone} />
+      <Logo asset={asset} tone={tone} siteName={siteName} />
     </Link>
   )
 }

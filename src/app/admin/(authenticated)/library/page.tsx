@@ -16,11 +16,6 @@ const SECTIONS = [
     title: 'Testimonials',
     description: 'Client quotes shown on the homepage and the about page.',
   },
-  {
-    href: '/admin/library/partner-logos',
-    title: 'Client logos',
-    description: 'The logo strip under the homepage hero.',
-  },
 ]
 
 export default function LibraryIndex() {

@@ -43,9 +43,9 @@ describe('sectionSchema', () => {
   it('validates data against the schema for the section type', () => {
     const result = sectionSchema.safeParse({
       id: 'a',
-      type: 'HERO',
+      type: 'PAGE_HEADER',
       isEnabled: true,
-      data: { headline: 'Hello' },
+      data: { eyebrow: 'Legal', title: 'Hello' },
     })
 
     expect(result.success).toBe(true)
@@ -54,26 +54,35 @@ describe('sectionSchema', () => {
   it('rejects data that does not match its type schema', () => {
     const result = sectionSchema.safeParse({
       id: 'a',
-      type: 'HERO',
+      type: 'PAGE_HEADER',
       isEnabled: true,
       // Exceeds the 160-character bound, which applies even while drafting.
-      data: { headline: 'x'.repeat(200) },
+      data: { eyebrow: 'Legal', title: 'x'.repeat(300) },
     })
 
     expect(result.success).toBe(false)
-    expect(result.error?.issues[0]?.path).toEqual(['data', 'headline'])
+    expect(result.error?.issues[0]?.path).toEqual(['data', 'title'])
   })
 
   it('reports the offending field path under data', () => {
     const result = sectionSchema.safeParse({
       id: 'a',
-      type: 'HERO',
+      type: 'PARTNER_BADGES',
       isEnabled: true,
-      data: { headline: 'ok', media: { altOverride: 'no mediaId' } },
+      data: {
+        label: '',
+        badges: [{ name: 'x', href: '', media: { altOverride: 'no mediaId' } }],
+      },
     })
 
     expect(result.success).toBe(false)
-    expect(result.error?.issues[0]?.path).toEqual(['data', 'media', 'mediaId'])
+    expect(result.error?.issues[0]?.path).toEqual([
+      'data',
+      'badges',
+      0,
+      'media',
+      'mediaId',
+    ])
   })
 
   it('rejects an unknown section type without throwing', () => {
@@ -90,28 +99,28 @@ describe('sectionSchema', () => {
 })
 
 describe('draft vs publish validation', () => {
-  const halfFinishedHero = {
+  const halfFinishedHeader = {
     id: 'a',
-    type: 'HERO',
+    type: 'PAGE_HEADER',
     isEnabled: true,
-    data: { headline: '' },
+    data: { eyebrow: 'Legal', title: '' },
   }
 
   // The editor must be able to save a section the moment they add it.
   it('accepts an unfinished section while drafting', () => {
-    expect(sectionSchema.safeParse(halfFinishedHero).success).toBe(true)
+    expect(sectionSchema.safeParse(halfFinishedHeader).success).toBe(true)
   })
 
   it('refuses to publish an unfinished enabled section', () => {
-    const result = publishSectionSchema.safeParse(halfFinishedHero)
+    const result = publishSectionSchema.safeParse(halfFinishedHeader)
     expect(result.success).toBe(false)
-    expect(result.error?.issues[0]?.path).toEqual(['data', 'headline'])
+    expect(result.error?.issues[0]?.path).toEqual(['data', 'title'])
   })
 
   // Otherwise an editor could never park a half-built section and ship the rest.
   it('allows publishing when the unfinished section is disabled', () => {
     const result = publishSectionSchema.safeParse({
-      ...halfFinishedHero,
+      ...halfFinishedHeader,
       isEnabled: false,
     })
     expect(result.success).toBe(true)
@@ -119,21 +128,9 @@ describe('draft vs publish validation', () => {
 
   it('treats whitespace as empty for required fields', () => {
     const result = publishSectionSchema.safeParse({
-      ...halfFinishedHero,
-      data: { headline: '   ' },
+      ...halfFinishedHeader,
+      data: { eyebrow: 'Legal', title: '   ' },
     })
     expect(result.success).toBe(false)
-  })
-
-  it('requires a referenced entity before a feature section can publish', () => {
-    const section = {
-      id: 'b',
-      type: 'CASE_STUDY_FEATURE',
-      isEnabled: true,
-      data: { caseStudyId: '' },
-    }
-
-    expect(sectionSchema.safeParse(section).success).toBe(true)
-    expect(publishSectionSchema.safeParse(section).success).toBe(false)
   })
 })

@@ -516,6 +516,74 @@ function FAQ_ITEMS() {
   }))
 }
 
+/* ------------------------------------------------------- FAQ and legal pages */
+
+/**
+ * These three have no designed route of their own — they render through the
+ * `[...slug]` catch-all, using the same components as everything else.
+ *
+ * Their body copy is **not** here: it is long-form legal text that has only
+ * ever lived in the CMS, and duplicating it into the repository would create a
+ * second copy to drift. What the blueprint contributes is the masthead they
+ * were missing, so they carry a page label and an `h1` like every other
+ * interior page. The titles are the ones already stored on the rows.
+ */
+const faq: PageBlueprint = {
+  slug: 'faq',
+  title: 'FAQ',
+  path: '/faq',
+  seoTitle: 'Frequently asked questions',
+  seoDescription:
+    'Common questions about working with Kova Media Group on email and SMS marketing.',
+  content: {
+    sections: [
+      // The questions themselves live in the CMS and are not duplicated here.
+      // What the blueprint contributes is the masthead: the accordion's own
+      // heading is an `h2`, so as a standalone page this had no `h1` at all.
+      section('faq', 'PAGE_HEADER', {
+        eyebrow: 'FAQ',
+        title: 'Questions, answered.',
+        description: '',
+      }),
+    ],
+  },
+}
+
+const privacy: PageBlueprint = {
+  slug: 'privacy',
+  title: 'Privacy policy',
+  path: '/privacy',
+  seoTitle: 'Privacy policy',
+  seoDescription:
+    'What personal data Kova Media Group collects through this website, why, and what we do with it.',
+  content: {
+    sections: [
+      section('privacy', 'PAGE_HEADER', {
+        eyebrow: 'Legal',
+        title: 'Privacy policy',
+        description: '',
+      }),
+    ],
+  },
+}
+
+const terms: PageBlueprint = {
+  slug: 'terms',
+  title: 'Terms',
+  path: '/terms',
+  seoTitle: 'Terms',
+  seoDescription: 'The terms covering your use of the Kova Media Group website.',
+  content: {
+    sections: [
+      section('terms', 'PAGE_HEADER', {
+        eyebrow: 'Legal',
+        title: 'Terms',
+        description: '',
+      }),
+    ],
+  },
+}
+
 /* ------------------------------------------------------------------ Exports */
 
 export const PAGE_BLUEPRINTS: PageBlueprint[] = [
@@ -526,6 +594,9 @@ export const PAGE_BLUEPRINTS: PageBlueprint[] = [
   caseStudies,
   contact,
   book,
+  faq,
+  privacy,
+  terms,
 ]
 
 const BY_SLUG = new Map(PAGE_BLUEPRINTS.map((blueprint) => [blueprint.slug, blueprint]))

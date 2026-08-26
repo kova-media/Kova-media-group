@@ -5,13 +5,8 @@ import { cacheLife, cacheTag } from 'next/cache'
 import { prisma } from '@/db/prisma'
 import { cacheTags } from '@/server/cache/tags'
 
-import { toEmailExample, toMediaAsset, toPartnerLogo, toTestimonial } from './mappers'
-import type {
-  EmailExampleDto,
-  MediaAssetDto,
-  PartnerLogoDto,
-  TestimonialDto,
-} from './types'
+import { toMediaAsset, toTestimonial } from './mappers'
+import type { MediaAssetDto, TestimonialDto } from './types'
 
 /**
  * Library entity resolvers.
@@ -135,64 +130,4 @@ export async function getAllTestimonials(): Promise<TestimonialDto[]> {
   })
 
   return testimonials.map(toTestimonial)
-}
-
-/** An empty id list means "all published logos, in their configured order". */
-export async function getPartnerLogos(
-  ids: readonly string[],
-): Promise<PartnerLogoDto[]> {
-  const all = await getAllPartnerLogos()
-  if (ids.length === 0) return all
-
-  const byId = new Map(all.map((logo) => [logo.id, logo]))
-  return ids
-    .map((id) => byId.get(id))
-    .filter((value): value is PartnerLogoDto => Boolean(value))
-}
-
-async function getAllPartnerLogos(): Promise<PartnerLogoDto[]> {
-  'use cache'
-  cacheTag(cacheTags.partnerLogosIndex)
-  cacheLife('max')
-
-  const logos = await prisma.partnerLogo.findMany({
-    where: { isPublished: true },
-    orderBy: { position: 'asc' },
-    select: { id: true, name: true, mediaId: true, href: true },
-  })
-
-  return logos.map(toPartnerLogo)
-}
-
-export async function getEmailExamples(
-  ids: readonly string[],
-): Promise<EmailExampleDto[]> {
-  const all = await getAllEmailExamples()
-  if (ids.length === 0) return all
-
-  const byId = new Map(all.map((example) => [example.id, example]))
-  return ids
-    .map((id) => byId.get(id))
-    .filter((value): value is EmailExampleDto => Boolean(value))
-}
-
-async function getAllEmailExamples(): Promise<EmailExampleDto[]> {
-  'use cache'
-  cacheTag(cacheTags.emailExamplesIndex)
-  cacheLife('max')
-
-  const examples = await prisma.emailExample.findMany({
-    where: { isPublished: true },
-    orderBy: { position: 'asc' },
-    select: {
-      id: true,
-      title: true,
-      clientName: true,
-      mediaId: true,
-      category: true,
-      caseStudyId: true,
-    },
-  })
-
-  return examples.map(toEmailExample)
 }

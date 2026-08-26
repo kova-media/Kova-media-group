@@ -22,6 +22,7 @@ import {
   ContactIntro,
   PartnerBadges,
   ProcessDetail,
+  ProseBand,
   ServicesClosing,
   ServicesList,
   ValuesBand,
@@ -308,6 +309,16 @@ function MarketingSection({
         />
       )
 
+    case 'RICH_TEXT': {
+      const parsed = richTextSchema.safeParse(data['body'])
+      return (
+        <ProseBand
+          heading={str(data['heading'])}
+          body={parsed.success ? parsed.data : []}
+        />
+      )
+    }
+
     case 'CASE_STUDY_LIST':
       return <CaseStudyIndex studies={refs.caseStudies} />
 
@@ -331,6 +342,9 @@ function MarketingSection({
         <BookDetails
           points={strings(data['points'])}
           writeFirstLabel={str(data['writeFirstLabel'])}
+          calendarTitle={str(data['calendarTitle'])}
+          notLoadingLabel={str(data['notLoadingLabel'])}
+          openInTabLabel={str(data['openInTabLabel'])}
           contactEmail={contactEmail}
           bookingUrl={bookingUrl}
         />

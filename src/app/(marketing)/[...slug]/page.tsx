@@ -3,16 +3,22 @@ import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 
 import { logger } from '@/lib/logger'
-import { PageView } from '@/features/marketing/page-view'
+import { MarketingSections } from '@/features/marketing/marketing-sections'
 import { getDraftPage } from '@/server/content/admin-queries'
 import { getPublishedPage } from '@/server/content/queries'
 import { safePublishedPageSlugs } from '@/server/content/static-params'
 
 /**
- * CMS-managed pages (about, privacy, terms, landing pages).
+ * CMS-managed pages that have no designed route of their own — the FAQ and the
+ * legal pages.
  *
  * Static segments take precedence over this catch-all, so real routes like
- * /contact and /work resolve to their own files (ARCHITECTURE.md §4.1.2).
+ * /contact and /services resolve to their own files (ARCHITECTURE.md §4.1.2).
+ *
+ * These used to render through a second, older section renderer, which is why
+ * they read as a different website: a narrower container, a different type
+ * scale, no masthead. They now go through the same `MarketingSections` as every
+ * other page, so there is one rendering path and one design system.
  */
 export async function generateStaticParams() {
   // "home" is served by the root route, not the catch-all. The exclusion is
@@ -78,5 +84,19 @@ export default async function CmsPage({ params }: PageProps<'/[...slug]'>) {
 
   if (!page) notFound()
 
-  return <PageView page={page} />
+  return (
+    <MarketingSections
+      page={{
+        slug: page.slug,
+        title: page.title,
+        seo: {
+          title: page.seo.title ?? page.title,
+          description: page.seo.description ?? '',
+        },
+        sections: page.content.sections,
+        isDraft: page.isDraft,
+        exists: true,
+      }}
+    />
+  )
 }

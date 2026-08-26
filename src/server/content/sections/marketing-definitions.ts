@@ -584,8 +584,18 @@ export const bookDetailsSection = defineSection({
   schema: z.object({
     points: textList(6, 200),
     writeFirstLabel: z.string().max(120).default(''),
+    /** The scheduler's own wording. Blank falls back to the designed default. */
+    calendarTitle: z.string().max(80).default(''),
+    notLoadingLabel: z.string().max(80).default(''),
+    openInTabLabel: z.string().max(60).default(''),
   }),
-  defaults: { points: [], writeFirstLabel: 'Prefer to write first?' },
+  defaults: {
+    points: [],
+    writeFirstLabel: 'Prefer to write first?',
+    calendarTitle: '',
+    notLoadingLabel: '',
+    openInTabLabel: '',
+  },
 })
 
 /* -------------------------------------------------------- Shared item schema */

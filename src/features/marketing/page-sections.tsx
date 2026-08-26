@@ -8,6 +8,8 @@ import { FlowDiagram } from '@/components/site/mockups'
 import { MediaImage, type ImageAsset } from '@/components/media/media-image'
 import { BookingEmbed } from '@/features/marketing/booking-embed'
 import { ContactForm } from '@/features/marketing/contact-form/contact-form'
+import { RichTextRenderer } from '@/features/sections/rich-text/rich-text'
+import type { RichText } from '@/server/content/schemas/rich-text'
 import type { CaseStudy } from '@/lib/site-data'
 
 import type { Flow, ProcessStep } from './home/sections'
@@ -22,6 +24,42 @@ import type { Flow, ProcessStep } from './home/sections'
  * and omits the rest, so an editor clearing an optional field gets a shorter
  * page rather than a labelled hole.
  */
+
+/* --------------------------------------------------------------------- Prose */
+
+/**
+ * Long-form prose — the privacy policy, the terms.
+ *
+ * These pages used to render through a separate, older component set that put
+ * them in a different container at a different measure, so they read as a
+ * different website. This is the same band every other interior page uses:
+ * the site's own container, the reading measure the rest of the site sets for
+ * body copy, and the vertical rhythm that follows a page masthead.
+ *
+ * No card, no eyebrow, no rule — legal prose is a document, and wrapping it in
+ * furniture would be decoration standing in for hierarchy. The rich-text
+ * renderer already owns the type scale for headings, lists and quotes.
+ */
+export function ProseBand({ heading, body }: { heading?: string; body?: RichText }) {
+  const nodes = body ?? []
+
+  if (nodes.length === 0 && !heading?.trim()) return null
+
+  return (
+    <section className="pb-24 sm:pb-32">
+      <Container>
+        <Reveal className="max-w-2xl">
+          {heading?.trim() && (
+            <h2 className="mb-6 text-2xl font-medium tracking-tight text-foreground">
+              {heading}
+            </h2>
+          )}
+          <RichTextRenderer nodes={nodes} className="leading-relaxed" />
+        </Reveal>
+      </Container>
+    </section>
+  )
+}
 
 /* -------------------------------------------------------------------- Values */
 
@@ -567,11 +605,17 @@ export function ContactIntro({
 export function BookDetails({
   points,
   writeFirstLabel,
+  calendarTitle,
+  notLoadingLabel,
+  openInTabLabel,
   contactEmail,
   bookingUrl,
 }: {
   points?: string[]
   writeFirstLabel?: string
+  calendarTitle?: string
+  notLoadingLabel?: string
+  openInTabLabel?: string
   contactEmail: string
   bookingUrl: string
 }) {
@@ -615,7 +659,12 @@ export function BookDetails({
           </Reveal>
 
           <Reveal delay={0.1}>
-            <BookingEmbed url={bookingUrl} />
+            <BookingEmbed
+              url={bookingUrl}
+              title={calendarTitle}
+              notLoadingLabel={notLoadingLabel}
+              openInTabLabel={openInTabLabel}
+            />
           </Reveal>
         </div>
       </Container>

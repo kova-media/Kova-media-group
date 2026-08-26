@@ -30,6 +30,8 @@ export type SiteChrome = {
   socialLinks: { label: string; href: string }[]
   bookingUrl: string
   contactEmail: string
+  /** Site-wide SEO defaults, applied to any page that sets none of its own. */
+  seo: { title: string; description: string; image: MediaAssetDto | null }
   header: Required<SiteHeaderContent>
   /** Footer links already resolved — `mailto:` carries the contact address. */
   footer: Required<SiteFooterContent>
@@ -38,6 +40,11 @@ export type SiteChrome = {
 }
 
 const FALLBACK_EMAIL = 'damian@kovamediagroup.com'
+
+/** Last-resort values, used only before Settings has ever been saved. */
+const DEFAULT_SEO_TITLE = 'Kova Media Group — Email & SMS Marketing for Ecommerce'
+const DEFAULT_SEO_DESCRIPTION =
+  'A specialist Email & SMS marketing agency for direct-to-consumer ecommerce brands.'
 
 export async function getSiteChrome(): Promise<SiteChrome> {
   // The header and footer are on every page, so an unreachable database must
@@ -48,9 +55,11 @@ export async function getSiteChrome(): Promise<SiteChrome> {
   try {
     settings = await getSiteSettings()
 
-    const logoIds = [settings?.logoId, settings?.logoDarkId].filter(
-      (id): id is string => Boolean(id),
-    )
+    const logoIds = [
+      settings?.logoId,
+      settings?.logoDarkId,
+      settings?.defaultSeoImageId,
+    ].filter((id): id is string => Boolean(id))
     if (logoIds.length) media = await getMediaAssets(logoIds)
   } catch (error) {
     logger.error('Could not read site settings; falling back to defaults', { error })
@@ -76,6 +85,13 @@ export async function getSiteChrome(): Promise<SiteChrome> {
     socialLinks: settings?.socialLinks ?? [],
     bookingUrl: settings?.bookingUrl?.trim() || DEFAULT_BOOKING_URL,
     contactEmail,
+    seo: {
+      title: settings?.defaultSeoTitle?.trim() || DEFAULT_SEO_TITLE,
+      description: settings?.defaultSeoDescription?.trim() || DEFAULT_SEO_DESCRIPTION,
+      image: settings?.defaultSeoImageId
+        ? (media.get(settings.defaultSeoImageId) ?? null)
+        : null,
+    },
     header: parseSiteHeader(settings?.header),
     footer: {
       ...footer,

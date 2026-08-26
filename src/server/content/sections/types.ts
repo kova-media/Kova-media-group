@@ -33,21 +33,9 @@ export const SECTION_TYPES = [
   'BOOK_DETAILS',
 
   // ------------------------------------------------------------------ Utility
-  // The original generic catalogue, used by the legal and utility pages that
-  // render through the `[...slug]` catch-all.
-  'HERO',
-  'LOGO_STRIP',
-  'PROOF_METRICS',
-  'NARRATIVE',
-  'SERVICE_DETAIL',
-  'EMAIL_GALLERY',
-  'CASE_STUDY_FEATURE',
-  'CASE_STUDY_GRID',
-  'TESTIMONIAL_FEATURE',
-  'TESTIMONIAL_GRID',
-  'PARTNERSHIP',
+  // The two the FAQ and legal pages use. They render through the same designed
+  // components as everything else — there is no second page system.
   'FAQ',
-  'CTA',
   'RICH_TEXT',
 ] as const
 

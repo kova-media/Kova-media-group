@@ -41,7 +41,7 @@ export async function SiteFooter() {
       <div className="mx-auto w-full max-w-[76rem] px-6 py-16 md:px-8 md:py-20">
         <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
           <div className="max-w-sm">
-            <LogoLink asset={chrome.logo} />
+            <LogoLink asset={chrome.logo} siteName={chrome.siteName} />
             {chrome.footer.description.trim() && (
               <p className="mt-5 text-sm leading-relaxed text-pretty text-muted-foreground">
                 {chrome.footer.description}

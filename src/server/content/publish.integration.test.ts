@@ -31,9 +31,9 @@ describe.skipIf(!enabled)('publish pipeline (integration)', () => {
     sections: [
       {
         id: randomUUID(),
-        type: 'HERO',
+        type: 'PAGE_HEADER',
         isEnabled: true,
-        data: { headline: 'Integration headline' },
+        data: { eyebrow: 'Legal', title: 'Integration headline', description: '' },
       },
     ],
   }
@@ -57,7 +57,12 @@ describe.skipIf(!enabled)('publish pipeline (integration)', () => {
   it('refuses to publish an incomplete enabled section, naming it', async () => {
     const incomplete: PageContent = {
       sections: [
-        { id: randomUUID(), type: 'HERO', isEnabled: true, data: { headline: '' } },
+        {
+          id: randomUUID(),
+          type: 'PAGE_HEADER',
+          isEnabled: true,
+          data: { eyebrow: 'Legal', title: '' },
+        },
       ],
     }
 
@@ -67,8 +72,8 @@ describe.skipIf(!enabled)('publish pipeline (integration)', () => {
     if (result.ok) return
 
     expect(result.issues.length).toBeGreaterThan(0)
-    expect(result.issues[0]?.sectionLabel).toBe('Hero')
-    expect(describeIssues(result.issues)).toContain('Hero')
+    expect(result.issues[0]?.sectionLabel).toBe('Page header')
+    expect(describeIssues(result.issues)).toContain('Page header')
   })
 
   it('refuses to publish a section referencing media that does not exist', async () => {
@@ -76,11 +81,17 @@ describe.skipIf(!enabled)('publish pipeline (integration)', () => {
       sections: [
         {
           id: randomUUID(),
-          type: 'HERO',
+          type: 'PARTNER_BADGES',
           isEnabled: true,
           data: {
-            headline: 'Fine headline',
-            media: { mediaId: 'definitely-not-a-real-media-id' },
+            label: '',
+            badges: [
+              {
+                name: 'Example',
+                media: { mediaId: 'definitely-not-a-real-media-id' },
+                href: '',
+              },
+            ],
           },
         },
       ],
@@ -98,7 +109,7 @@ describe.skipIf(!enabled)('publish pipeline (integration)', () => {
     // Built through createSection so it carries the registry defaults, exactly
     // as a section added in the editor does — then blanked to make it
     // publish-incomplete.
-    const parked = createSection('CTA', randomUUID())
+    const parked = createSection('FINAL_CTA', randomUUID())
 
     const content: PageContent = {
       sections: [
@@ -171,7 +182,7 @@ describe.skipIf(!enabled)('publish pipeline (integration)', () => {
     expect(published.slug).toBe(slug)
     expect(published.isDraft).toBe(false)
     expect(published.content.sections).toHaveLength(1)
-    expect((published.content.sections[0]?.data as { headline: string }).headline).toBe(
+    expect((published.content.sections[0]?.data as { title: string }).title).toBe(
       'Integration headline',
     )
   })

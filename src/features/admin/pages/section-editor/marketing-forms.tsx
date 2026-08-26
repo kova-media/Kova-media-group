@@ -1036,6 +1036,27 @@ export function BookDetailsForm(props: FormProps) {
         value={str(data['writeFirstLabel'])}
         onChange={(value) => set(props, 'writeFirstLabel', value)}
       />
+      <TextField
+        label="Calendar heading"
+        hint="Shown if the calendar cannot be embedded. Blank keeps the current wording."
+        maxLength={80}
+        value={str(data['calendarTitle'])}
+        onChange={(value) => set(props, 'calendarTitle', value)}
+      />
+      <div className="grid grid-cols-2 gap-3">
+        <TextField
+          label="“Not loading?” text"
+          maxLength={80}
+          value={str(data['notLoadingLabel'])}
+          onChange={(value) => set(props, 'notLoadingLabel', value)}
+        />
+        <TextField
+          label="Open-in-new-tab link"
+          maxLength={60}
+          value={str(data['openInTabLabel'])}
+          onChange={(value) => set(props, 'openInTabLabel', value)}
+        />
+      </div>
       <p className="text-xs text-ink-500">
         The calendar itself comes from the booking link in Settings, and the email
         address from the contact email there.

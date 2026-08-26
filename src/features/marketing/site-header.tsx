@@ -16,11 +16,13 @@ import { ButtonLink } from '@/components/site/ui'
  */
 export function SiteHeader({
   logo,
+  siteName,
   navigation,
   ctaLabel,
   ctaHref,
 }: {
   logo?: LogoAsset | null
+  siteName: string
   navigation: { label: string; href: string }[]
   ctaLabel: string
   ctaHref: string
@@ -49,7 +51,7 @@ export function SiteHeader({
         )}
       >
         <div className="mx-auto flex h-16 w-full max-w-[76rem] items-center justify-between px-6 md:px-8">
-          <LogoLink asset={logo} />
+          <LogoLink asset={logo} siteName={siteName} />
 
           <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
             {nav.map((item) => {

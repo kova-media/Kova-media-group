@@ -12,15 +12,18 @@ import { SECTION_TYPES } from './sections/types'
  * nothing; catching it in the admin costs a support conversation.
  */
 describe('page blueprints', () => {
-  it('covers every designed marketing route', () => {
+  it('covers every CMS-managed route', () => {
     expect(PAGE_BLUEPRINTS.map((blueprint) => blueprint.slug).sort()).toEqual([
       'about',
       'book',
       'case-studies',
       'contact',
+      'faq',
       'home',
+      'privacy',
       'process',
       'services',
+      'terms',
     ])
   })
 

@@ -7,13 +7,9 @@ import { ok, parseInput, unexpected, type ActionResult } from '@/server/actions/
 import { requireAdmin } from '@/server/auth/dal'
 import { cacheTags } from '@/server/cache/tags'
 import {
-  createPartnerLogo,
   createTestimonial,
-  deletePartnerLogo,
   deleteTestimonial,
-  reorderPartnerLogos,
   reorderTestimonials,
-  updatePartnerLogo,
   updateTestimonial,
 } from '@/server/content/library-mutations'
 
@@ -29,11 +25,6 @@ function invalidateTestimonial(id?: string) {
   updateTag(cacheTags.testimonialsIndex)
   revalidatePath('/')
   revalidatePath('/about')
-}
-
-function invalidateLogos() {
-  updateTag(cacheTags.partnerLogosIndex)
-  revalidatePath('/')
 }
 
 const testimonialSchema = z.object({
@@ -119,78 +110,5 @@ export async function reorderTestimonialsAction(
     return ok()
   } catch (error) {
     return unexpected('reorderTestimonials', error)
-  }
-}
-
-const logoSchema = z.object({
-  id: z.string().optional(),
-  name: z.string().trim().min(1, 'A brand name is required.').max(120),
-  mediaId: z.string().trim().min(1, 'Choose a logo image.').max(64),
-  href: z.string().trim().max(300),
-  isPublished: z.coerce.boolean(),
-})
-
-export async function savePartnerLogo(
-  _previous: ActionResult | null,
-  formData: FormData,
-): Promise<ActionResult> {
-  await requireAdmin()
-
-  const parsed = parseInput(logoSchema, {
-    id: formData.get('id') || undefined,
-    name: formData.get('name'),
-    mediaId: formData.get('mediaId') ?? '',
-    href: formData.get('href') ?? '',
-    isPublished: formData.get('isPublished') === 'on',
-  })
-
-  if (!parsed.ok) return parsed.result
-
-  const { id, href, ...rest } = parsed.data
-  const input = { ...rest, href: href || null }
-
-  try {
-    if (id) {
-      await updatePartnerLogo(id, input)
-    } else {
-      await createPartnerLogo(input)
-    }
-
-    invalidateLogos()
-    revalidatePath('/admin/library/partner-logos')
-    return ok()
-  } catch (error) {
-    return unexpected('savePartnerLogo', error)
-  }
-}
-
-export async function removePartnerLogo(id: string): Promise<ActionResult> {
-  await requireAdmin()
-
-  try {
-    await deletePartnerLogo(id)
-    invalidateLogos()
-    revalidatePath('/admin/library/partner-logos')
-    return ok()
-  } catch (error) {
-    return unexpected('removePartnerLogo', error)
-  }
-}
-
-export async function reorderPartnerLogosAction(
-  orderedIds: string[],
-): Promise<ActionResult> {
-  await requireAdmin()
-
-  const parsed = parseInput(z.array(z.string().min(1)).max(200), orderedIds)
-  if (!parsed.ok) return parsed.result
-
-  try {
-    await reorderPartnerLogos(parsed.data)
-    invalidateLogos()
-    revalidatePath('/admin/library/partner-logos')
-    return ok()
-  } catch (error) {
-    return unexpected('reorderPartnerLogos', error)
   }
 }

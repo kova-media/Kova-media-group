@@ -69,6 +69,53 @@ export const pageHeaderSection = defineSection({
 
 /* ------------------------------------------------------------------ Home hero */
 
+/**
+ * The hero's three panels, as content.
+ *
+ * These were sixteen strings in `mockups.tsx`, five of which read as reporting
+ * data — an attributed-revenue figure, a change, an open rate, a click rate and
+ * a count of live flows. Illustration or not, a visitor reads them as numbers
+ * about this business, and numbers about the business belong where the owner
+ * can change them. The panels, their motion and their layout stay in code.
+ *
+ * Figures are **strings**, matching the case-study results: "$248,910" carries
+ * its own currency and grouping, and forcing it through a numeric field would
+ * split the value from the symbol for no gain.
+ */
+const heroArtworkFields = z.object({
+  report: z
+    .object({
+      label: z.string().max(40).default(''),
+      value: z.string().max(24).default(''),
+      change: z.string().max(16).default(''),
+      period: z.string().max(12).default(''),
+      stats: z
+        .array(
+          z.object({
+            value: z.string().max(16).default(''),
+            label: z.string().max(32).default(''),
+          }),
+        )
+        .max(3)
+        .default([]),
+    })
+    .default({ label: '', value: '', change: '', period: '', stats: [] }),
+  email: z
+    .object({
+      subject: z.string().max(80).default(''),
+      sender: z.string().max(60).default(''),
+      button: z.string().max(40).default(''),
+    })
+    .default({ subject: '', sender: '', button: '' }),
+  sms: z
+    .object({
+      label: z.string().max(24).default(''),
+      message: z.string().max(200).default(''),
+      reply: z.string().max(80).default(''),
+    })
+    .default({ label: '', message: '', reply: '' }),
+})
+
 const homeHeroFields = z.object({
   /**
    * Written as one field with line breaks rather than a list of lines.
@@ -81,6 +128,7 @@ const homeHeroFields = z.object({
   subhead: z.string().max(400).default(''),
   primaryCta: ctaSchema.default({ label: '', href: '' }),
   secondaryCta: ctaSchema.default({ label: '', href: '' }),
+  artwork: heroArtworkFields.default(() => heroArtworkFields.parse({})),
 })
 
 export const homeHeroSection = defineSection({
@@ -97,6 +145,7 @@ export const homeHeroSection = defineSection({
     subhead: '',
     primaryCta: { label: 'Book a strategy call', href: '/book' },
     secondaryCta: { label: 'View case studies', href: '/case-studies' },
+    artwork: heroArtworkFields.parse({}),
   },
 })
 
@@ -218,6 +267,30 @@ export const workIndexSection = defineSection({
 
 /* ---------------------------------------------------------------- Process */
 
+/**
+ * The automation diagram, as content.
+ *
+ * `kind` chooses which of the four designed tile treatments a step gets, and
+ * `icon` which glyph sits in it — both are closed sets, so the diagram cannot be
+ * restyled from the admin, only relabelled and reordered. `badge` is the short
+ * text a step with no icon shows instead, which is how "2d" appears on the wait
+ * step today.
+ */
+const flowFields = z.object({
+  title: z.string().max(60).default(''),
+  steps: z
+    .array(
+      z.object({
+        label: z.string().max(60).default(''),
+        kind: z.enum(['trigger', 'action', 'wait', 'goal']).default('action'),
+        icon: z.enum(['none', 'click', 'mail', 'sms', 'trend']).default('none'),
+        badge: z.string().max(4).default(''),
+      }),
+    )
+    .max(8)
+    .default([]),
+})
+
 const processStep = z.object({
   title: z.string().max(80).default(''),
   description: z.string().max(600).default(''),
@@ -233,6 +306,7 @@ export const processStepsSection = defineSection({
     heading: z.string().max(200).default(''),
     body: z.string().max(400).default(''),
     steps: z.array(processStep).max(8).default([]),
+    flow: flowFields.default(() => flowFields.parse({})),
   }),
   publishSchema: z.object({
     heading: requiredText(200),
@@ -241,8 +315,9 @@ export const processStepsSection = defineSection({
       .array(processStep.extend({ title: requiredText(80) }))
       .max(8)
       .default([]),
+    flow: flowFields.default(() => flowFields.parse({})),
   }),
-  defaults: { heading: '', body: '', steps: [] },
+  defaults: { heading: '', body: '', steps: [], flow: flowFields.parse({}) },
 })
 
 export const processDetailSection = defineSection({
@@ -255,6 +330,7 @@ export const processDetailSection = defineSection({
     steps: z.array(processStep).max(8).default([]),
     asideEyebrow: z.string().max(40).default(''),
     asideBody: z.string().max(400).default(''),
+    flow: flowFields.default(() => flowFields.parse({})),
   }),
   publishSchema: z.object({
     steps: z
@@ -263,8 +339,14 @@ export const processDetailSection = defineSection({
       .default([]),
     asideEyebrow: z.string().max(40).default(''),
     asideBody: z.string().max(400).default(''),
+    flow: flowFields.default(() => flowFields.parse({})),
   }),
-  defaults: { steps: [], asideEyebrow: '', asideBody: '' },
+  defaults: {
+    steps: [],
+    asideEyebrow: '',
+    asideBody: '',
+    flow: flowFields.parse({}),
+  },
 })
 
 /* --------------------------------------------------------------- Statement */

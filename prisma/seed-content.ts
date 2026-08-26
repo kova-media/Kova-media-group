@@ -301,10 +301,79 @@ async function backfillSections() {
   return added
 }
 
+/**
+ * Fills a field that a section gained after the page was already seeded.
+ *
+ * `backfillSections` adds whole sections a page is missing; this is the other
+ * half — a section that exists but predates a new field on its schema. Only
+ * absent keys are written, so an edit made in the admin is never overwritten,
+ * and the values come from the blueprint, which holds exactly what the site
+ * renders today.
+ */
+async function backfillFields() {
+  const filled: string[] = []
+
+  for (const blueprint of PAGE_BLUEPRINTS) {
+    const existing = await prisma.page.findUnique({
+      where: { slug: blueprint.slug },
+      select: { id: true, draftContent: true, publishedContent: true },
+    })
+
+    if (!existing) continue
+
+    let changed = false
+
+    const apply = (value: unknown) => {
+      const doc = (value ?? {}) as { sections?: Record<string, unknown>[] }
+      if (!Array.isArray(doc.sections)) return value
+
+      for (const section of doc.sections) {
+        const source = blueprint.content.sections.find(
+          (candidate) => candidate.type === section['type'],
+        )
+        if (!source) continue
+
+        const data = (section['data'] ?? {}) as Record<string, unknown>
+        for (const [key, seeded] of Object.entries(
+          (source.data ?? {}) as Record<string, unknown>,
+        )) {
+          if (data[key] === undefined) {
+            data[key] = seeded
+            changed = true
+            filled.push(`${blueprint.slug}/${section['type']}.${key}`)
+          }
+        }
+        section['data'] = data
+      }
+
+      return doc
+    }
+
+    const draft = apply(structuredClone(existing.draftContent))
+    const published = existing.publishedContent
+      ? apply(structuredClone(existing.publishedContent))
+      : null
+
+    if (!changed) continue
+
+    await prisma.page.update({
+      where: { id: existing.id },
+      data: {
+        draftContent: draft as Prisma.InputJsonValue,
+        draftVersion: { increment: 1 },
+        ...(published ? { publishedContent: published as Prisma.InputJsonValue } : {}),
+      },
+    })
+  }
+
+  return filled
+}
+
 async function main() {
   const studies = await seedCaseStudies()
   const pages = await seedMarketingPages()
   const backfilled = await backfillSections()
+  const fields = await backfillFields()
   const chrome = await seedChrome()
 
   console.log(`Case studies created: ${studies}`)
@@ -316,6 +385,7 @@ async function main() {
   )
   console.log(`Header/footer content: ${chrome ? 'seeded' : 'already set'}`)
   console.log(`Sections backfilled: ${backfilled.join(', ') || 'none'}`)
+  console.log(`Fields backfilled: ${fields.join(', ') || 'none'}`)
   console.log(
     'Testimonials are deliberately not seeded — every quote on the site must be ' +
       'a real one, added through the admin.',

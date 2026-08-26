@@ -177,6 +177,7 @@ function MarketingSection({
           subhead={str(data['subhead'])}
           primaryCta={cta(data['primaryCta'])}
           secondaryCta={cta(data['secondaryCta'])}
+          artwork={data['artwork'] as Parameters<typeof Hero>[0]['artwork']}
         />
       )
 
@@ -224,6 +225,7 @@ function MarketingSection({
           heading={str(data['heading'])}
           body={str(data['body'])}
           steps={list(data['steps'])}
+          flow={data['flow'] as Parameters<typeof ProcessPreview>[0]['flow']}
         />
       )
 
@@ -302,6 +304,7 @@ function MarketingSection({
           steps={list(data['steps'])}
           asideEyebrow={str(data['asideEyebrow'])}
           asideBody={str(data['asideBody'])}
+          flow={data['flow'] as Parameters<typeof ProcessDetail>[0]['flow']}
         />
       )
 

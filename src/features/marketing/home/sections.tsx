@@ -5,7 +5,7 @@ import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import type { CaseStudy } from '@/lib/site-data'
 import { Container, Eyebrow, ButtonLink } from '@/components/site/ui'
 import { Reveal, RevealGroup, RevealItem } from '@/components/site/reveal'
-import { FlowDiagram } from '@/components/site/mockups'
+import { FlowDiagram, type FlowStep } from '@/components/site/mockups'
 import { hasCta, type Cta } from '@/features/marketing/sections'
 
 /**
@@ -264,14 +264,18 @@ export type ProcessStep = { title: string; description?: string }
  * Numbers are plain — `2`, not `02` — and they are derived from position, so an
  * editor reordering the steps never has to renumber anything.
  */
+export type Flow = { title?: string; steps?: FlowStep[] }
+
 export function ProcessPreview({
   heading,
   body,
   steps,
+  flow,
 }: {
   heading?: string
   body?: string
   steps?: ProcessStep[]
+  flow?: Flow
 }) {
   const items = (steps ?? []).filter((step) => step.title?.trim())
 
@@ -321,7 +325,7 @@ export function ProcessPreview({
           </div>
 
           <div className="lg:sticky lg:top-28 lg:self-start lg:pt-24">
-            <FlowDiagram />
+            <FlowDiagram title={flow?.title} steps={flow?.steps} />
           </div>
         </div>
       </Container>

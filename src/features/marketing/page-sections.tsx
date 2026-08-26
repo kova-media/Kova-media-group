@@ -10,7 +10,7 @@ import { BookingEmbed } from '@/features/marketing/booking-embed'
 import { ContactForm } from '@/features/marketing/contact-form/contact-form'
 import type { CaseStudy } from '@/lib/site-data'
 
-import type { ProcessStep } from './home/sections'
+import type { Flow, ProcessStep } from './home/sections'
 
 /**
  * The interior-page bands — About, Services, Process, Case studies, Contact,
@@ -322,10 +322,12 @@ export function ProcessDetail({
   steps,
   asideEyebrow,
   asideBody,
+  flow,
 }: {
   steps?: ProcessStep[]
   asideEyebrow?: string
   asideBody?: string
+  flow?: Flow
 }) {
   const items = (steps ?? []).filter((step) => step.title?.trim())
 
@@ -372,7 +374,7 @@ export function ProcessDetail({
                 </p>
               )}
               <div className="mt-8">
-                <FlowDiagram />
+                <FlowDiagram title={flow?.title} steps={flow?.steps} />
               </div>
             </Reveal>
           </div>

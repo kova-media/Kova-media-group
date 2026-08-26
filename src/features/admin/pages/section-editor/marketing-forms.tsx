@@ -5,6 +5,7 @@ import type { MediaAssetDto } from '@/server/content/types'
 
 import {
   CtaField,
+  SelectField,
   NumberField,
   RepeaterField,
   StringListField,
@@ -114,10 +115,147 @@ export function HomeHeroForm(props: FormProps) {
         value={cta(data['secondaryCta'])}
         onChange={(value) => set(props, 'secondaryCta', value)}
       />
-      <p className="text-xs text-ink-500">
-        The animated panels beside the headline are part of the design and are not
-        editable here.
-      </p>
+      <HeroArtworkFields {...props} />
+    </div>
+  )
+}
+
+/**
+ * The words and figures inside the three hero panels.
+ *
+ * Grouped and labelled by panel, because that is how someone looking at the
+ * homepage thinks about them — "the reporting panel", "the email", "the text
+ * message" — not as a flat list of twelve strings. The panels themselves, their
+ * angles and their choreography stay in code.
+ */
+function HeroArtworkFields(props: FormProps) {
+  const artwork = (props.data['artwork'] ?? {}) as Record<string, unknown>
+  const report = (artwork['report'] ?? {}) as Record<string, unknown>
+  const email = (artwork['email'] ?? {}) as Record<string, unknown>
+  const sms = (artwork['sms'] ?? {}) as Record<string, unknown>
+
+  const setPanel = (panel: string, next: Record<string, unknown>) =>
+    set(props, 'artwork', { ...artwork, [panel]: next })
+
+  return (
+    <div className="flex flex-col gap-4 rounded-md border border-border p-4">
+      <div>
+        <p className="text-sm font-medium text-ink-900">Artwork beside the headline</p>
+        <p className="mt-1 text-xs text-ink-500">
+          The three panels are illustration, not live reporting. Whatever you put here
+          is what a visitor reads, so keep it to figures you are comfortable showing.
+          Clearing a box hides that line.
+        </p>
+      </div>
+
+      <fieldset className="flex flex-col gap-3 border-t border-border pt-3">
+        <legend className="sr-only">Reporting panel</legend>
+        <p className="text-xs font-medium tracking-wide text-ink-600 uppercase">
+          Reporting panel
+        </p>
+        <TextField
+          label="Figure label"
+          maxLength={40}
+          value={str(report['label'])}
+          onChange={(value) => setPanel('report', { ...report, label: value })}
+        />
+        <div className="grid grid-cols-3 gap-3">
+          <TextField
+            label="Figure"
+            hint="Written as shown."
+            maxLength={24}
+            value={str(report['value'])}
+            onChange={(value) => setPanel('report', { ...report, value })}
+          />
+          <TextField
+            label="Change"
+            maxLength={16}
+            value={str(report['change'])}
+            onChange={(value) => setPanel('report', { ...report, change: value })}
+          />
+          <TextField
+            label="Period"
+            maxLength={12}
+            value={str(report['period'])}
+            onChange={(value) => setPanel('report', { ...report, period: value })}
+          />
+        </div>
+        <RepeaterField<Figure>
+          label="Summary figures"
+          addLabel="Add figure"
+          max={3}
+          items={arr<Figure>(report['stats'])}
+          createItem={() => ({ value: '', label: '' })}
+          onChange={(next) => setPanel('report', { ...report, stats: next })}
+          renderItem={(figure, update) => (
+            <div className="grid grid-cols-2 gap-3">
+              <TextField
+                label="Figure"
+                maxLength={16}
+                value={figure.value}
+                onChange={(value) => update({ ...figure, value })}
+              />
+              <TextField
+                label="Label"
+                maxLength={32}
+                value={figure.label}
+                onChange={(value) => update({ ...figure, label: value })}
+              />
+            </div>
+          )}
+        />
+      </fieldset>
+
+      <fieldset className="flex flex-col gap-3 border-t border-border pt-3">
+        <legend className="sr-only">Email preview</legend>
+        <p className="text-xs font-medium tracking-wide text-ink-600 uppercase">
+          Email preview
+        </p>
+        <TextField
+          label="Subject line"
+          maxLength={80}
+          value={str(email['subject'])}
+          onChange={(value) => setPanel('email', { ...email, subject: value })}
+        />
+        <TextField
+          label="From"
+          maxLength={60}
+          value={str(email['sender'])}
+          onChange={(value) => setPanel('email', { ...email, sender: value })}
+        />
+        <TextField
+          label="Button"
+          maxLength={40}
+          value={str(email['button'])}
+          onChange={(value) => setPanel('email', { ...email, button: value })}
+        />
+      </fieldset>
+
+      <fieldset className="flex flex-col gap-3 border-t border-border pt-3">
+        <legend className="sr-only">Text message</legend>
+        <p className="text-xs font-medium tracking-wide text-ink-600 uppercase">
+          Text message
+        </p>
+        <TextField
+          label="Header"
+          maxLength={24}
+          value={str(sms['label'])}
+          onChange={(value) => setPanel('sms', { ...sms, label: value })}
+        />
+        <TextAreaField
+          label="Message sent"
+          rows={2}
+          maxLength={200}
+          value={str(sms['message'])}
+          onChange={(value) => setPanel('sms', { ...sms, message: value })}
+        />
+        <TextField
+          label="Reply received"
+          maxLength={80}
+          value={str(sms['reply'])}
+          onChange={(value) => setPanel('sms', { ...sms, reply: value })}
+        />
+      </fieldset>
     </div>
   )
 }
@@ -362,6 +500,96 @@ function StepsRepeater({
   )
 }
 
+type FlowStepItem = { label: string; kind: string; icon: string; badge: string }
+
+const FLOW_KINDS = [
+  { value: 'trigger', label: 'Trigger — what starts it' },
+  { value: 'action', label: 'Action — something is sent' },
+  { value: 'wait', label: 'Wait — a pause' },
+  { value: 'goal', label: 'Goal — the outcome' },
+]
+
+const FLOW_ICONS = [
+  { value: 'none', label: 'No icon (shows the short label instead)' },
+  { value: 'click', label: 'Sign-up' },
+  { value: 'mail', label: 'Email' },
+  { value: 'sms', label: 'Text message' },
+  { value: 'trend', label: 'Result' },
+]
+
+/**
+ * The automation diagram beside the process steps.
+ *
+ * Step type and icon are fixed lists, so the diagram can be relabelled and
+ * reordered but not restyled — the four tile treatments and five glyphs are the
+ * design. The short label is what a step with no icon shows in its tile, which
+ * is how "2d" appears on the wait step.
+ */
+function FlowFields(props: FormProps) {
+  const flow = (props.data['flow'] ?? {}) as Record<string, unknown>
+  const setFlow = (next: Record<string, unknown>) => set(props, 'flow', next)
+
+  return (
+    <div className="flex flex-col gap-4 rounded-md border border-border p-4">
+      <div>
+        <p className="text-sm font-medium text-ink-900">Automation diagram</p>
+        <p className="mt-1 text-xs text-ink-500">
+          The illustrated flow beside the steps. Remove every step to hide it.
+        </p>
+      </div>
+
+      <TextField
+        label="Diagram title"
+        maxLength={60}
+        value={str(flow['title'])}
+        onChange={(value) => setFlow({ ...flow, title: value })}
+      />
+
+      <RepeaterField<FlowStepItem>
+        label="Flow steps"
+        addLabel="Add step"
+        max={8}
+        items={arr<FlowStepItem>(flow['steps'])}
+        createItem={() => ({ label: '', kind: 'action', icon: 'none', badge: '' })}
+        onChange={(next) => setFlow({ ...flow, steps: next })}
+        renderItem={(step, update) => (
+          <div className="flex flex-col gap-3">
+            <TextField
+              label="Label"
+              maxLength={60}
+              value={step.label}
+              onChange={(value) => update({ ...step, label: value })}
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <SelectField
+                label="Step type"
+                value={step.kind}
+                options={FLOW_KINDS}
+                onChange={(kind) => update({ ...step, kind })}
+              />
+              <SelectField
+                label="Icon"
+                value={step.icon}
+                options={FLOW_ICONS}
+                onChange={(icon) => update({ ...step, icon })}
+              />
+            </div>
+            {step.icon === 'none' && (
+              <TextField
+                label="Short label"
+                hint="Shown in the tile when there is no icon, e.g. “2d”."
+                maxLength={4}
+                value={step.badge}
+                onChange={(value) => update({ ...step, badge: value })}
+              />
+            )}
+          </div>
+        )}
+      />
+    </div>
+  )
+}
+
 export function ProcessStepsForm(props: FormProps) {
   const { data } = props
   return (
@@ -385,8 +613,9 @@ export function ProcessStepsForm(props: FormProps) {
       />
       <p className="text-xs text-ink-500">
         Steps are numbered automatically, so reordering them here renumbers them on the
-        page. The diagram beside them is part of the design.
+        page.
       </p>
+      <FlowFields {...props} />
     </div>
   )
 }
@@ -411,6 +640,7 @@ export function ProcessDetailForm(props: FormProps) {
         value={str(data['asideBody'])}
         onChange={(value) => set(props, 'asideBody', value)}
       />
+      <FlowFields {...props} />
     </div>
   )
 }

@@ -5,7 +5,14 @@ import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react'
 import { cn } from '@/lib/utils'
 import { Container, ButtonLink } from '@/components/site/ui'
 import { RevealLines } from '@/components/site/reveal'
-import { DashboardCard, EmailCard, SmsCard } from '@/components/site/mockups'
+import {
+  DashboardCard,
+  EmailCard,
+  SmsCard,
+  type EmailPreview,
+  type ReportPanel,
+  type SmsPreview,
+} from '@/components/site/mockups'
 import { hasCta, type Cta } from '@/features/marketing/sections'
 
 const ease = [0.16, 1, 0.3, 1] as const
@@ -48,16 +55,24 @@ const BEAT_MS = 5200
  * turns by pressing Enter, which is a thing anyone understands, and never
  * touches the animation that reveals it.
  */
+export type HeroArtwork = {
+  report?: ReportPanel
+  email?: EmailPreview
+  sms?: SmsPreview
+}
+
 export function Hero({
   headline,
   subhead,
   primaryCta,
   secondaryCta,
+  artwork,
 }: {
   headline?: string
   subhead?: string
   primaryCta?: Cta
   secondaryCta?: Cta
+  artwork?: HeroArtwork
 }) {
   const lines = (headline ?? '')
     .split('\n')
@@ -157,7 +172,7 @@ export function Hero({
               transition={{ duration: 1, delay: 0.3, ease }}
               className="mx-auto w-full max-w-[21rem] sm:absolute sm:top-0 sm:right-0 sm:z-20 sm:mx-0 sm:w-[22rem] sm:max-w-none"
             >
-              <DashboardCard className="max-w-none" />
+              <DashboardCard className="max-w-none" {...(artwork?.report ?? {})} />
             </motion.div>
 
             {/* Email preview — behind the reporting panel, peeking out to the
@@ -172,7 +187,11 @@ export function Hero({
               transition={{ duration: 1, delay: 0.55, ease }}
               className="absolute top-[6.5rem] left-0 z-0 hidden w-[14.5rem] sm:block"
             >
-              <EmailCard beat={beat} className={panel('-rotate-[3.5deg]')} />
+              <EmailCard
+                beat={beat}
+                className={panel('-rotate-[3.5deg]')}
+                {...(artwork?.email ?? {})}
+              />
             </motion.div>
 
             {/* SMS thread — front of the stack, tilted the other way so the two
@@ -184,7 +203,11 @@ export function Hero({
               transition={{ duration: 1, delay: 0.7, ease }}
               className="absolute right-[2.5rem] bottom-0 z-30 hidden w-[13.5rem] sm:block"
             >
-              <SmsCard beat={beat} className={panel('rotate-[3deg]')} />
+              <SmsCard
+                beat={beat}
+                className={panel('rotate-[3deg]')}
+                {...(artwork?.sms ?? {})}
+              />
             </motion.div>
           </div>
         </div>

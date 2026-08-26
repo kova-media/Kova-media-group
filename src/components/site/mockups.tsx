@@ -30,13 +30,18 @@ const ease = [0.16, 1, 0.3, 1] as const
 
 /* ---------------------------------------------------------------- Email preview */
 
+export type EmailPreview = { subject?: string; sender?: string; button?: string }
+
 export function EmailCard({
   className,
   beat = 0,
+  subject,
+  sender,
+  button,
 }: {
   className?: string
   beat?: number
-}) {
+} & EmailPreview) {
   const still = useReducedMotion() === true
 
   return (
@@ -51,10 +56,14 @@ export function EmailCard({
           <Mail className="h-3.5 w-3.5" />
         </span>
         <div className="min-w-0">
-          <p className="truncate text-[0.8125rem] font-medium text-foreground">
-            Your cart misses you
-          </p>
-          <p className="truncate text-xs text-muted-foreground">Kova Brand · now</p>
+          {subject?.trim() && (
+            <p className="truncate text-[0.8125rem] font-medium text-foreground">
+              {subject}
+            </p>
+          )}
+          {sender?.trim() && (
+            <p className="truncate text-xs text-muted-foreground">{sender}</p>
+          )}
         </div>
       </div>
       <div className="space-y-3 p-4">
@@ -67,15 +76,17 @@ export function EmailCard({
         </div>
         {/* The send: the CTA lifts on each beat, a moment before the SMS
             reply lands next door. */}
-        <motion.div
-          key={still ? 'static' : beat}
-          initial={{ scale: 1 }}
-          animate={still ? { scale: 1 } : { scale: [1, 1.04, 1] }}
-          transition={{ duration: 0.9, ease }}
-          className="mt-1 inline-flex h-8 items-center rounded-full bg-brand px-4 text-xs font-medium text-brand-foreground"
-        >
-          Complete your order
-        </motion.div>
+        {button?.trim() && (
+          <motion.div
+            key={still ? 'static' : beat}
+            initial={{ scale: 1 }}
+            animate={still ? { scale: 1 } : { scale: [1, 1.04, 1] }}
+            transition={{ duration: 0.9, ease }}
+            className="mt-1 inline-flex h-8 items-center rounded-full bg-brand px-4 text-xs font-medium text-brand-foreground"
+          >
+            {button}
+          </motion.div>
+        )}
       </div>
     </div>
   )
@@ -83,13 +94,18 @@ export function EmailCard({
 
 /* --------------------------------------------------------------------- SMS card */
 
+export type SmsPreview = { label?: string; message?: string; reply?: string }
+
 export function SmsCard({
   className,
   beat = 0,
+  label,
+  message,
+  reply,
 }: {
   className?: string
   beat?: number
-}) {
+} & SmsPreview) {
   const still = useReducedMotion() === true
 
   return (
@@ -103,22 +119,28 @@ export function SmsCard({
         <span className="flex h-7 w-7 items-center justify-center rounded-md bg-brand/10 text-brand">
           <MessageSquare className="h-3.5 w-3.5" />
         </span>
-        <p className="text-[0.8125rem] font-medium text-foreground">SMS</p>
+        {label?.trim() && (
+          <p className="text-[0.8125rem] font-medium text-foreground">{label}</p>
+        )}
       </div>
       <div className="space-y-2">
-        <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-muted px-3 py-2 text-xs leading-snug text-foreground">
-          The drop is live. Early access for you — 2 hours only.
-        </div>
+        {message?.trim() && (
+          <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-muted px-3 py-2 text-xs leading-snug text-foreground">
+            {message}
+          </div>
+        )}
         {/* The reply arrives on the beat, just after the email CTA lifts. */}
-        <motion.div
-          key={still ? 'static' : beat}
-          initial={still ? false : { opacity: 0, y: 8, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.55, delay: 0.45, ease }}
-          className="ml-auto max-w-[75%] rounded-2xl rounded-tr-sm bg-brand px-3 py-2 text-xs leading-snug text-brand-foreground"
-        >
-          On my way 🛒
-        </motion.div>
+        {reply?.trim() && (
+          <motion.div
+            key={still ? 'static' : beat}
+            initial={still ? false : { opacity: 0, y: 8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.55, delay: 0.45, ease }}
+            className="ml-auto max-w-[75%] rounded-2xl rounded-tr-sm bg-brand px-3 py-2 text-xs leading-snug text-brand-foreground"
+          >
+            {reply}
+          </motion.div>
+        )}
       </div>
     </div>
   )
@@ -137,9 +159,23 @@ const bars = [38, 52, 44, 66, 58, 78, 72, 92]
  * element in the composition that is supposed to read as a result reads as
  * nothing at all. The bars already carry the panel's motion.
  */
-const REVENUE = 248910
+export type ReportPanel = {
+  label?: string
+  value?: string
+  change?: string
+  period?: string
+  stats?: { value: string; label: string }[]
+}
 
-export function DashboardCard({ className }: { className?: string }) {
+export function DashboardCard({
+  className,
+  label,
+  value,
+  change,
+  period,
+  stats,
+}: { className?: string } & ReportPanel) {
+  const figures = (stats ?? []).filter((s) => s.value?.trim() || s.label?.trim())
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '0px 0px -10% 0px' })
 
@@ -153,21 +189,31 @@ export function DashboardCard({ className }: { className?: string }) {
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-medium tracking-[0.12em] text-foreground/65 uppercase">
-            Attributed revenue
-          </p>
-          <div className="mt-1.5 flex items-end gap-2">
-            <span className="text-3xl font-semibold tracking-tight text-foreground tabular-nums">
-              ${REVENUE.toLocaleString('en-US')}
-            </span>
-            <span className="mb-1 inline-flex items-center gap-1 text-[0.8125rem] font-medium text-brand">
-              <TrendingUp className="h-3.5 w-3.5" /> +35%
-            </span>
-          </div>
+          {label?.trim() && (
+            <p className="text-xs font-medium tracking-[0.12em] text-foreground/65 uppercase">
+              {label}
+            </p>
+          )}
+          {(value?.trim() || change?.trim()) && (
+            <div className="mt-1.5 flex items-end gap-2">
+              {value?.trim() && (
+                <span className="text-3xl font-semibold tracking-tight text-foreground tabular-nums">
+                  {value}
+                </span>
+              )}
+              {change?.trim() && (
+                <span className="mb-1 inline-flex items-center gap-1 text-[0.8125rem] font-medium text-brand">
+                  <TrendingUp className="h-3.5 w-3.5" /> {change}
+                </span>
+              )}
+            </div>
+          )}
         </div>
-        <span className="rounded-md bg-muted px-2 py-1 font-mono text-xs text-muted-foreground">
-          30d
-        </span>
+        {period?.trim() && (
+          <span className="rounded-md bg-muted px-2 py-1 font-mono text-xs text-muted-foreground">
+            {period}
+          </span>
+        )}
       </div>
 
       <div className="mt-6 flex h-28 items-end gap-2">
@@ -186,33 +232,39 @@ export function DashboardCard({ className }: { className?: string }) {
         ))}
       </div>
 
-      <div className="mt-5 grid grid-cols-3 gap-3 border-t border-border pt-4">
-        {[
-          { k: 'Open rate', v: '52.4%' },
-          { k: 'Click rate', v: '4.9%' },
-          { k: 'Flows live', v: '9' },
-        ].map((s) => (
-          <div key={s.k}>
-            <p className="text-base font-semibold text-foreground tabular-nums">
-              {s.v}
-            </p>
-            <p className="mt-0.5 text-xs text-muted-foreground">{s.k}</p>
-          </div>
-        ))}
-      </div>
+      {figures.length > 0 && (
+        <div className="mt-5 grid grid-cols-3 gap-3 border-t border-border pt-4">
+          {figures.map((figure, index) => (
+            <div key={`${figure.label}-${index}`}>
+              <p className="text-base font-semibold text-foreground tabular-nums">
+                {figure.value}
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{figure.label}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
 
 /* --------------------------------------------------------------- Automation flow */
 
-const flowNodes = [
-  { label: 'Subscribes', icon: MousePointerClick, kind: 'trigger' },
-  { label: 'Welcome email', icon: Mail, kind: 'action' },
-  { label: 'Wait 2 days', icon: null, kind: 'wait' },
-  { label: 'Offer + SMS', icon: MessageSquare, kind: 'action' },
-  { label: 'Converts', icon: TrendingUp, kind: 'goal' },
-]
+export type FlowStep = {
+  label: string
+  kind: 'trigger' | 'action' | 'wait' | 'goal'
+  icon: 'none' | 'click' | 'mail' | 'sms' | 'trend'
+  badge: string
+}
+
+/** Closed set: the admin picks from these, it cannot introduce a new glyph. */
+const FLOW_ICONS = {
+  none: null,
+  click: MousePointerClick,
+  mail: Mail,
+  sms: MessageSquare,
+  trend: TrendingUp,
+} as const
 
 /**
  * Each step used to be an icon tile *plus* a separate bordered pill holding the
@@ -220,9 +272,22 @@ const flowNodes = [
  * label now sits as plain text on the connector rule, so the diagram has one
  * frame instead of three per row.
  */
-export function FlowDiagram({ className }: { className?: string }) {
+export function FlowDiagram({
+  className,
+  title,
+  steps,
+}: {
+  className?: string
+  title?: string
+  steps?: FlowStep[]
+}) {
+  const flowNodes = (steps ?? []).filter((step) => step.label?.trim())
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '0px 0px -15% 0px' })
+
+  // Nothing to draw is not an empty bordered box on the page. Hooks run first —
+  // the early return has to sit below them.
+  if (flowNodes.length === 0 && !title?.trim()) return null
 
   return (
     <div
@@ -232,14 +297,16 @@ export function FlowDiagram({ className }: { className?: string }) {
         className,
       )}
     >
-      <p className="mb-6 text-[0.8125rem] font-medium tracking-[0.06em] text-foreground/65 uppercase">
-        Welcome flow
-      </p>
+      {title?.trim() && (
+        <p className="mb-6 text-[0.8125rem] font-medium tracking-[0.06em] text-foreground/65 uppercase">
+          {title}
+        </p>
+      )}
       <div className="flex flex-col">
         {flowNodes.map((node, i) => {
-          const Icon = node.icon
+          const Icon = FLOW_ICONS[node.icon] ?? null
           return (
-            <div key={node.label}>
+            <div key={`${node.label}-${i}`}>
               <motion.div
                 className="flex items-center gap-4"
                 initial={{ opacity: 0, x: -12 }}
@@ -259,7 +326,7 @@ export function FlowDiagram({ className }: { className?: string }) {
                   {Icon ? (
                     <Icon className="h-4 w-4" />
                   ) : (
-                    <span className="font-mono">2d</span>
+                    <span className="font-mono">{node.badge}</span>
                   )}
                 </div>
                 <p className="text-[0.9375rem] font-medium text-foreground">

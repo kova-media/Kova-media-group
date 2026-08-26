@@ -74,6 +74,7 @@ const home: PageBlueprint = {
           'We help ecommerce brands generate more revenue from the customers they already have — through high-performing campaigns, intelligent automations, and strategic SMS.',
         primaryCta: BOOK_CTA,
         secondaryCta: WORK_CTA,
+        artwork: HERO_ARTWORK(),
       }),
       section('home', 'CLIENT_MARQUEE', {
         caption: 'Trusted by direct-to-consumer brands',
@@ -128,6 +129,7 @@ const home: PageBlueprint = {
         heading: 'A clear, four-step engagement.',
         body: 'No mystery, no fluff. You always know what we are working on and why.',
         steps: PROCESS_STEPS(),
+        flow: WELCOME_FLOW(),
       }),
       section('home', 'STATEMENT', {
         statement:
@@ -286,6 +288,7 @@ const process: PageBlueprint = {
       }),
       section('process', 'PROCESS_DETAIL', {
         steps: PROCESS_STEPS(),
+        flow: WELCOME_FLOW(),
         asideEyebrow: 'What we build',
         asideBody:
           'A typical automation suite recovers revenue around the clock. Here is a simplified view of the flows we design and connect.',
@@ -421,6 +424,53 @@ function PARTNER_BADGES() {
     badges: [
       { name: 'Shopify Partner', href: '' },
       { name: 'Klaviyo Partner', href: '' },
+    ],
+  }
+}
+
+/**
+ * The three hero panels, exactly as they render today.
+ *
+ * Moved out of `mockups.tsx` unchanged — these are the figures already on the
+ * site, not new ones. They are illustrative rather than reported, which is
+ * precisely why the owner needs to be able to change them.
+ */
+function HERO_ARTWORK() {
+  return {
+    report: {
+      label: 'Attributed revenue',
+      value: '$248,910',
+      change: '+35%',
+      period: '30d',
+      stats: [
+        { value: '52.4%', label: 'Open rate' },
+        { value: '4.9%', label: 'Click rate' },
+        { value: '9', label: 'Flows live' },
+      ],
+    },
+    email: {
+      subject: 'Your cart misses you',
+      sender: 'Kova Brand · now',
+      button: 'Complete your order',
+    },
+    sms: {
+      label: 'SMS',
+      message: 'The drop is live. Early access for you — 2 hours only.',
+      reply: 'On my way 🛒',
+    },
+  }
+}
+
+/** The automation diagram, exactly as it renders today. */
+function WELCOME_FLOW() {
+  return {
+    title: 'Welcome flow',
+    steps: [
+      { label: 'Subscribes', kind: 'trigger', icon: 'click', badge: '' },
+      { label: 'Welcome email', kind: 'action', icon: 'mail', badge: '' },
+      { label: 'Wait 2 days', kind: 'wait', icon: 'none', badge: '2d' },
+      { label: 'Offer + SMS', kind: 'action', icon: 'sms', badge: '' },
+      { label: 'Converts', kind: 'goal', icon: 'trend', badge: '' },
     ],
   }
 }

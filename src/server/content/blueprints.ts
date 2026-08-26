@@ -141,6 +141,11 @@ const home: PageBlueprint = {
         heading: 'Questions, answered.',
         items: FAQ_ITEMS(),
       }),
+      // Credentials sit at the end of the argument, not the top of it — a quiet
+      // line before the ask rather than a second "trusted by" band under the
+      // client names. Both slots are named and waiting; neither draws anything
+      // until the official artwork is in the media library.
+      section('home', 'PARTNER_BADGES', PARTNER_BADGES()),
       section('home', 'FINAL_CTA', FINAL_CTA()),
     ],
   },
@@ -193,7 +198,7 @@ const about: PageBlueprint = {
       // shipped empty: the official Shopify and Klaviyo badge artwork is not in
       // the media library yet, and the band renders nothing until it is. No
       // partner status is asserted anywhere until a real badge is uploaded.
-      section('about', 'PARTNER_BADGES', { label: '', badges: [] }),
+      section('about', 'PARTNER_BADGES', PARTNER_BADGES()),
       section('about', 'TESTIMONIALS', {
         heading: 'Trusted by the founders who hired us.',
       }),
@@ -400,6 +405,24 @@ function PROCESS_STEPS() {
         'We test, measure, and refine every week. Winning ideas scale, weak ones are cut, and the program compounds quarter over quarter.',
     },
   ]
+}
+
+/**
+ * The two badge slots, named and empty.
+ *
+ * The names are what a screen reader will read once artwork exists, and they
+ * are what makes the two slots identifiable in the admin. They render nowhere
+ * on their own: a badge with no image is not drawn, so no partner status is
+ * claimed until someone uploads the official asset.
+ */
+function PARTNER_BADGES() {
+  return {
+    label: '',
+    badges: [
+      { name: 'Shopify Partner', href: '' },
+      { name: 'Klaviyo Partner', href: '' },
+    ],
+  }
 }
 
 function FINAL_CTA() {

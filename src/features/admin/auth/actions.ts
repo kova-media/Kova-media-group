@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
 import { prisma } from '@/db/prisma'
+import { env } from '@/env'
 import { logger } from '@/lib/logger'
 import {
   fail,
@@ -127,9 +128,33 @@ export async function requestPasswordReset(
 
   try {
     const supabase = await createServerSupabaseClient()
-    await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/admin/reset-password`,
+
+    /**
+     * Point at the callback, not at the form.
+     *
+     * The link previously came back to `/admin/reset-password` directly, where
+     * nothing exchanged the code Supabase appends for a session — so the form
+     * loaded with no session and refused every submission. The callback does
+     * the exchange and then forwards here.
+     *
+     * The origin is the configured site URL rather than the request's own
+     * `Host` header. That is deliberate: a reset link built from an
+     * attacker-controlled header is a well-known account-takeover route, and
+     * this is the one email in the system that carries a session with it.
+     */
+    const redirectTo = new URL('/api/auth/callback', env.NEXT_PUBLIC_SITE_URL)
+    redirectTo.searchParams.set('next', '/admin/reset-password')
+
+    const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+      redirectTo: redirectTo.toString(),
     })
+
+    if (error) {
+      // Logged, never surfaced: which addresses fail is itself information.
+      logger.error('Supabase rejected a password reset request', {
+        message: error.message,
+      })
+    }
   } catch (error) {
     logger.error('Password reset request failed', { error })
   }

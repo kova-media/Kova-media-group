@@ -213,6 +213,7 @@ export function toCaseStudySummary(
  * column to fall out of sync with it.
  */
 export function derivePageStatus(row: {
+  draftContent: unknown
   publishedContent: unknown
   publishedAt: Date | null
   updatedAt: Date
@@ -221,7 +222,7 @@ export function derivePageStatus(row: {
     return row.publishedAt ? 'UNPUBLISHED' : 'DRAFT'
   }
 
-  if (row.publishedAt && row.updatedAt.getTime() > row.publishedAt.getTime()) {
+  if (hasUnpublishedChanges(row.draftContent, row.publishedContent)) {
     return 'LIVE_WITH_CHANGES'
   }
 
@@ -265,6 +266,7 @@ export function toCaseStudyAdminSummary(row: {
   headline: string
   isFeatured: boolean
   position: number
+  draftContent: unknown
   publishedContent: unknown
   publishedAt: Date | null
   updatedAt: Date
@@ -323,4 +325,18 @@ export function toSiteSettings(row: SettingsRow): SiteSettingsDto {
     header: row.header,
     footer: row.footer,
   }
+}
+
+/**
+ * Does the draft differ from what is live?
+ *
+ * Compared by content, not by timestamp. The timestamps cannot answer this:
+ * publishing sets `publishedAt` from the application clock and `updatedAt` from
+ * the database write a few milliseconds later, so every page was permanently
+ * flagged as "edited but not published" from the moment it was published. The
+ * documents are a few kilobytes and this runs on admin screens only.
+ */
+export function hasUnpublishedChanges(draft: unknown, published: unknown): boolean {
+  if (published === null || published === undefined) return false
+  return JSON.stringify(draft) !== JSON.stringify(published)
 }

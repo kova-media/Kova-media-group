@@ -1,6 +1,8 @@
 import { ImageResponse } from 'next/og'
 
-export const alt = 'Kova Media Group — Email & SMS marketing for ecommerce'
+import { getSiteChrome } from '@/server/content/site-chrome'
+
+export const alt = 'Share card'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -24,10 +26,13 @@ export function OgShell({
   eyebrow,
   title,
   footer,
+  brand,
 }: {
   eyebrow: string
   title: string
   footer?: string
+  /** The site name, from Settings. */
+  brand?: string
 }) {
   return (
     <div
@@ -81,18 +86,27 @@ export function OgShell({
           fontSize: 24,
         }}
       >
-        <div style={{ display: 'flex', color: PAPER }}>Kova Media Group</div>
+        <div style={{ display: 'flex', color: PAPER }}>
+          {brand ?? 'Kova Media Group'}
+        </div>
         <div style={{ display: 'flex' }}>{footer ?? 'kovamediagroup.com'}</div>
       </div>
     </div>
   )
 }
 
-export default function OpengraphImage() {
+/**
+ * The wording comes from Site settings, so the card a link produces in Slack or
+ * iMessage says whatever the SEO defaults say. Only the layout is fixed.
+ */
+export default async function OpengraphImage() {
+  const chrome = await getSiteChrome()
+
   return new ImageResponse(
     <OgShell
-      eyebrow="Email & SMS"
-      title="Email & SMS marketing that drives revenue."
+      brand={chrome.siteName}
+      eyebrow={chrome.siteName}
+      title={chrome.seo.title}
     />,
     size,
   )

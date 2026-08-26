@@ -3,6 +3,7 @@ import 'server-only'
 import { prisma } from '@/db/prisma'
 import { requireAdmin } from '@/server/auth/dal'
 
+import { hasUnpublishedChanges } from './mappers'
 import { parseStoredNarrative, type CaseStudyNarrative } from './schemas/case-study'
 
 /**
@@ -56,9 +57,10 @@ export async function getCaseStudyForEdit(
     draftVersion: study.draftVersion,
     narrative: parseStoredNarrative(draft.narrative),
     isLive: study.publishedContent !== null,
-    hasUnpublishedChanges: study.publishedAt
-      ? study.updatedAt.getTime() > study.publishedAt.getTime()
-      : study.publishedContent !== null,
+    hasUnpublishedChanges: hasUnpublishedChanges(
+      study.draftContent,
+      study.publishedContent,
+    ),
     publishedAt: study.publishedAt?.toISOString() ?? null,
   }
 }

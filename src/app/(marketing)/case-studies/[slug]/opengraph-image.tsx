@@ -1,9 +1,10 @@
 import { ImageResponse } from 'next/og'
 
+import { getSiteChrome } from '@/server/content/site-chrome'
 import { OgShell } from '../../opengraph-image'
 import { getCaseStudyDetail } from '@/server/content/site-content'
 
-export const alt = 'Kova Media Group case study'
+export const alt = 'Case study share card'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -17,11 +18,11 @@ export default async function CaseStudyOgImage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const study = await getCaseStudyDetail(slug)
+  const [study, chrome] = await Promise.all([getCaseStudyDetail(slug), getSiteChrome()])
 
   if (!study) {
     return new ImageResponse(
-      <OgShell eyebrow="Case study" title="Kova Media Group" />,
+      <OgShell brand={chrome.siteName} eyebrow="Case study" title={chrome.siteName} />,
       size,
     )
   }
@@ -30,6 +31,7 @@ export default async function CaseStudyOgImage({
 
   return new ImageResponse(
     <OgShell
+      brand={chrome.siteName}
       eyebrow={study.category || 'Case study'}
       title={study.brand}
       footer={headline ? `${headline.value} · ${headline.label}` : undefined}

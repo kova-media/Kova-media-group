@@ -5,6 +5,7 @@ import { Prisma } from '@/generated/prisma/client'
 import { requireAdmin } from '@/server/auth/dal'
 
 import {
+  hasUnpublishedChanges,
   toCaseStudyAdminSummary,
   toPageSummary,
   toPublishedCaseStudy,
@@ -102,9 +103,10 @@ export async function getPageForEdit(id: string): Promise<PageForEdit | null> {
     seoNoIndex: page.seoNoIndex,
     draft: toPublishedPage(page, 'draft'),
     isLive: page.publishedContent !== null,
-    hasUnpublishedChanges: page.publishedAt
-      ? page.updatedAt.getTime() > page.publishedAt.getTime()
-      : page.publishedContent !== null,
+    hasUnpublishedChanges: hasUnpublishedChanges(
+      page.draftContent,
+      page.publishedContent,
+    ),
     publishedAt: page.publishedAt?.toISOString() ?? null,
   }
 }
@@ -166,6 +168,7 @@ export async function listCaseStudies(): Promise<CaseStudyAdminSummary[]> {
       headline: true,
       isFeatured: true,
       position: true,
+      draftContent: true,
       publishedContent: true,
       publishedAt: true,
       updatedAt: true,
@@ -185,17 +188,19 @@ export async function getDashboardStats() {
       prisma.contactSubmission.count({ where: { status: 'NEW' } }),
       prisma.contactSubmission.count({ where: { notifiedAt: null } }),
       prisma.page.findMany({
-        select: { publishedContent: true, publishedAt: true, updatedAt: true },
+        select: {
+          draftContent: true,
+          publishedContent: true,
+          publishedAt: true,
+          updatedAt: true,
+        },
       }),
       prisma.caseStudy.count({ where: { publishedContent: { not: Prisma.DbNull } } }),
       prisma.mediaAsset.count({ where: { deletedAt: null } }),
     ])
 
-  const pagesWithChanges = pages.filter(
-    (page) =>
-      page.publishedContent !== null &&
-      page.publishedAt !== null &&
-      page.updatedAt.getTime() > page.publishedAt.getTime(),
+  const pagesWithChanges = pages.filter((page) =>
+    hasUnpublishedChanges(page.draftContent, page.publishedContent),
   ).length
 
   return {

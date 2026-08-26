@@ -31,9 +31,24 @@ const PUBLIC_ADMIN_PATHS = [
 function buildAdminCsp(nonce: string, isDev: boolean) {
   return [
     "default-src 'self'",
-    // 'strict-dynamic' means the nonce transitively covers scripts that Next.js
-    // loads, so no host allowlist is needed for scripts.
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ''}`,
+    /**
+     * Nonce **and** `'self'`, without `'strict-dynamic'`.
+     *
+     * `'strict-dynamic'` tells the browser to ignore host allowlists entirely
+     * and trust only nonced scripts plus whatever those load. Next.js nonces
+     * its inline flight-data scripts but emits the chunk `<script src>` tags
+     * without one — so every one of them was blocked, React never hydrated, and
+     * the whole admin rendered as dead HTML in production. Forms still posted
+     * (Server Actions degrade gracefully) which is precisely why it went
+     * unnoticed: the login page looked fine and the section editor, the media
+     * uploader and every button silently did nothing.
+     *
+     * Dropping `'strict-dynamic'` restores `'self'` for those chunks while the
+     * nonce still governs inline scripts. This remains stricter than the public
+     * site's policy, which allows `'unsafe-inline'` — and no user-supplied HTML
+     * is ever rendered anywhere in this application (ADR-016).
+     */
+    `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ''}`,
     // Next.js injects inline styles that carry no nonce; 'unsafe-inline' is
     // required for styles specifically and is far lower risk than for scripts.
     "style-src 'self' 'unsafe-inline'",

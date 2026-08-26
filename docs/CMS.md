@@ -171,15 +171,19 @@ mapping in `features/marketing/marketing-sections.tsx`.
 | `CONTACT_INTRO`     | Contact copy and details, with the enquiry form beside it        |
 | `BOOK_DETAILS`      | What to expect from the call, beside the scheduler               |
 
-**Utility sections** are the original generic catalogue, used by the legal and
-utility pages that render through the `[...slug]` catch-all.
+**Utility sections** are the two the FAQ and legal pages use.
 
-| Type                                             | Role                                  |
-| ------------------------------------------------ | ------------------------------------- |
-| `HERO`, `LOGO_STRIP`, `PROOF_METRICS`            | Generic opening, credibility, numbers |
-| `NARRATIVE`, `SERVICE_DETAIL`, `PARTNERSHIP`     | Prose and outcome lists               |
-| `EMAIL_GALLERY`, `TESTIMONIAL_*`, `CASE_STUDY_*` | Library-driven blocks                 |
-| `FAQ`, `CTA`, `RICH_TEXT`                        | Questions, the ask, and legal prose   |
+| Type        | Role                                        |
+| ----------- | ------------------------------------------- |
+| `FAQ`       | Questions and answers, as an accordion      |
+| `RICH_TEXT` | Long-form prose for the FAQ and legal pages |
+
+The rest of the original V1 catalogue — a generic hero, logo strip, proof
+metrics, narrative, service detail, partnership, email gallery, case-study and
+testimonial blocks and a generic CTA — has been removed, along with the second
+renderer that drew them. There is one rendering path and one design system.
+`PartnerLogo` and `EmailExample` went with it: neither had a public surface, so
+both were admin controls that could never produce anything on the site.
 
 `FAQ` is shared: the homepage's accordion and the `/faq` page read the same
 section type, flattening its rich-text answers to paragraphs.
@@ -190,7 +194,8 @@ dashboards, generic feature grids, pricing tables.
 ### 3.6 The designed marketing pages
 
 `/`, `/about`, `/services`, `/process`, `/case-studies`, `/contact` and `/book`
-are real route files **and** CMS pages. The route reads its `Page` row by slug
+are real route files **and** CMS pages. `/faq`, `/privacy` and `/terms` are CMS
+pages served by the `[...slug]` catch-all, through the same components. The route reads its `Page` row by slug
 and hands the sections to `MarketingSections`; it holds no copy of its own.
 
 Their default documents live in `src/server/content/blueprints.ts` and are the
@@ -216,6 +221,13 @@ getPublishedPage(slug)        → cacheTag('page:home')
 Each resolver is its own cache entry with its own tag, so editing one testimonial invalidates that testimonial — not every page that shows it. On a cache hit the whole page still costs zero database reads.
 
 ### 3.8 Rich text
+
+The editor's plain-text surface lives in
+`admin/pages/section-editor/rich-text-markup.ts` and is **lossless**: every node
+the schema allows survives a round trip, which it did not before — links were
+deleted on save, because a link node carries no `text` of its own. The syntax is
+`**bold**`, `_italic_`, `[label](href)`, with a backslash escaping anything that
+would otherwise read as formatting.
 
 `RICH_TEXT` stores a **structured node tree**, not HTML:
 

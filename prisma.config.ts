@@ -13,7 +13,18 @@ loadEnv({ path: '.env' })
 
 const url = process.env['DIRECT_URL']
 
-if (!url) {
+/**
+ * Commands that actually talk to a database.
+ *
+ * `generate` does not — it reads the schema and writes a client. It runs on
+ * every `npm ci` through `postinstall`, including on a CI job that holds no
+ * secrets, so throwing here for a missing URL failed the install before a
+ * single check could run. The error is worth keeping; it just belongs on the
+ * commands that need the connection.
+ */
+const NEEDS_DATABASE = new Set(['migrate', 'db', 'studio', 'debug'])
+
+if (!url && NEEDS_DATABASE.has(process.argv[2] ?? '')) {
   throw new Error(
     'DIRECT_URL is not set. Prisma Migrate needs the direct (non-pooled) connection.\n' +
       'See .env.example.',
@@ -31,5 +42,5 @@ export default defineConfig({
     path: 'prisma/migrations',
     seed: 'npx tsx prisma/seed.ts',
   },
-  datasource: { url },
+  ...(url ? { datasource: { url } } : {}),
 })

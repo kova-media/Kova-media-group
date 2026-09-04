@@ -39,7 +39,6 @@ export function FooterColumnsEditor({ columns }: { columns: FooterColumn[] }) {
         <Button
           variant="secondary"
           size="sm"
-          disabled={value.length >= 4}
           onClick={() => setValue([...value, { heading: '', links: [] }])}
         >
           Add column

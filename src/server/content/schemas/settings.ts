@@ -66,7 +66,8 @@ export const siteFooterSchema = z.object({
   tagline: label(80).default(''),
   /** The rest of the copyright line, after "© {year} {site name}." */
   note: label(80).default(''),
-  columns: z.array(footerColumnSchema).max(4).default([]),
+  /** Link columns are intentionally unbounded so the footer can grow with the site. */
+  columns: z.array(footerColumnSchema).default([]),
 })
 
 export type SiteFooterContent = z.infer<typeof siteFooterSchema>

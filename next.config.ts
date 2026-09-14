@@ -17,30 +17,22 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
  * Deliberately nonce-free: a per-request nonce forces dynamic rendering, which
  * would destroy the static shell that ADR-002 exists to produce. `'unsafe-inline'`
  * is acceptable here only because the public site renders no user-supplied HTML
- * (ADR-016) and loads no third-party scripts (ADR-018). `/admin` gets a strict
- * nonce-based policy from proxy.ts instead. See ADR-013.
+ * (ADR-016).
  */
 const isDev = process.env.NODE_ENV === 'development'
 
 const publicCsp = [
   "default-src 'self'",
-  // React's development build uses eval() for debugging features (rebuilding
-  // stack traces across environments). It never does so in production, so the
-  // allowance is scoped to `next dev` — without it the dev console fills with
-  // CSP violations and real errors get lost in the noise.
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
+  `script-src 'self' 'unsafe-inline' https://app.cal.com${isDev ? " 'unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' blob: data: https://${supabaseHostname}`,
-  "font-src 'self' data:",
-  `connect-src 'self' https://${supabaseHostname} https://vitals.vercel-insights.com`,
+  `img-src 'self' blob: data: https://${supabaseHostname} https://app.cal.com https://cal.com`,
+  "font-src 'self' data: https://app.cal.com https://cal.com",
+  `connect-src 'self' https://${supabaseHostname} https://vitals.vercel-insights.com https://app.cal.com https://cal.com`,
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  "form-action 'self' https://app.cal.com https://cal.com",
   "frame-ancestors 'none'",
-  // The booking page embeds Calendly's scheduler as an iframe rather than
-  // loading its widget script, so only framing needs to be allowed — the
-  // script-src policy stays closed to third parties.
-  'frame-src https://calendly.com https://*.calendly.com',
+  'frame-src https://cal.com https://*.cal.com https://app.cal.com https://*.app.cal.com',
   'upgrade-insecure-requests',
 ].join('; ')
 
@@ -59,9 +51,7 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
-  // Partial Prerendering + tag-based invalidation (ADR-002).
   cacheComponents: true,
-  // Upgrades the App Shell to a full route once params are known (ADR-017).
   partialPrefetching: true,
 
   images: {
@@ -75,29 +65,15 @@ const nextConfig: NextConfig = {
   },
 
   experimental: {
-    // Makes Next.js's built-in Server Action origin check meaningful behind
-    // Vercel's proxy.
     serverActions: {
       allowedOrigins: [new URL(siteUrl).host],
     },
-
-    /**
-     * Rewrites barrel imports to direct paths.
-     *
-     * `import { Mail } from 'lucide-react'` otherwise pulls the package's index
-     * into the graph, and the icon set is thousands of modules — it measured
-     * 47kB gzipped on the homepage for roughly a dozen icons. Naming the
-     * packages here is what makes the tree-shaking actually happen.
-     */
     optimizePackageImports: ['lucide-react', 'motion'],
   },
 
   async headers() {
     return [
       {
-        // Admin routes get their CSP from proxy.ts; the rest of these headers
-        // are harmless there and a duplicate CSP would be over-restrictive, so
-        // this matcher excludes /admin.
         source: '/:path((?!admin).*)',
         headers: securityHeaders,
       },

@@ -40,6 +40,7 @@ export type SiteChrome = {
 }
 
 const FALLBACK_EMAIL = 'damian@kovamediagroup.com'
+const LEGACY_BOOKING_URL = 'https://calendly.com/damian-kovamediagroup-7lpe/30min'
 
 /** Last-resort values, used only before Settings has ever been saved. */
 const DEFAULT_SEO_TITLE = 'Kova Media Group — Email & SMS Marketing for Ecommerce'
@@ -78,12 +79,17 @@ export async function getSiteChrome(): Promise<SiteChrome> {
   // An empty string in the database must not produce an href of "".
   const contactEmail = settings?.contactEmail || FALLBACK_EMAIL
   const footer = parseSiteFooter(settings?.footer)
+  const configuredBookingUrl = settings?.bookingUrl?.trim()
+  const bookingUrl =
+    configuredBookingUrl && configuredBookingUrl !== LEGACY_BOOKING_URL
+      ? configuredBookingUrl
+      : DEFAULT_BOOKING_URL
 
   return {
     siteName: settings?.siteName ?? 'Kova Media Group',
     navigation,
     socialLinks: settings?.socialLinks ?? [],
-    bookingUrl: settings?.bookingUrl?.trim() || DEFAULT_BOOKING_URL,
+    bookingUrl,
     contactEmail,
     seo: {
       title: settings?.defaultSeoTitle?.trim() || DEFAULT_SEO_TITLE,

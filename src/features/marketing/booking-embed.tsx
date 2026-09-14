@@ -69,21 +69,8 @@ export function BookingEmbed({
       }
     }
 
-    const existingScript = document.querySelector<HTMLScriptElement>(
-      'script[data-kova-cal-embed="true"]',
-    )
-
-    if (existingScript) {
-      mount()
-    } else {
-      const script = document.createElement('script')
-      script.src = 'https://cal.com/embed.js'
-      script.async = true
-      script.dataset.kovaCalEmbed = 'true'
-      script.onload = mount
-      script.onerror = () => setEmbedFailed(true)
-      document.head.appendChild(script)
-    }
+    initializeCalLoader()
+    mount()
 
     return () => {
       cancelled = true
@@ -138,13 +125,36 @@ export function BookingEmbed({
   )
 }
 
+type CalFunction = ((action: string, ...args: unknown[]) => void) & {
+  loaded?: boolean
+  q?: unknown[]
+  ns?: Record<string, CalFunction>
+}
+
 declare global {
   interface Window {
-    Cal?: (
-      action: string,
-      config?: Record<string, unknown>,
-    ) => void
+    Cal?: CalFunction
   }
+}
+
+function initializeCalLoader() {
+  if (typeof window === 'undefined' || window.Cal) return
+
+  const cal = ((...args: unknown[]) => {
+    const current = window.Cal
+    if (!current) return
+    current.q = current.q || []
+    current.q.push(args)
+  }) as CalFunction
+
+  cal.q = []
+  cal.ns = {}
+  window.Cal = cal
+
+  const script = document.createElement('script')
+  script.src = 'https://cal.com/embed.js'
+  script.async = true
+  document.head.appendChild(script)
 }
 
 function safeHost(url: string): string {

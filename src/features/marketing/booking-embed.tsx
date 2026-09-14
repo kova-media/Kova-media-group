@@ -43,20 +43,14 @@ export function BookingEmbed({
     let cancelled = false
     let retryTimer: ReturnType<typeof setTimeout> | undefined
 
+    initializeCalLoader()
+
     const mount = () => {
-      if (cancelled || !containerRef.current || typeof window === 'undefined') return
-
-      const cal = window.Cal
-      if (!cal) {
-        retryTimer = setTimeout(mount, 100)
-        return
-      }
-
-      containerRef.current.replaceChildren()
+      if (cancelled || !containerRef.current || !window.Cal) return
 
       try {
-        cal('init', { origin: 'https://cal.com' })
-        cal('inline', {
+        window.Cal('init', { origin: 'https://cal.com' })
+        window.Cal('inline', {
           elementOrSelector: `#${containerId}`,
           calLink,
           config: {
@@ -69,8 +63,9 @@ export function BookingEmbed({
       }
     }
 
-    initializeCalLoader()
-    mount()
+    // The official Cal loader queues calls until embed.js has finished loading.
+    // Give it a moment to replace the queue with the live embed implementation.
+    retryTimer = setTimeout(mount, 0)
 
     return () => {
       cancelled = true
@@ -125,7 +120,7 @@ export function BookingEmbed({
   )
 }
 
-type CalFunction = ((action: string, ...args: unknown[]) => void) & {
+type CalFunction = ((...args: unknown[]) => unknown) & {
   loaded?: boolean
   q?: unknown[]
   ns?: Record<string, CalFunction>
@@ -138,23 +133,34 @@ declare global {
 }
 
 function initializeCalLoader() {
-  if (typeof window === 'undefined' || window.Cal) return
+  if (typeof window === 'undefined' || window.Cal?.loaded) return
 
-  const cal = ((...args: unknown[]) => {
-    const current = window.Cal
-    if (!current) return
-    current.q = current.q || []
-    current.q.push(args)
+  const existing = window.Cal
+  if (existing) {
+    return
+  }
+
+  const loader = ((...args: unknown[]) => {
+    const cal = window.Cal
+    if (!cal) return
+
+    cal.q = cal.q || []
+    cal.q.push(args)
+
+    if (cal.loaded) return
+
+    cal.ns = cal.ns || {}
+    cal.loaded = true
+
+    const script = document.createElement('script')
+    script.src = 'https://cal.com/embed.js'
+    script.async = true
+    document.head.appendChild(script)
   }) as CalFunction
 
-  cal.q = []
-  cal.ns = {}
-  window.Cal = cal
-
-  const script = document.createElement('script')
-  script.src = 'https://cal.com/embed.js'
-  script.async = true
-  document.head.appendChild(script)
+  loader.q = []
+  loader.ns = {}
+  window.Cal = loader
 }
 
 function safeHost(url: string): string {

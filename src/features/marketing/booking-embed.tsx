@@ -1,17 +1,14 @@
+'use client'
+
+import { useEffect, useId, useRef, useState } from 'react'
 import { ArrowUpRight } from 'lucide-react'
 
 /**
- * The Calendly scheduler.
+ * Inline booking embed.
  *
- * Embedded as a plain `<iframe>` rather than through Calendly's widget script.
- * That is a deliberate trade: the script would need `script-src` opened up to a
- * third-party origin on the public CSP — the one thing that policy exists to
- * prevent — and would ship ~90kB of JavaScript to render what is, in effect, a
- * remote page. The iframe needs only `frame-src`.
- *
- * `?hide_gdpr_banner=1` suppresses Calendly's own consent banner: the embed
- * sets no cookies of ours, and the site carries no analytics that would require
- * consent (ADR-018).
+ * Cal.com provides an official inline embed that keeps the complete booking
+ * flow on the Kova site. This avoids sending a visitor to a separate calendar
+ * tab after they have already reached the booking page.
  */
 export function BookingEmbed({
   url,
@@ -29,11 +26,72 @@ export function BookingEmbed({
   openInTabLabel?: string
 }) {
   const heading = title?.trim() || 'Book a strategy call'
-  const isCalendly = /(^|\.)calendly\.com$/.test(safeHost(url))
+  const containerId = useId().replace(/:/g, '')
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [embedFailed, setEmbedFailed] = useState(false)
+  const isCalCom = /(^|\.)cal\.com$/.test(safeHost(url))
 
-  // A booking URL that is not a Calendly link (or is malformed) cannot be
-  // framed safely, so it degrades to a prominent link rather than an empty box.
-  if (!isCalendly) {
+  useEffect(() => {
+    if (!isCalCom || !containerRef.current) return
+
+    const calLink = getCalLink(url)
+    if (!calLink) {
+      setEmbedFailed(true)
+      return
+    }
+
+    let cancelled = false
+    let retryTimer: ReturnType<typeof setTimeout> | undefined
+
+    const mount = () => {
+      if (cancelled || !containerRef.current || typeof window === 'undefined') return
+
+      const cal = window.Cal
+      if (!cal) {
+        retryTimer = setTimeout(mount, 100)
+        return
+      }
+
+      containerRef.current.replaceChildren()
+
+      try {
+        cal('init', { origin: 'https://cal.com' })
+        cal('inline', {
+          elementOrSelector: `#${containerId}`,
+          calLink,
+          config: {
+            layout: 'month_view',
+            useSlotsViewOnSmallScreen: 'true',
+          },
+        })
+      } catch {
+        setEmbedFailed(true)
+      }
+    }
+
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      'script[data-kova-cal-embed="true"]',
+    )
+
+    if (existingScript) {
+      mount()
+    } else {
+      const script = document.createElement('script')
+      script.src = 'https://cal.com/embed.js'
+      script.async = true
+      script.dataset.kovaCalEmbed = 'true'
+      script.onload = mount
+      script.onerror = () => setEmbedFailed(true)
+      document.head.appendChild(script)
+    }
+
+    return () => {
+      cancelled = true
+      if (retryTimer) clearTimeout(retryTimer)
+    }
+  }, [containerId, isCalCom, url])
+
+  if (!isCalCom || embedFailed) {
     return (
       <div className="flex flex-col items-start rounded-2xl border border-border bg-card p-8 shadow-[var(--shadow-soft)]">
         <p className="text-lg font-medium text-foreground">{heading}</p>
@@ -55,32 +113,15 @@ export function BookingEmbed({
     )
   }
 
-  const embedUrl = `${url}${url.includes('?') ? '&' : '?'}hide_gdpr_banner=1&background_color=ffffff&text_color=1a1a1a&primary_color=14b8a6`
-
   return (
     <div>
-      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)]">
-        <iframe
-          src={embedUrl}
-          title={heading}
-          // Tall enough that Calendly's own layout never scrolls internally on
-          // desktop, which is where the embed feels most like part of the page.
-          //
-          // Deliberately **not** `loading="lazy"`: this page exists to show a
-          // calendar, so deferring it only guarantees the visitor waits. Lazy
-          // loading also proved unreliable here — the frame sits below the fold
-          // on load and the fetch was never triggered at all.
-          className="h-[46rem] w-full border-0"
-        />
-      </div>
+      <div
+        id={containerId}
+        ref={containerRef}
+        aria-label={heading}
+        className="min-h-[46rem] w-full overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)]"
+      />
 
-      {/*
-        The escape hatch. Privacy extensions and strict browser settings block
-        third-party frames routinely, and when that happens the embed above
-        renders as an empty box with no explanation — a silently lost booking
-        on the one page whose entire job is to take one. This link always
-        renders, so the conversion path never dead-ends.
-      */}
       <p className="mt-4 text-center text-sm text-muted-foreground">
         {notLoadingLabel?.trim() || 'Calendar not loading?'}{' '}
         <a
@@ -97,9 +138,27 @@ export function BookingEmbed({
   )
 }
 
+declare global {
+  interface Window {
+    Cal?: (
+      action: string,
+      config?: Record<string, unknown>,
+    ) => void
+  }
+}
+
 function safeHost(url: string): string {
   try {
     return new URL(url).hostname
+  } catch {
+    return ''
+  }
+}
+
+function getCalLink(url: string): string {
+  try {
+    const parsed = new URL(url)
+    return parsed.pathname.replace(/^\/+|\/+$/g, '')
   } catch {
     return ''
   }

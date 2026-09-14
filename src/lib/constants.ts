@@ -31,14 +31,13 @@ export const DEFAULT_NAVIGATION = [
 ] as const
 
 /**
- * The scheduler embedded on `/book`. `SiteSettings.bookingUrl` overrides it, so
- * the owner can swap the Calendly link without a deploy.
+ * The scheduler embedded on `/book`. `SiteSettings.bookingUrl` overrides it,
+ * so the owner can change the booking provider without changing the site code.
  *
  * Note this is the *scheduler*, not the CTA target: buttons across the site
  * link to `routes.book`, which hosts this embed.
  */
-export const DEFAULT_BOOKING_URL =
-  'https://calendly.com/damian-kovamediagroup-7lpe/30min'
+export const DEFAULT_BOOKING_URL = 'https://cal.com/damian-kirby/30min'
 
 /** Seconds, to match Framer Motion. Mirrors --duration-* in globals.css. */
 export const duration = {

@@ -63,8 +63,6 @@ export function BookingEmbed({
       }
     }
 
-    // The official Cal loader queues calls until embed.js has finished loading.
-    // Give it a moment to replace the queue with the live embed implementation.
     retryTimer = setTimeout(mount, 0)
 
     return () => {
@@ -133,29 +131,47 @@ declare global {
 }
 
 function initializeCalLoader() {
-  if (typeof window === 'undefined' || window.Cal?.loaded) return
-
-  const existing = window.Cal
-  if (existing) {
-    return
-  }
+  if (typeof window === 'undefined' || window.Cal) return
 
   const loader = ((...args: unknown[]) => {
     const cal = window.Cal
     if (!cal) return
 
+    if (!cal.loaded) {
+      cal.ns = {}
+      cal.q = cal.q || []
+      const script = document.createElement('script')
+      script.src = 'https://cal.com/embed.js'
+      script.async = true
+      document.head.appendChild(script)
+      cal.loaded = true
+    }
+
+    if (args[0] === 'init') {
+      const api = ((...queuedArgs: unknown[]) => {
+        const current = window.Cal
+        if (!current) return
+        current.q = current.q || []
+        current.q.push(queuedArgs)
+      }) as CalFunction
+      const namespace = args[1]
+      api.q = api.q || []
+
+      if (typeof namespace === 'string') {
+        cal.ns = cal.ns || {}
+        cal.ns[namespace] = api
+        cal.q = cal.q || []
+        cal.q.push(args)
+      } else {
+        cal.q = cal.q || []
+        cal.q.push(args)
+      }
+
+      return api
+    }
+
     cal.q = cal.q || []
     cal.q.push(args)
-
-    if (cal.loaded) return
-
-    cal.ns = cal.ns || {}
-    cal.loaded = true
-
-    const script = document.createElement('script')
-    script.src = 'https://cal.com/embed.js'
-    script.async = true
-    document.head.appendChild(script)
   }) as CalFunction
 
   loader.q = []

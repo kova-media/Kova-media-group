@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button, buttonClasses } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/field'
 import { formatRelative } from '@/lib/format'
 import type { SubmissionStatus } from '@/generated/prisma/enums'
@@ -11,7 +11,7 @@ import type { SubmissionSummary } from '@/server/submissions/queries'
 import { removeSubmission, setSubmissionNotes, setSubmissionStatus } from './actions'
 
 /**
- * The enquiry inbox.
+ * The submissions inbox.
  *
  * A lead is worked from the list — read it, change its status, jot a note —
  * rather than from a detail page, because the whole record is four fields and
@@ -38,6 +38,7 @@ const STATUS_CLASS: Record<SubmissionStatus, string> = {
 export function SubmissionList({
   rows,
   detail,
+  emptyMessage = 'No submissions yet.',
 }: {
   rows: SubmissionSummary[]
   detail: Record<
@@ -49,13 +50,14 @@ export function SubmissionList({
       source: string | null
     }
   >
+  emptyMessage?: string
 }) {
   const [openId, setOpenId] = useState<string | null>(null)
 
   if (rows.length === 0) {
     return (
       <p className="rounded-lg border border-dashed border-border px-4 py-12 text-center text-sm text-ink-500">
-        No enquiries yet.
+        {emptyMessage}
       </p>
     )
   }
@@ -107,7 +109,12 @@ export function SubmissionList({
             </button>
 
             {isOpen && extra && (
-              <ExpandedSubmission id={row.id} status={row.status} extra={extra} />
+              <ExpandedSubmission
+                id={row.id}
+                status={row.status}
+                email={row.email}
+                extra={extra}
+              />
             )}
           </div>
         )
@@ -119,10 +126,12 @@ export function SubmissionList({
 function ExpandedSubmission({
   id,
   status,
+  email,
   extra,
 }: {
   id: string
   status: SubmissionStatus
+  email: string
   extra: {
     message: string
     websiteUrl: string | null
@@ -138,6 +147,15 @@ function ExpandedSubmission({
   return (
     <div className="border-t border-border px-5 py-5">
       <p className="text-sm whitespace-pre-wrap text-ink-800">{extra.message}</p>
+
+      <div className="mt-5">
+        <a
+          href={`mailto:${email}`}
+          className={buttonClasses({ variant: 'primary', size: 'sm' })}
+        >
+          Reply by email
+        </a>
+      </div>
 
       <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-xs text-ink-500">
         {extra.websiteUrl && (

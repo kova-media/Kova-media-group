@@ -70,9 +70,7 @@ export function SiteHeader({
                 >
                   {item.label}
                   {active && (
-                    <span
-                  className="absolute inset-x-3.5 bottom-0 h-0.5 bg-brand"
-                  />
+                    <span className="absolute inset-x-3.5 bottom-0 h-0.5 bg-brand" />
                   )}
                 </Link>
               )

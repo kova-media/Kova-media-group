@@ -111,7 +111,7 @@ export default async function AdminDashboardPage() {
         </section>
 
         {/* Only when a notification actually failed. A permanently green
-           "emails are fine" panel trains you to stop reading it. */}
+          "emails are fine" panel trains you to stop reading it. */}
         {stats.unnotifiedSubmissions > 0 && (
           <p
             role="alert"
@@ -127,6 +127,7 @@ export default async function AdminDashboardPage() {
             .
           </p>
         )}
+
         {needsPublishing.length > 0 && (
           <section className="rounded-lg border border-border bg-card">
             <h2 className="border-b border-border px-5 py-3 text-sm font-medium text-ink-950">
@@ -171,22 +172,16 @@ export default async function AdminDashboardPage() {
                     <span className="text-sm text-ink-900">
                       {revision.title}{' '}
                       <span className="text-ink-500">
-                        —{' '}
-                        {revision.action === 'unpublished' ? 'Unpublished' : 'Published'}
-                        {' · '}
-                        {revision.entityType === 'caseStudy' ? 'Case study' : 'Page'}
+                        {`— ${revision.action === 'unpublished' ? 'Unpublished' : 'Published'} · ${revision.entityType === 'caseStudy' ? 'Case study' : 'Page'}`}
                       </span>
                     </span>
                     <time
                       dateTime={revision.createdAt.toISOString()}
                       className="text-sm text-ink-500"
                     >
-                      {new Intl.DateTimeFormat('en-GB', {
+                      {revision.createdAt.toLocaleString('en-GB', {
                         day: 'numeric',
                         month: 'short',
-                      }).format(revision.createdAt)}{' '}
-                      ·{' '}
-                      {revision.createdAt.toLocaleTimeString('en-GB', {
                         hour: '2-digit',
                         minute: '2-digit',
                       })}

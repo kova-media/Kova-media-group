@@ -50,6 +50,17 @@ const saveDraftSchema = z.object({
 
 export type SaveDraftResult = { version: number }
 
+/**
+ * What addSection returns. Besides the new version it carries the new
+ * section's id and the full updated draft content, so the editor can apply
+ * the added section to its state in place — no page reload needed.
+ */
+export type AddSectionResult = {
+  version: number
+  sectionId: string
+  content: PageContent
+}
+
 export async function saveDraft(
   input: unknown,
 ): Promise<ActionResult<SaveDraftResult>> {
@@ -90,7 +101,7 @@ const addSectionSchema = z.object({
 
 export async function addSection(
   input: unknown,
-): Promise<ActionResult<SaveDraftResult>> {
+): Promise<ActionResult<AddSectionResult>> {
   await requireAdmin()
 
   const parsed = parseInput(addSectionSchema, input)
@@ -124,7 +135,7 @@ export async function addSection(
       parsed.data.expectedVersion,
     )
 
-    return ok({ version })
+    return ok({ version, sectionId: section.id, content: { sections } })
   } catch (error) {
     if (error instanceof DraftConflictError) {
       return fail('This page was changed somewhere else. Reload before editing again.')

@@ -79,12 +79,12 @@ export function Hero({
       <Container>
         <div className="grid items-center gap-16 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
           {/* Copy */}
-        <div className="max-w-xl">
-            {lines.length > 0 && (
-            <h1 className="tracking-tightest text-[3.25rem] leading-[1.02] font-semibold text-balance text-foreground md:text-6xl lg:text-[4.5rem]">
-              <RevealLines lines={lines} />
-            </h1>
-          )}
+          <div className="max-w-xl">
+              {lines.length > 0 && (
+              <h1 className="tracking-tightest text-[3.25rem] leading-[1.02] font-semibold text-balance text-foreground md:text-6xl lg:text-[4.5rem]">
+                <RevealLines lines={lines} />
+              </h1>
+            )}
 
             {subhead?.trim() && (
               <motion.p

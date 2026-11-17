@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
+import { Logo } from '@/components/site/logo'
 import { Button } from '@/components/ui/button'
 import { logout } from '@/features/admin/auth/actions'
 import type { AdminSession } from '@/server/auth/dal'
@@ -22,11 +23,14 @@ export function AdminShell({
     <div className="flex min-h-screen bg-paper-sunk">
       <aside className="flex w-60 shrink-0 flex-col border-r border-border bg-card">
         <div className="border-b border-border px-5 py-4">
-          <Link href="/admin" className="block">
-            <span className="text-2xs font-medium tracking-wide text-ink-500 uppercase">
-              Kova
+          <Link href="/admin" className="flex items-center gap-3">
+            <Logo className="shrink-0" />
+            <span className="leading-none">
+              <span className="block text-2xs font-medium tracking-wide text-ink-500 uppercase">
+                Kova
+              </span>
+              <span className="mt-1 block text-sm font-medium text-ink-950">Admin</span>
             </span>
-            <span className="block text-sm font-medium text-ink-950">Admin</span>
           </Link>
         </div>
 
@@ -36,7 +40,7 @@ export function AdminShell({
           <p className="truncate text-sm font-medium text-ink-900">{session.name}</p>
           <p className="truncate text-xs text-ink-500">{session.email}</p>
           {/* A form, not a link: sign-out changes state, and Next.js prefetches
-              links — which would sign the admin out as they hovered. */}
+             links — which would sign the admin out as they hovered. */}
           <form action={logout} className="mt-3">
             <Button type="submit" variant="ghost" size="sm" className="w-full">
               Sign out

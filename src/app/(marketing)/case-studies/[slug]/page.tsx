@@ -203,7 +203,7 @@ export default async function CaseStudyPage({
                 asset={study.heroImage}
                 sizes="(max-width: 768px) 100vw, 768px"
                 priority
-                className="mx-auto max-h-[480px] w-auto"
+                className="mx-auto max-h-[480px] max-w-[640px] w-auto"
               />
             </Reveal>
           )}

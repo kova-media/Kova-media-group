@@ -111,7 +111,7 @@ export function SectionEditor({
     (id: string) => {
       draft.update((current) => ({
         sections: current.sections.map((section) =>
-          section.id === id ?  { ...section, isEnabled: !section.isEnabled }  : section,
+          section.id === id ? { ...section, isEnabled: !section.isEnabled } : section,
         ),
       }))
     },
@@ -189,7 +189,7 @@ export function SectionEditor({
 
       const result = await publishPage({ pageId: page.id })
       setPublishState(
-        result.ok ? { status: 'done' }  : { status: 'error', message: result.message },
+        result.ok ? { status: 'done' } : { status: 'error', message: result.message },
       )
     })
   }

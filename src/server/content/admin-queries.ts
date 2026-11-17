@@ -270,7 +270,7 @@ export async function getRecentRevisions(limit = 8): Promise<RecentRevision[]> {
     caseStudyIds.length > 0
       ? prisma.caseStudy.findMany({
           where: { id: { in: caseStudyIds } },
-          select: { id: true, title: true },
+          select: { id: true, headline: true },
         })
       : [],
   ])
@@ -280,7 +280,7 @@ export async function getRecentRevisions(limit = 8): Promise<RecentRevision[]> {
     titles.set(`page:${page.id}`, page.title)
   }
   for (const study of caseStudies) {
-    titles.set(`caseStudy:${study.id}`, study.title)
+    titles.set(`caseStudy:${study.id}`, study.headline)
   }
 
   return revisions.map((revision) => {

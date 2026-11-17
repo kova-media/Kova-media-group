@@ -149,7 +149,10 @@ export default async function AdminDashboardPage() {
           </section>
         )}
 
-        <section aria-label="Recent activity" className="rounded-lg border border-border bg-card">
+        <section
+          aria-label="Recent activity"
+          className="rounded-lg border border-border bg-card"
+        >
           <h2 className="border-b border-border px-5 py-3 text-sm font-medium text-ink-950">
             Recent activity
           </h2>

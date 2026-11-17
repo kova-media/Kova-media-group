@@ -201,9 +201,9 @@ export default async function CaseStudyPage({
             <Reveal className="mt-14">
               <MediaImage
                 asset={study.heroImage}
-                sizes="(max-width: 1024px) 100vw, 1200px"
+                sizes="(max-width: 768px) 100vw, 768px"
                 priority
-                className="w-full"
+                className="mx-auto max-h-[480px] w-auto"
               />
             </Reveal>
           )}

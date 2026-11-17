@@ -213,3 +213,87 @@ export async function getDashboardStats() {
     mediaCount,
   }
 }
+
+export type RecentRevision = {
+  id: string
+  entityType: 'page' | 'caseStudy'
+  entityId: string
+  title: string
+  action: string
+  createdAt: Date
+}
+
+/**
+ * Latest publish history for the dashboard's Recent activity panel.
+ * ContentRevision is append-only — one row per publish or unpublish — and
+ * carries no title, so titles are resolved from the page or case study the
+ * revision belongs to. A revision whose item has since been deleted falls
+ * back to its type name.
+ */
+export async function getRecentRevisions(limit = 8): Promise<RecentRevision[]> {
+  await requireAdmin()
+
+  const revisions = await prisma.contentRevision.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+    select: {
+      id: true,
+      entityType: true,
+      entityId: true,
+      action: true,
+      createdAt: true,
+    },
+  })
+
+  const pageIds = [
+    ...new Set(
+      revisions
+        .filter((revision) => revision.entityType === 'page')
+        .map((revision) => revision.entityId),
+    ),
+  ]
+  const caseStudyIds = [
+    ...new Set(
+      revisions
+        .filter((revision) => revision.entityType === 'caseStudy')
+        .map((revision) => revision.entityId),
+    ),
+  ]
+
+  const [pages, caseStudies] = await Promise.all([
+    pageIds.length > 0
+      ? prisma.page.findMany({
+          where: { id: { in: pageIds } },
+          select: { id: true, title: true },
+        })
+      : [],
+    caseStudyIds.length > 0
+      ? prisma.caseStudy.findMany({
+          where: { id: { in: caseStudyIds } },
+          select: { id: true, headline: true },
+        })
+      : [],
+  ])
+
+  const titles = new Map<string, string>()
+  for (const page of pages) {
+    titles.set(`page:${page.id}`, page.title)
+  }
+  for (const study of caseStudies) {
+    titles.set(`caseStudy:${study.id}`, study.headline)
+  }
+
+  return revisions.map((revision) => {
+    const entityType = revision.entityType === 'caseStudy' ? 'caseStudy' : 'page'
+    return {
+      id: revision.id,
+      entityType,
+      entityId: revision.entityId,
+      title:
+        titles.get(`${revision.entityType}:${revision.entityId}`) ??
+        (entityType === 'caseStudy' ? 'Case study' : 'Page'),
+      action: revision.action,
+      createdAt: revision.createdAt,
+    }
+  })
+}

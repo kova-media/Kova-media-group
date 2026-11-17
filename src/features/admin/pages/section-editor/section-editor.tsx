@@ -39,14 +39,18 @@ export function SectionEditor({
   )
   const [expandedIds, setExpandedIds] = useState<Set<string>>(
     () =>
-      new Set(page.draft.content.sections.slice(0, 1).map((section) => section.id)),
+      new Set(
+        page.draft.content.sections.slice(0, 1).map((section) => section.id),
+      ),
   )
   const [scrollToId, setScrollToId] = useState<string | null>(null)
   const [media, setMedia] = useState(
     () => new Map(initialMedia.map((asset) => [asset.id, asset])),
   )
   const [publishState, setPublishState] = useState<
-    { status: 'idle' } | { status: 'error'; message: string } | { status: 'done' }
+    | { status: 'idle' }
+    | { status: 'error'; message: string }
+    | { status: 'done' }
   >({ status: 'idle' })
   const [isPending, startTransition] = useTransition()
 
@@ -97,7 +101,8 @@ export function SectionEditor({
       draft.update((current) => {
         const index = current.sections.findIndex((section) => section.id === id)
         const target = index + direction
-        if (index < 0 || target < 0 || target >= current.sections.length) return current
+        if (index < 0 || target < 0 || target >= current.sections.length)
+          return current
 
         const next = [...current.sections]
         const [moved] = next.splice(index, 1)
@@ -112,7 +117,9 @@ export function SectionEditor({
     (id: string) => {
       draft.update((current) => ({
         sections: current.sections.map((section) =>
-          section.id === id ? { ...section, isEnabled: !section.isEnabled } : section,
+          section.id === id
+            ? { ...section, isEnabled: !section.isEnabled }
+            : section,
         ),
       }))
     },
@@ -190,7 +197,9 @@ export function SectionEditor({
 
       const result = await publishPage({ pageId: page.id })
       setPublishState(
-        result.ok ? { status: 'done' } : { status: 'error', message: result.message },
+        result.ok
+          ? { status: 'done' }
+          : { status: 'error', message: result.message },
       )
     })
   }
@@ -199,7 +208,9 @@ export function SectionEditor({
     startTransition(async () => {
       const result = await unpublishPage({ pageId: page.id })
       setPublishState(
-        result.ok ? { status: 'done' } : { status: 'error', message: result.message },
+        result.ok
+          ? { status: 'done' }
+          : { status: 'error', message: result.message },
       )
     })
   }
@@ -210,7 +221,8 @@ export function SectionEditor({
         <div>
           <SaveIndicator state={draft.saveState} isLive={page.isLive} />
           <p className="text-xs text-ink-500">
-            Changes save automatically as a draft. Only publishing makes them live.
+            Changes save automatically as a draft. Only publishing makes them
+            live.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -343,7 +355,10 @@ export function SectionEditor({
                         {section.isEnabled ? 'Visible' : 'Hidden'}
                       </span>
                     </span>
-                    <span aria-hidden="true" className="shrink-0 text-sm text-ink-500">
+                    <span
+                      aria-hidden="true"
+                      className="shrink-0 text-sm text-ink-500"
+                    >
                       {isExpanded ? '▾' : '▸'}
                     </span>
                   </button>

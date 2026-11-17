@@ -8,11 +8,7 @@ import { formatRelative } from '@/lib/format'
 import type { SubmissionStatus } from '@/generated/prisma/enums'
 import type { SubmissionSummary } from '@/server/submissions/queries'
 
-import {
-  removeSubmission,
-  setSubmissionNotes,
-  setSubmissionStatus,
-} from './actions'
+import { removeSubmission, setSubmissionNotes, setSubmissionStatus } from './actions'
 
 /**
  * The submissions inbox.
@@ -69,38 +65,50 @@ export function SubmissionList({
   return (
     <div className="flex flex-col gap-3">
       {rows.map((row) => {
+        const isOpen = openId === row.id
         const extra = detail[row.id]
+
         return (
-          <article
-            key={row.id}
-            className="rounded-lg border border-border bg-card"
-          >
+          <div key={row.id} className="rounded-lg border border-border bg-card">
             <button
               type="button"
-              onClick={() => setOpenId(openId === row.id ? null : row.id)}
-              aria-expanded={openId === row.id}
-              className="block w-full rounded-lg px-5 py-4 text-left hover:bg-ink-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink-900"
+              onClick={() => setOpenId(isOpen ? null : row.id)}
+              aria-expanded={isOpen}
+              className="flex w-full items-start gap-4 p-5 text-left"
             >
-              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-                <h2 className="text-sm font-medium text-ink-900">
-                  {row.name}
-                  {row.companyName ? ` · ${row.companyName}` : ''}
-                </h2>
-                <span
-                  className={`inline-flex shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_CLASS[row.status]}`}
-                >
-                  {row.status}
-                </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-medium text-ink-900">{row.name}</span>
+                  {row.company && (
+                    <span className="text-sm text-ink-500">· {row.company}</span>
+                  )}
+                  <span
+                    className={`rounded px-2 py-0.5 text-xs font-medium ${STATUS_CLASS[row.status]}`}
+                  >
+                    {row.status}
+                  </span>
+                  {!row.notifiedAt && (
+                    <span
+                      className="rounded bg-warning/15 px-2 py-0.5 text-xs text-ink-800"
+                      title="The notification email did not go out. Follow up by hand."
+                    >
+                      Not emailed
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1.5 truncate text-sm text-ink-600">{row.excerpt}</p>
+                <p className="mt-1 text-xs text-ink-500">
+                  {row.email}
+                  {row.monthlyRevenue && ` · ${row.monthlyRevenue}`} ·{' '}
+                  {formatRelative(row.createdAt)}
+                </p>
               </div>
-              <p className="mt-1 truncate text-sm text-ink-500">
-                {row.email} · {row.revenueRange ?? 'Revenue not given'} ·{' '}
-                {formatRelative(row.createdAt)}
-              </p>
-              <p className="mt-1 truncate text-sm text-ink-700">
-                {row.excerpt}
-              </p>
+              <span aria-hidden className="text-ink-400">
+                {isOpen ? '−' : '+'}
+              </span>
             </button>
-            {openId === row.id && extra && (
+
+            {isOpen && extra && (
               <ExpandedSubmission
                 id={row.id}
                 status={row.status}
@@ -108,7 +116,7 @@ export function SubmissionList({
                 extra={extra}
               />
             )}
-          </article>
+          </div>
         )
       })}
     </div>
@@ -131,20 +139,14 @@ function ExpandedSubmission({
     source: string | null
   }
 }) {
-  const [isPending, startTransition] = useTransition()
   const [notes, setNotes] = useState(extra.adminNotes ?? '')
-  const [confirmingDelete, setConfirmingDelete] = useState(false)
-
-  const updateStatus = (next: SubmissionStatus) =>
-    startTransition(async () => {
-      await setSubmissionStatus(id, next)
-    })
+  const [isSaving, startSaving] = useTransition()
+  const [isDeleting, startDeleting] = useTransition()
+  const [confirming, setConfirming] = useState(false)
 
   return (
     <div className="border-t border-border px-5 py-5">
-      <p className="whitespace-pre-wrap text-sm leading-relaxed text-ink-700">
-        {extra.message}
-      </p>
+      <p className="text-sm whitespace-pre-wrap text-ink-800">{extra.message}</p>
 
       <div className="mt-5">
         <a
@@ -155,111 +157,73 @@ function ExpandedSubmission({
         </a>
       </div>
 
-      <dl className="mt-5 flex flex-col gap-2 text-sm">
+      <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-xs text-ink-500">
         {extra.websiteUrl && (
-          <div className="flex gap-2">
-            <dt className="shrink-0 font-medium text-ink-900">Website</dt>
-            <dd className="min-w-0 break-all text-ink-700">
-              {extra.websiteUrl}
-            </dd>
+          <div>
+            <dt className="inline">Website: </dt>
+            <dd className="inline text-ink-700">{extra.websiteUrl}</dd>
           </div>
         )}
-        <div className="flex gap-2">
-          <dt className="shrink-0 font-medium text-ink-900">Source</dt>
-          <dd className="text-ink-700">{extra.source ?? 'Not recorded'}</dd>
-        </div>
+        {extra.source && (
+          <div>
+            <dt className="inline">Page: </dt>
+            <dd className="inline text-ink-700">{extra.source}</dd>
+          </div>
+        )}
       </dl>
 
-      <div className="mt-5 flex flex-wrap gap-2">
-        {STATUSES.filter((candidate) => candidate !== status).map(
-          (candidate) => (
-            <Button
-              key={candidate}
-              type="button"
-              variant="secondary"
-              size="sm"
-              disabled={isPending}
-              onClick={() => updateStatus(candidate)}
-            >
-              Mark {candidate.toLowerCase()}
-            </Button>
-          ),
-        )}
+      <div className="mt-5 flex flex-wrap items-center gap-2">
+        {STATUSES.map((candidate) => (
+          <Button
+            key={candidate}
+            size="sm"
+            variant={candidate === status ? 'primary' : 'secondary'}
+            onClick={() => startSaving(() => void setSubmissionStatus(id, candidate))}
+            disabled={isSaving}
+          >
+            {candidate}
+          </Button>
+        ))}
       </div>
 
-      <form
-        className="mt-5"
-        action={async (formData: FormData) => {
-          const value = formData.get('notes')
-          await setSubmissionNotes(id, typeof value === 'string' ? value : '')
-        }}
-      >
-        <label
-          htmlFor={`notes-${id}`}
-          className="text-sm font-medium text-ink-900"
-        >
-          Admin notes
-        </label>
+      <div className="mt-5">
         <Textarea
-          id={`notes-${id}`}
-          name="notes"
-          rows={3}
+          rows={2}
           value={notes}
+          placeholder="Internal notes…"
+          aria-label="Internal notes"
           onChange={(event) => setNotes(event.target.value)}
-          placeholder="Private notes — not sent to the sender."
-          className="mt-2"
         />
-        <Button
-          type="submit"
-          variant="primary"
-          size="sm"
-          disabled={isPending}
-          className="mt-2"
-        >
-          Save notes
-        </Button>
-      </form>
+        <div className="mt-2 flex items-center justify-between gap-3">
+          <Button
+            size="sm"
+            variant="secondary"
+            disabled={isSaving}
+            onClick={() => startSaving(() => void setSubmissionNotes(id, notes))}
+          >
+            Save note
+          </Button>
 
-      <div className="mt-5 border-t border-border pt-5">
-        {confirmingDelete ? (
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm text-ink-700">
-              Delete this submission? This cannot be undone.
-            </p>
-            <Button
-              type="button"
-              variant="destructive"
-              size="sm"
-              disabled={isPending}
-              onClick={() =>
-                startTransition(async () => {
-                  await removeSubmission(id)
-                })
-              }
-            >
+          {confirming ? (
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="destructive"
+                disabled={isDeleting}
+                onClick={() => startDeleting(() => void removeSubmission(id))}
+              >
+                {isDeleting ? 'Deleting…' : 'Delete permanently'}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setConfirming(false)}>
+                Cancel
+              </Button>
+            </div>
+          ) : (
+            <Button size="sm" variant="ghost" onClick={() => setConfirming(true)}>
               Delete
             </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              disabled={isPending}
-              onClick={() => setConfirmingDelete(false)}
-            >
-              Cancel
-            </Button>
-          </div>
-        ) : (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            disabled={isPending}
-            onClick={() => setConfirmingDelete(true)}
-          >
-            Delete submission
-          </Button>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

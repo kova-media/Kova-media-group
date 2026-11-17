@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
  * client boundary — used by the CMS section renderer and other server-rendered
  * surfaces.
  *
- * The width matches `ui.tsx` exactly (76rem / px-6 / md:px-8). If one changes,
+ * The width matches `ui.tsx` exactly (100rem / px-6 / md:px-8). If one changes,
  * both change.
  */
 export function Container({
@@ -23,7 +23,7 @@ export function Container({
     <div
       className={cn(
         'mx-auto w-full px-6 md:px-8',
-        width === 'content' ? 'max-w-3xl' : 'max-w-[76rem]',
+        width === 'content' ? 'max-w-3xl' : 'max-w-[100rem]',
         className,
       )}
       {...props}

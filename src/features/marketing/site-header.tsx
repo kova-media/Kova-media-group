@@ -50,7 +50,7 @@ export function SiteHeader({
             : 'border-b border-transparent bg-transparent',
         )}
       >
-        <div className="mx-auto flex h-16 w-full max-w-[76rem] items-center justify-between px-6 md:px-8">
+        <div className="mx-auto flex h-16 w-full max-w-[100rem] items-center justify-between px-6 md:px-8">
           <LogoLink asset={logo} siteName={siteName} />
 
           <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
@@ -111,7 +111,7 @@ export function SiteHeader({
             className="border-b border-border bg-background md:hidden"
           >
             <nav
-              className="mx-auto flex w-full max-w-[76rem] flex-col gap-1 px-6 py-4"
+              className="mx-auto flex w-full max-w-[100rem] flex-col gap-1 px-6 py-4"
               aria-label="Mobile"
             >
               {nav.map((item) => (

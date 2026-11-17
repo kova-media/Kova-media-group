@@ -119,10 +119,12 @@
   --spacing-gutter: 1.5rem;
 
   --container-content: 46rem;
+  /* Wide page container token (1600px), used across the site. */
   --container-wide: 100rem;
 
   --shadow-subtle: var(--shadow-soft);
   --shadow-raised: var(--shadow-soft);
+  
   --shadow-lifted: var(--shadow-lift);
 }
 

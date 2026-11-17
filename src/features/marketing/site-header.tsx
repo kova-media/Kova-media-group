@@ -46,7 +46,7 @@ export function SiteHeader({
         className={cn(
           'transition-all duration-500',
           scrolled
-            ? 'border-b border-border bg-background',
+            ? 'border-b border-border bg-background'
             : 'border-b border-transparent bg-transparent',
         )}
       >

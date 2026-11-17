@@ -2,7 +2,11 @@ import Link from 'next/link'
 
 import { AdminPageHeader } from '@/features/admin/shell/admin-shell'
 import { requireAdmin } from '@/server/auth/dal'
-import { getDashboardStats, listPages } from '@/server/content/admin-queries'
+import {
+  getDashboardStats,
+  getRecentRevisions,
+  listPages,
+} from '@/server/content/admin-queries'
 import { listSubmissions } from '@/server/submissions/queries'
 
 export const metadata = { title: 'Dashboard' }
@@ -20,17 +24,18 @@ export const metadata = { title: 'Dashboard' }
  * work waiting to be published, and people waiting for a reply.
  */
 export default async function AdminDashboardPage() {
-  const [session, stats, pages, submissions] = await Promise.all([
+  const [session, stats, pages, submissions, revisions] = await Promise.all([
     requireAdmin(),
     getDashboardStats(),
     listPages(),
     listSubmissions({ status: 'NEW', take: 5 }),
+    getRecentRevisions(),
   ])
 
   const needsPublishing = pages.filter((page) => page.status === 'LIVE_WITH_CHANGES')
   const recent = submissions.items
 
-  const counts = [
+  const counts: { label: string; value: string; href: string; context?: string }[] = [
     {
       label: 'Pages live',
       value: `${stats.livePages}/${stats.totalPages}`,
@@ -45,6 +50,7 @@ export default async function AdminDashboardPage() {
       label: 'New enquiries',
       value: String(stats.newSubmissions),
       href: '/admin/submissions',
+      context: stats.newSubmissions === 0 ? 'No new enquiries yet' : undefined,
     },
     { label: 'Images', value: String(stats.mediaCount), href: '/admin/media' },
   ]
@@ -68,12 +74,44 @@ export default async function AdminDashboardPage() {
                 {card.value}
               </p>
               <p className="mt-1 text-sm text-ink-500">{card.label}</p>
+              {card.context && (
+                <p className="mt-1 text-sm text-ink-500">{card.context}</p>
+              )}
             </Link>
           ))}
         </div>
 
+        <section aria-label="Quick actions" className="flex flex-wrap gap-2">
+          <Link
+            href="/admin/pages/new"
+            className="duration-fast rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-ink-950 transition-colors hover:border-ink-300"
+          >
+            New page
+          </Link>
+          <Link
+            href="/admin/case-studies/new"
+            className="duration-fast rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-ink-950 transition-colors hover:border-ink-300"
+          >
+            New case study
+          </Link>
+          <Link
+            href="/admin/media"
+            className="duration-fast rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-ink-950 transition-colors hover:border-ink-300"
+          >
+            Upload media
+          </Link>
+          <Link
+            href="/"
+            target="_blank"
+            rel="noreferrer"
+            className="duration-fast rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-ink-950 transition-colors hover:border-ink-300"
+          >
+            View live site
+          </Link>
+        </section>
+
         {/* Only when a notification actually failed. A permanently green
-            "emails are fine" panel trains you to stop reading it. */}
+           "emails are fine" panel trains you to stop reading it. */}
         {stats.unnotifiedSubmissions > 0 && (
           <p
             role="alert"
@@ -89,7 +127,6 @@ export default async function AdminDashboardPage() {
             .
           </p>
         )}
-
         {needsPublishing.length > 0 && (
           <section className="rounded-lg border border-border bg-card">
             <h2 className="border-b border-border px-5 py-3 text-sm font-medium text-ink-950">
@@ -110,6 +147,56 @@ export default async function AdminDashboardPage() {
             </ul>
           </section>
         )}
+
+        <section aria-label="Recent activity" className="rounded-lg border border-border bg-card">
+          <h2 className="border-b border-border px-5 py-3 text-sm font-medium text-ink-950">
+            Recent activity
+          </h2>
+          {revisions.length === 0 ? (
+            <p className="px-5 py-4 text-sm text-ink-500">
+              No activity yet. Publish a page or case study and it will show up here.
+            </p>
+          ) : (
+            <ul>
+              {revisions.map((revision) => (
+                <li key={revision.id} className="border-b border-border last:border-0">
+                  <Link
+                    href={
+                      revision.entityType === 'caseStudy'
+                        ? `/admin/case-studies/${revision.entityId}`
+                        : `/admin/pages/${revision.entityId}`
+                    }
+                    className="duration-fast flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3 transition-colors hover:bg-paper-sunk"
+                  >
+                    <span className="text-sm text-ink-900">
+                      {revision.title}{' '}
+                      <span className="text-ink-500">
+                        —{' '}
+                        {revision.action === 'unpublished' ? 'Unpublished' : 'Published'}
+                        {' · '}
+                        {revision.entityType === 'caseStudy' ? 'Case study' : 'Page'}
+                      </span>
+                    </span>
+                    <time
+                      dateTime={revision.createdAt.toISOString()}
+                      className="text-sm text-ink-500"
+                    >
+                      {new Intl.DateTimeFormat('en-GB', {
+                        day: 'numeric',
+                        month: 'short',
+                      }).format(revision.createdAt)}{' '}
+                      ·{' '}
+                      {revision.createdAt.toLocaleTimeString('en-GB', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </time>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
         {recent.length > 0 && (
           <section className="rounded-lg border border-border bg-card">

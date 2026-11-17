@@ -185,6 +185,10 @@ export function LinkField({
  * Repeating group of sub-items (metrics, outcomes, FAQ entries).
  * Reordering is intentionally simple up/down rather than drag: these lists are
  * short, and a keyboard-accessible button beats a drag target every time.
+ *
+ * When a maximum is set, the count — and, once it is reached, the reason the
+ * add button is disabled — is shown next to the button, so a disabled button
+ * is never left unexplained.
  */
 export function RepeaterField<T>({
   label,
@@ -203,6 +207,8 @@ export function RepeaterField<T>({
   max?: number
   addLabel?: string
 }) {
+  const atMax = max !== undefined && items.length >= max
+
   const move = (from: number, to: number) => {
     if (to < 0 || to >= items.length) return
     const next = [...items]
@@ -218,12 +224,20 @@ export function RepeaterField<T>({
         <Button
           variant="secondary"
           size="sm"
-          disabled={max !== undefined && items.length >= max}
+          disabled={atMax}
           onClick={() => onChange([...items, createItem()])}
         >
           {addLabel}
         </Button>
       </div>
+
+      {max !== undefined && (
+        <p className="text-xs text-ink-500">
+          {atMax
+            ? `Maximum of ${max} reached — remove one to add another.`
+            : `${items.length} of ${max} added.`}
+        </p>
+      )}
 
       {items.length === 0 && <p className="text-xs text-ink-500">Nothing added yet.</p>}
 
@@ -281,6 +295,9 @@ export function RepeaterField<T>({
  * bordered card per row with its own header, which for a list of short lines is
  * far more furniture than the content. This is one input per line with the same
  * add / move / remove controls.
+ *
+ * As with `RepeaterField`, when a maximum is set the count — and, once it is
+ * reached, the reason the add button is disabled — is shown in the UI.
  */
 export function StringListField({
   label,
@@ -301,6 +318,8 @@ export function StringListField({
   max?: number
   maxLength?: number
 }) {
+  const atMax = max !== undefined && items.length >= max
+
   const move = (from: number, to: number) => {
     if (to < 0 || to >= items.length) return
     const next = [...items]
@@ -316,12 +335,20 @@ export function StringListField({
         <Button
           variant="secondary"
           size="sm"
-          disabled={max !== undefined && items.length >= max}
+          disabled={atMax}
           onClick={() => onChange([...items, ''])}
         >
           {addLabel}
         </Button>
       </div>
+
+      {max !== undefined && (
+        <p className="text-xs text-ink-500">
+          {atMax
+            ? `Maximum of ${max} reached — remove one to add another.`
+            : `${items.length} of ${max} added.`}
+        </p>
+      )}
 
       {hint && <p className="-mt-1 text-xs text-ink-500">{hint}</p>}
 

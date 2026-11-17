@@ -1,8 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'motion/react'
-import { cn } from '@/lib/utils'
+import { motion, useReducedMotion } from 'motion/react'
 import { ButtonLink, Container, Eyebrow } from '@/components/site/ui'
 import { RevealLines } from '@/components/site/reveal'
 import { hasCta, type Cta } from '@/features/marketing/sections'
@@ -53,7 +52,12 @@ export function Hero({
   /** The Zilkee study's slug, for the link to the case study. */
   slug?: string
 }) {
-  const lines = headline?.split('\n').filter(Boolean) ?? []
+  const lines = (headline ?? '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+  const reduced = useReducedMotion()
+  const still = reduced === true
   const caseStudy =
     results && results.length > 0 && slug
       ? { results, resultsPeriod, slug }
@@ -64,28 +68,27 @@ export function Hero({
 
   return (
     <section className="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-28">
+      {/* Measured grid, masked to the top edge — ruling, not ambient glow. */}
       <div
-        aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[34rem] [mask-image:linear-gradient(to_bottom,black,transparent)] opacity-[0.55]"
+        aria-hidden
       >
         <div className="grid-lines h-full w-full" />
       </div>
 
       <Container>
-        <div
-          className={cn(
-            'grid items-center gap-16',
-            'lg:grid-cols-[0.95fr_1.05fr] lg:gap-12',
-          )}
-        >
-          <div className="max-w-xl">
-            <h1 className="tracking-tightest text-[3.25rem] leading-[1.02] font-semibold text-balance text-foreground sm:text-[4.25rem] lg:text-[4.75rem]">
+        <div className="grid items-center gap-16 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
+          {/* Copy */}
+        <div className="max-w-xl">
+            {lines.length > 0 && (
+            <h1 className="tracking-tightest text-[3.25rem] leading-[1.02] font-semibold text-balance text-foreground md:text-6xl lg:text-[4.5rem]">
               <RevealLines lines={lines} />
             </h1>
+          )}
 
             {subhead?.trim() && (
               <motion.p
-                initial={{ opacity: 0, y: 12 }}
+                initial={still ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.5, ease }}
                 className="mt-8 max-w-lg text-lg leading-relaxed text-pretty text-muted-foreground"
@@ -96,13 +99,13 @@ export function Hero({
 
             {(hasCta(primaryCta) || hasCta(secondaryCta)) && (
               <motion.div
-                initial={{ opacity: 0, y: 12 }}
+                initial={still ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.65, ease }}
                 className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
               >
                 {hasCta(primaryCta) && (
-                  <ButtonLink href={primaryCta.href} withArrow>
+                  <ButtonLink href={primaryCta.href} variant="primary" withArrow>
                     {primaryCta.label}
                   </ButtonLink>
                 )}

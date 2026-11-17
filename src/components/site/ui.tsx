@@ -97,11 +97,11 @@ export function Eyebrow({
   )
 }
 
-/** Animated number that counts up from 0 when scrolled into view. */
+/** The server renders the real value first; initialising with 0 meant crawlers and no-JS readers saw +0% on the Zilkee case study. The count-up on scroll is an enhancement only and ends at the real value. */
 export function CountUp({ value, className }: { value: string; className?: string }) {
   const ref = useRef<HTMLSpanElement>(null)
   const inView = useInView(ref, { once: true, margin: '0px 0px -15% 0px' })
-  const [display, setDisplay] = useState(value.replace(/[\d.]+/, '0'))
+  const [display, setDisplay] = useState(value)
   const mv = useMotionValue(0)
 
   // Parse the numeric portion and its surrounding prefix/suffix (e.g. "$10M+",

@@ -38,7 +38,7 @@ export async function SiteFooter() {
 
   return (
     <footer className="border-t border-border bg-surface">
-      <div className="mx-auto w-full max-w-[76rem] px-6 py-16 md:px-8 md:py-20">
+      <div className="mx-auto w-full max-w-[100rem] px-6 py-16 md:px-8 md:py-20">
         <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
           <div className="max-w-sm">
             <LogoLink asset={chrome.logo} siteName={chrome.siteName} />

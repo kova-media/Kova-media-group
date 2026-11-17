@@ -29,8 +29,7 @@ export function ButtonLink({
    * is a bug, not a style choice. Everything else stays neutral.
    */
   const variants = {
-    primary:
-      'bg-cta text-cta-foreground px-6 py-3 hover:bg-cta-hover',
+    primary: 'bg-cta text-cta-foreground px-6 py-3 hover:bg-cta-hover',
     secondary:
       'bg-transparent text-foreground px-6 py-3 border border-border-strong hover:border-foreground hover:bg-foreground/[0.03]',
     ghost: 'text-foreground px-1 py-1 hover:text-brand',

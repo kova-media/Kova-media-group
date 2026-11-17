@@ -58,10 +58,9 @@ export function Hero({
     .filter(Boolean)
   const reduced = useReducedMotion()
   const still = reduced === true
-  const caseStudy =
-    results && results.length > 0 && slug
-      ? { results, resultsPeriod, slug }
-      : null
+  const caseStudy = results && results.length > 0 && slug
+  ? { results, resultsPeriod, slug }
+  : null
   const eyebrowLabel = caseStudy?.resultsPeriod
     ? `Zilkee — ${caseStudy.resultsPeriod}`
     : 'Zilkee'

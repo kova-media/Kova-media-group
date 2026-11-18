@@ -177,7 +177,7 @@ export function CaseStudyIndex({ studies }: { studies?: CaseStudy[] }) {
                 {study.summary && <p className="mt-5 leading-relaxed text-pretty text-muted-foreground">{study.summary}</p>}
               </div>
               {study.results.length > 0 && <div className="flex gap-x-12 gap-y-6 lg:justify-end lg:pt-1">
-                {study.results.slice(0, 2).map((result) => <div key={result.label} className="border-t-2 border-brand pt-4">
+                {study.results.map((result) => <div key={result.label} className="border-t-2 border-brand pt-4">
                   <div className="text-3xl font-semibold tracking-tight text-foreground tabular-nums sm:text-4xl">{result.value}</div>
                   <div className="mt-2 max-w-[10rem] text-[0.875rem] leading-snug text-muted-foreground">{result.label}</div>
                 </div>)}

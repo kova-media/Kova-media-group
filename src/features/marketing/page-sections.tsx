@@ -174,12 +174,12 @@ export function CaseStudyIndex({ studies }: { studies?: CaseStudy[] }) {
                   {study.brand}
                   <ArrowUpRight className="h-7 w-7 shrink-0 text-muted-foreground transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-brand" aria-hidden />
                 </h2>
-                {study.summary && <p className="mt-5 leading-relaxed text-pretty text-muted-foreground">{study.summary}</p>}
+                {study.summary && <p className="mt-5 text-lg leading-relaxed text-pretty text-foreground/85">{study.summary}</p>}
               </div>
-              {study.results.length > 0 && <div className="flex gap-x-12 gap-y-6 lg:justify-end lg:pt-1">
+              {study.results.length > 0 && <div className="flex flex-wrap gap-x-12 gap-y-6 lg:justify-evenly lg:pt-1 lg:w-[36rem] lg:shrink-0">
                 {study.results.map((result) => <div key={result.label} className="border-t-2 border-brand pt-4">
                   <div className="text-3xl font-semibold tracking-tight text-foreground tabular-nums sm:text-4xl">{result.value}</div>
-                  <div className="mt-2 max-w-[10rem] text-[0.875rem] leading-snug text-muted-foreground">{result.label}</div>
+                  <div className="mt-2 max-w-[10rem] text-[0.9375rem] leading-snug text-foreground/70">{result.label}</div>
                 </div>)}
               </div>}
             </Link>

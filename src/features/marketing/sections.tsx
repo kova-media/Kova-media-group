@@ -30,7 +30,7 @@ export function hasCta(cta: Cta | undefined | null): cta is Cta {
   return Boolean(cta?.label?.trim() && cta?.href?.trim())
 }
 
-/* ---------------------------------------------------------------------- Client logos */
+/* ------------------------------------------------------------------ Client logos */
 
 export function ClientMarquee({
   caption,
@@ -134,7 +134,7 @@ export function MetricsRow({
   )
 }
 
-/* ---------------------------------------------------------------------- Testimonials */
+/* ------------------------------------------------------------------ Testimonials */
 
 /**
  * Client testimonials, from the CMS library.
@@ -169,9 +169,9 @@ export function Testimonials({
           </Reveal>
         )}
         {/* Quotes are set as quotes, not as cards: a teal rule opens each one,
-          the type is large enough to actually be read, and attribution sits
-          on a single line beneath. Three bordered boxes in a row would put
-          this section in the same shape as every other one on the site. */}
+      the type is large enough to actually be read, and attribution sits
+      on a single line beneath. Three bordered boxes in a row would put
+      this section in the same shape as every other one on the site. */}
         <RevealGroup
           className={cn(
             'grid gap-x-12 gap-y-14',

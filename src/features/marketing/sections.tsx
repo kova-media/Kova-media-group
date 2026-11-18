@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Plus } from 'lucide-react'
 import { Container, CountUp, ButtonLink } from '@/components/site/ui'
+import { Reveal, RevealGroup, RevealItem } from '@/components/site/reveal'
 import { cn } from '@/lib/utils'
 
 /**
@@ -48,11 +49,11 @@ export function ClientMarquee({
     <section className="border-y border-border bg-background py-10">
       <Container>
         {caption?.trim() && (
-          <div>
+          <Reveal>
             <p className="mb-10 text-[0.8125rem] font-medium tracking-[0.08em] text-foreground/65 uppercase">
               {caption}
             </p>
-          </div>
+          </Reveal>
         )}
         <div className="flex flex-wrap gap-x-14 gap-y-4">
           {names.map((name, i) => (
@@ -93,12 +94,12 @@ export function MetricsRow({
   if (figures.length === 0) return null
 
   return (
-    <section className="bg-background py-16 md:py-24">
+    <section className="bg-background py-24 md:py-32">
       <Container>
         {(heading?.trim() || body?.trim()) && (
-          <div className="max-w-3xl">
+          <Reveal className="max-w-3xl">
             {heading?.trim() && (
-              <h2 className="text-3xl font-semibold tracking-tight text-balance text-foreground md:text-4xl">
+              <h2 className="text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl lg:text-6xl">
                 {heading}
               </h2>
             )}
@@ -107,27 +108,27 @@ export function MetricsRow({
                 {body}
               </p>
             )}
-          </div>
+          </Reveal>
         )}
 
-        <div
+        <RevealGroup
           className={cn(
             'grid grid-cols-2 gap-x-10 gap-y-12 md:grid-cols-4',
             heading?.trim() || body?.trim() ? 'mt-16 md:mt-20' : '',
           )}
         >
           {figures.map((m) => (
-            <div key={m.label} className="border-t-2 border-brand pt-6">
+            <RevealItem key={m.label} className="border-t-2 border-brand pt-6">
               <CountUp
                 value={m.value}
-                className="block text-4xl font-semibold tracking-tight text-foreground tabular-nums md:text-5xl"
+                className="block text-5xl font-semibold tracking-tight text-foreground tabular-nums md:text-6xl"
               />
               <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
                 {m.label}
               </p>
-            </div>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       </Container>
     </section>
   )
@@ -158,20 +159,20 @@ export function Testimonials({
   if (testimonials.length === 0) return null
 
   return (
-    <section className="bg-surface py-16 md:py-24">
+    <section className="bg-surface py-24 md:py-32">
       <Container>
         {heading?.trim() && (
-          <div className="max-w-3xl">
-            <h2 className="text-3xl font-semibold tracking-tight text-balance text-foreground md:text-4xl">
+          <Reveal className="max-w-3xl">
+            <h2 className="text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl lg:text-6xl">
               {heading}
             </h2>
-          </div>
+          </Reveal>
         )}
         {/* Quotes are set as quotes, not as cards: a teal rule opens each one,
             the type is large enough to actually be read, and attribution sits
             on a single line beneath. Three bordered boxes in a row would put
             this section in the same shape as every other one on the site. */}
-        <div
+        <RevealGroup
           className={cn(
             'grid gap-x-12 gap-y-14',
             heading?.trim() ? 'mt-14 md:mt-20' : '',
@@ -185,7 +186,10 @@ export function Testimonials({
           )}
         >
           {testimonials.map((t) => (
-            <div key={t.quote} className="flex flex-col border-t-2 border-brand pt-7">
+            <RevealItem
+              key={t.quote}
+              className="flex flex-col border-t-2 border-brand pt-7"
+            >
               <p className="text-xl leading-[1.5] text-pretty text-foreground">
                 {t.quote}
               </p>
@@ -193,9 +197,9 @@ export function Testimonials({
                 <span className="font-medium text-foreground">{t.name}</span>
                 {t.role ? `, ${t.role}` : ''}
               </p>
-            </div>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       </Container>
     </section>
   )
@@ -226,17 +230,17 @@ export function Faq({
   return (
     <section
       className={cn(
-        'py-16 md:py-24',
+        'py-24 md:py-32',
         tone === 'surface' ? 'bg-surface' : 'bg-background',
       )}
     >
       <Container className="max-w-4xl">
         {heading?.trim() && (
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-tight text-balance text-foreground md:text-4xl">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <h2 className="text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
               {heading}
             </h2>
-          </div>
+          </Reveal>
         )}
         <div
           className={cn(
@@ -312,10 +316,16 @@ export function FinalCta({
   if (!heading?.trim()) return null
 
   return (
-    <section className="relative overflow-hidden bg-navy py-16 md:py-24">
+    <section className="relative overflow-hidden bg-navy py-24 md:py-32">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-64 [mask-image:linear-gradient(to_bottom,black,transparent)] opacity-[0.07]"
+        aria-hidden
+      >
+        <div className="grid-lines-light h-full w-full" />
+      </div>
       <Container className="relative">
-        <div className="max-w-3xl">
-          <h2 className="text-3xl font-semibold tracking-tight text-balance text-white md:text-4xl">
+        <Reveal className="max-w-3xl">
+          <h2 className="text-4xl font-semibold tracking-tight text-balance text-white md:text-5xl lg:text-6xl">
             {heading}
           </h2>
           {body?.trim() && (
@@ -328,7 +338,7 @@ export function FinalCta({
               {hasCta(primaryCta) && (
                 <Link
                   href={primaryCta.href}
-                  className="group inline-flex items-center justify-center gap-2 rounded-sm bg-cta px-7 py-3.5 text-[0.95rem] font-medium text-cta-foreground transition-all duration-300 hover:bg-cta-hover"
+                  className="group inline-flex items-center justify-center gap-2 rounded-full bg-cta px-7 py-3.5 text-[0.95rem] font-medium text-cta-foreground transition-all duration-300 hover:bg-cta-hover"
                 >
                   {primaryCta.label}
                 </Link>
@@ -345,7 +355,7 @@ export function FinalCta({
               )}
             </div>
           )}
-        </div>
+        </Reveal>
       </Container>
     </section>
   )

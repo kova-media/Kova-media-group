@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import type { CaseStudy } from '@/lib/site-data'
 import { Container, Eyebrow, ButtonLink } from '@/components/site/ui'
+import { Reveal, RevealGroup, RevealItem } from '@/components/site/reveal'
 import { FlowDiagram, type FlowStep } from '@/components/site/mockups'
 import { hasCta, type Cta } from '@/features/marketing/sections'
 
@@ -55,9 +56,9 @@ export function ServicesPreview({
     <section className="bg-surface py-24 md:py-32">
       <Container>
         {(heading?.trim() || body?.trim()) && (
-          <div className="max-w-3xl">
+          <Reveal className="max-w-3xl">
             {heading?.trim() && (
-              <h2 className="text-3xl font-semibold tracking-tight text-balance text-foreground md:text-4xl">
+              <h2 className="text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl lg:text-6xl">
                 {heading}
               </h2>
             )}
@@ -66,13 +67,13 @@ export function ServicesPreview({
                 {body}
               </p>
             )}
-          </div>
+          </Reveal>
         )}
 
         {items.length > 0 && (
-          <div className="mt-16 border-t border-border-strong md:mt-20">
+          <RevealGroup className="mt-16 border-t border-border-strong md:mt-20">
             {items.map((service, i) => (
-              <div key={`${service.title}-${i}`}>
+              <RevealItem key={`${service.title}-${i}`}>
                 <Link
                   href={service.href?.trim() || '/services'}
                   className="group grid gap-x-12 gap-y-6 border-b border-border py-10 transition-colors duration-300 hover:border-foreground/25 md:grid-cols-[3rem_1fr_18rem] md:py-14"
@@ -116,9 +117,9 @@ export function ServicesPreview({
                     </ul>
                   )}
                 </Link>
-              </div>
+              </RevealItem>
             ))}
-          </div>
+          </RevealGroup>
         )}
       </Container>
     </section>
@@ -170,7 +171,7 @@ export function FeaturedCaseStudies({
         {/* The label sits opposite the index link on one line, rather than
             stacked above the headline. Same information, different move. */}
         {(eyebrow?.trim() || allWorkLabel?.trim()) && (
-          <div className="flex items-baseline justify-between gap-6 border-b border-border-strong pb-6">
+          <Reveal className="flex items-baseline justify-between gap-6 border-b border-border-strong pb-6">
             {eyebrow?.trim() ? <Eyebrow>{eyebrow}</Eyebrow> : <span />}
             {allWorkLabel?.trim() && (
               <Link
@@ -181,13 +182,13 @@ export function FeaturedCaseStudies({
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
             )}
-          </div>
+          </Reveal>
         )}
 
         {(heading?.trim() || body?.trim()) && (
-          <div className="mt-12 max-w-3xl">
+          <Reveal className="mt-12 max-w-3xl">
             {heading?.trim() && (
-              <h2 className="text-3xl font-semibold tracking-tight text-balance text-foreground md:text-4xl">
+              <h2 className="text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl lg:text-6xl">
                 {heading}
               </h2>
             )}
@@ -196,12 +197,12 @@ export function FeaturedCaseStudies({
                 {body}
               </p>
             )}
-          </div>
+          </Reveal>
         )}
 
-        <div className="mt-16 md:mt-20">
+        <RevealGroup className="mt-16 md:mt-20">
           {featured.map((cs) => (
-            <div key={cs.slug}>
+            <RevealItem key={cs.slug}>
               <Link
                 href={`/case-studies/${cs.slug}`}
                 className="group grid gap-x-12 gap-y-8 border-t border-border py-12 transition-colors duration-300 last:border-b hover:border-foreground/25 md:grid-cols-[1fr_auto] md:py-16"
@@ -244,9 +245,9 @@ export function FeaturedCaseStudies({
                   </div>
                 )}
               </Link>
-            </div>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       </Container>
     </section>
   )
@@ -281,14 +282,14 @@ export function ProcessPreview({
   if (!heading?.trim() && items.length === 0) return null
 
   return (
-    <section className="bg-surface py-16 md:py-24">
+    <section className="bg-surface py-24 md:py-32">
       <Container>
         <div className="grid gap-14 lg:grid-cols-[1fr_minmax(0,24rem)] lg:gap-24">
           <div>
             {(heading?.trim() || body?.trim()) && (
-              <div>
+              <Reveal>
                 {heading?.trim() && (
-                  <h2 className="text-3xl font-semibold tracking-tight text-balance text-foreground md:text-4xl">
+                  <h2 className="text-4xl font-semibold tracking-tight text-balance text-foreground md:text-5xl">
                     {heading}
                   </h2>
                 )}
@@ -297,12 +298,12 @@ export function ProcessPreview({
                     {body}
                   </p>
                 )}
-              </div>
+              </Reveal>
             )}
 
             <div className="mt-14">
               {items.map((p, i) => (
-                <div key={`${p.title}-${i}`}>
+                <Reveal key={`${p.title}-${i}`} delay={i * 0.05}>
                   <div className="grid grid-cols-[2.5rem_1fr] gap-x-6 border-t border-border py-8 last:border-b">
                     <span className="font-mono text-sm text-brand tabular-nums">
                       {i + 1}
@@ -318,7 +319,7 @@ export function ProcessPreview({
                       )}
                     </div>
                   </div>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -343,22 +344,22 @@ export function AboutPreview({ statement, cta }: { statement?: string; cta?: Cta
   if (!statement?.trim()) return null
 
   return (
-    <section className="bg-background py-16 md:py-20">
+    <section className="bg-background py-24 md:py-32">
       <Container>
         <div className="mx-auto max-w-3xl">
-          <div>
+          <Reveal>
             <p className="text-2xl leading-[1.4] font-medium tracking-tight text-balance text-foreground md:text-4xl md:leading-[1.35]">
               {statement}
             </p>
-          </div>
+          </Reveal>
           {hasCta(cta) && (
-            <div>
+            <Reveal delay={0.1}>
               <div className="mt-12">
                 <ButtonLink href={cta.href} variant="secondary" withArrow>
                   {cta.label}
                 </ButtonLink>
               </div>
-            </div>
+            </Reveal>
           )}
         </div>
       </Container>

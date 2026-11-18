@@ -11,7 +11,6 @@ import { ContactForm } from '@/features/marketing/contact-form/contact-form'
 import { RichTextRenderer } from '@/features/sections/rich-text/rich-text'
 import type { RichText } from '@/server/content/schemas/rich-text'
 import type { CaseStudy } from '@/lib/site-data'
-import { cn } from '@/lib/utils'
 
 import type { Flow, ProcessStep } from './home/sections'
 
@@ -157,11 +156,7 @@ export function ProcessDetail({ steps, asideEyebrow, asideBody, flow }: { steps?
   )
 }
 
-export function CaseStudyIndex({
-  studies,
-}: {
-  studies?: (CaseStudy & { heroImage?: ImageAsset | null })[]
-}) {
+export function CaseStudyIndex({ studies }: { studies?: CaseStudy[] }) {
   const items = studies ?? []
   if (items.length === 0) return null
   return (
@@ -169,25 +164,7 @@ export function CaseStudyIndex({
       <Container>
         <div className="flex flex-col">
           {items.map((study, i) => <div key={study.slug}>
-            <Link
-              href={`/case-studies/${study.slug}`}
-              className={cn(
-                'group grid gap-x-12 gap-y-8 border-t border-border py-12 transition-colors duration-300 last:border-b hover:border-foreground/25 sm:py-16',
-                study.heroImage
-                  ? 'md:grid-cols-[10rem_1fr_auto]'
-                  : 'lg:grid-cols-[1fr_auto]',
-              )}
-            >
-              {study.heroImage && (
-                <div className="h-28 w-40 bg-surface">
-                  <MediaImage
-                    asset={study.heroImage}
-                    altOverride={study.brand}
-                    sizes="160px"
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-              )}
+            <Link href={`/case-studies/${study.slug}`} className="group grid gap-x-12 gap-y-8 border-t border-border py-12 transition-colors duration-300 last:border-b hover:border-foreground/25 sm:py-16 lg:grid-cols-[1fr_auto]">
               <div className="max-w-2xl">
                 <div className="flex items-center gap-3 text-[0.8125rem] font-medium tracking-[0.08em] text-muted-foreground uppercase">
                   <span className="font-mono tabular-nums">{i + 1}</span>

@@ -82,13 +82,34 @@ function resolveLabels(labels: Partial<CaseStudyLabels> | undefined) {
 }
 
 /**
+ * A case study row, with its hero image resolved.
+ *
+ * `CaseStudyView` is the bundled shape and stays as it is — it is what the
+ * index and homepage rows read. The rows need the hero image too, so they can
+ * show a thumbnail; the narrative fields stay detail-only.
+ */
+export type CaseStudyListView = CaseStudyView & {
+  heroImage: MediaAssetDto | null
+}
+
+/**
  * Published case studies, featured first, then by position.
  *
  * An empty result is an empty result: the bands that read this render nothing
  * rather than showing studies the owner has unpublished or deleted.
  */
-export async function getCaseStudyList(): Promise<CaseStudyView[]> {
+export async function getCaseStudyList(): Promise<CaseStudyListView[]> {
   const published = await read(() => getPublishedCaseStudies(), [], 'case study list')
+
+  // One id at most per study, and only when the study actually has an image —
+  // the resolver is separately cached and tagged, so this costs nothing warm.
+  const heroImageIds = published
+    .map((study) => study.heroImageId)
+    .filter((id): id is string => Boolean(id))
+  const media =
+    heroImageIds.length > 0
+      ? await getMediaAssets(heroImageIds)
+      : new Map<string, MediaAssetDto>()
 
   return published.map((study) => ({
     slug: study.slug,
@@ -106,6 +127,7 @@ export async function getCaseStudyList(): Promise<CaseStudyView[]> {
     results: study.results,
     resultsPeriod: study.resultsPeriod,
     accent: study.accent || DEFAULT_CASE_STUDY_ACCENT,
+    heroImage: study.heroImageId ? (media.get(study.heroImageId) ?? null) : null,
   }))
 }
 

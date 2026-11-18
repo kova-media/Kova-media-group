@@ -11,7 +11,7 @@ import {
 import { cn } from '@/lib/utils'
 import { MediaImage } from '@/components/media/media-image'
 import { Container, Eyebrow, CountUp } from '@/components/site/ui'
-import { Reveal, RevealLines } from '@/components/site/reveal'
+import { RevealLines } from '@/components/site/reveal'
 import { FinalCta } from '@/features/marketing/sections'
 import { getMarketingPage } from '@/server/content/marketing-content'
 
@@ -163,11 +163,11 @@ export default async function CaseStudyPage({
           <h1 className="mt-6 max-w-4xl text-5xl leading-[0.95] font-medium tracking-tight sm:text-6xl md:text-7xl">
             <RevealLines lines={[study.brand]} />
           </h1>
-          <Reveal delay={0.15}>
+          <div>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground">
               {study.summary}
             </p>
-          </Reveal>
+          </div>
 
           {study.results.length > 0 && (
             <div
@@ -198,14 +198,14 @@ export default async function CaseStudyPage({
               study has one today, so nothing about the page changes until one
               is uploaded — and there is no placeholder frame in the meantime. */}
           {study.heroImage && (
-            <Reveal className="mt-14">
+            <div className="mt-14">
               <MediaImage
                 asset={study.heroImage}
                 sizes="(max-width: 768px) 100vw, 768px"
                 priority
                 className="mx-auto max-h-[480px] max-w-[640px] w-auto"
               />
-            </Reveal>
+            </div>
           )}
           <div className="pb-16" />
         </Container>
@@ -215,18 +215,18 @@ export default async function CaseStudyPage({
         <Container>
           <div className="flex flex-col gap-14">
             {blocks.map((block) => (
-              <Reveal key={block.label}>
+              <div key={block.label}>
                 <div className="grid gap-4 sm:grid-cols-[8rem_1fr] sm:gap-8">
                   <Eyebrow>{block.label}</Eyebrow>
                   <p className="max-w-2xl text-lg leading-relaxed text-pretty text-foreground/85">
                     {block.body}
                   </p>
                 </div>
-              </Reveal>
+              </div>
             ))}
 
             {study.strategy.length > 0 && (
-              <Reveal>
+              <div>
                 <div className="grid gap-4 sm:grid-cols-[8rem_1fr] sm:gap-8">
                   <Eyebrow>{study.labels.strategy}</Eyebrow>
                   <ul className="flex flex-col gap-3">
@@ -244,7 +244,7 @@ export default async function CaseStudyPage({
                     ))}
                   </ul>
                 </div>
-              </Reveal>
+              </div>
             )}
           </div>
         </Container>

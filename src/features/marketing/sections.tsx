@@ -193,10 +193,7 @@ export function Testimonials({
           )}
         >
           {testimonials.map((t) => (
-            <div
-              key={t.quote}
-              className="flex flex-col border-t-2 border-brand pt-7"
-            >
+            <div key={t.quote} className="flex flex-col border-t-2 border-brand pt-7">
               <p className="text-xl leading-[1.5] text-pretty text-foreground">
                 {t.quote}
               </p>

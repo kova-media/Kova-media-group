@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { ArrowUpRight, Check, Clock, Mail, MessageSquare } from 'lucide-react'
 import { Container, Eyebrow } from '@/components/site/ui'
-import { Reveal, RevealGroup, RevealItem, RevealLines } from '@/components/site/reveal'
+import { RevealLines } from '@/components/site/reveal'
 import { FlowDiagram } from '@/components/site/mockups'
 import { MediaImage, type ImageAsset } from '@/components/media/media-image'
 import { BookingEmbed } from '@/features/marketing/booking-embed'
@@ -18,12 +18,12 @@ export function ProseBand({ heading, body }: { heading?: string; body?: RichText
   const nodes = body ?? []
   if (nodes.length === 0 && !heading?.trim()) return null
   return (
-    <section className="pb-24 sm:pb-32">
+    <section className="pb-16 sm:pb-24">
       <Container>
-        <Reveal className="max-w-2xl">
+        <div className="max-w-2xl">
           {heading?.trim() && <h2 className="mb-6 text-2xl font-medium tracking-tight text-foreground">{heading}</h2>}
           <RichTextRenderer nodes={nodes} className="leading-relaxed" />
-        </Reveal>
+        </div>
       </Container>
     </section>
   )
@@ -33,23 +33,23 @@ export function ValuesBand({ eyebrow, statement, items }: { eyebrow?: string; st
   const values = (items ?? []).filter((item) => item.title?.trim())
   if (!statement?.trim() && values.length === 0) return null
   return (
-    <section className="py-20 sm:py-28">
+    <section className="py-16 sm:py-20">
       <Container>
         <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
-          <Reveal className="lg:sticky lg:top-28 lg:self-start">
+          <div className="lg:sticky lg:top-28 lg:self-start">
             {eyebrow?.trim() && <Eyebrow>{eyebrow}</Eyebrow>}
             {statement?.trim() && <p className="mt-7 text-2xl leading-[1.35] font-medium tracking-tight text-balance text-foreground sm:text-3xl">{statement}</p>}
-          </Reveal>
-          <RevealGroup className="flex flex-col">
+          </div>
+          <div className="flex flex-col">
             {values.map((value, index) => (
-              <RevealItem key={`${value.title}-${index}`}>
+              <div key={`${value.title}-${index}`}>
                 <div className="grid gap-x-10 gap-y-3 border-t border-border py-8 last:border-b sm:grid-cols-[13rem_1fr]">
                   <h3 className="text-lg font-medium tracking-tight text-balance text-foreground">{value.title}</h3>
                   {value.body?.trim() && <p className="max-w-xl leading-relaxed text-pretty text-muted-foreground">{value.body}</p>}
                 </div>
-              </RevealItem>
+              </div>
             ))}
-          </RevealGroup>
+          </div>
         </div>
       </Container>
     </section>
@@ -92,7 +92,7 @@ export function ServicesList({ includesLabel, services }: { includesLabel?: stri
             const Icon = SERVICE_ICONS[index % SERVICE_ICONS.length] ?? Mail
             const points = (service.points ?? []).filter(Boolean)
             return (
-              <Reveal key={`${service.title}-${index}`}>
+              <div key={`${service.title}-${index}`}>
                 <article className="grid gap-8 border-b border-border py-14 last:border-0 md:grid-cols-[3.5rem_1fr_20rem] md:gap-12 md:py-20">
                   <div className="flex items-center gap-5 md:flex-col md:items-start md:gap-7">
                     <span className="font-mono text-sm text-muted-foreground tabular-nums">{index + 1}</span>
@@ -110,7 +110,7 @@ export function ServicesList({ includesLabel, services }: { includesLabel?: stri
                     </ul>
                   </div>}
                 </article>
-              </Reveal>
+              </div>
             )
           })}
         </div>
@@ -122,14 +122,14 @@ export function ServicesList({ includesLabel, services }: { includesLabel?: stri
 export function ServicesClosing({ label, statement, body }: { label?: string; statement?: string; body?: string }) {
   if (!statement?.trim() && !body?.trim()) return null
   return (
-    <section className="pb-24 sm:pb-32">
-      <Container><Reveal><div className="grid gap-x-12 gap-y-8 border-t-2 border-brand pt-10 md:grid-cols-[3.5rem_1fr]">
+    <section className="pb-16 sm:pb-24">
+      <Container><div><div className="grid gap-x-12 gap-y-8 border-t-2 border-brand pt-10 md:grid-cols-[3.5rem_1fr]">
         {label?.trim() ? <span className="text-[0.8125rem] font-medium tracking-[0.08em] text-foreground/65 uppercase md:pt-2">{label}</span> : <span />}
         <div>
           {statement?.trim() && <p className="max-w-3xl text-2xl leading-[1.4] font-medium tracking-tight text-balance text-foreground sm:text-3xl">{statement}</p>}
           {body?.trim() && <p className="mt-7 max-w-2xl leading-relaxed text-pretty text-muted-foreground">{body}</p>}
         </div>
-      </div></Reveal></Container>
+      </div></div></Container>
     </section>
   )
 }
@@ -138,19 +138,19 @@ export function ProcessDetail({ steps, asideEyebrow, asideBody, flow }: { steps?
   const items = (steps ?? []).filter((step) => step.title?.trim())
   if (items.length === 0) return null
   return (
-    <section className="pb-24 sm:pb-32">
+    <section className="pb-16 sm:pb-24">
       <Container><div className="grid gap-16 lg:grid-cols-[1fr_minmax(0,26rem)] lg:gap-20">
-        <div><RevealGroup className="flex flex-col">
-          {items.map((item, index) => <RevealItem key={`${item.title}-${index}`}><div className="grid grid-cols-[3rem_1fr] gap-x-6 border-t border-border py-9 last:border-b">
+        <div><div className="flex flex-col">
+          {items.map((item, index) => <div key={`${item.title}-${index}`}><div className="grid grid-cols-[3rem_1fr] gap-x-6 border-t border-border py-9 last:border-b">
             <span className="font-mono text-sm text-brand tabular-nums">{index + 1}</span>
             <div><h2 className="text-2xl font-medium tracking-tight text-foreground">{item.title}</h2>{item.description?.trim() && <p className="mt-3 max-w-xl leading-relaxed text-pretty text-muted-foreground">{item.description}</p>}</div>
-          </div></RevealItem>)}
-        </RevealGroup></div>
-        <div className="lg:sticky lg:top-28 lg:self-start"><Reveal>
+          </div></div>)}
+        </div></div>
+        <div className="lg:sticky lg:top-28 lg:self-start"><div>
           {asideEyebrow?.trim() && <Eyebrow>{asideEyebrow}</Eyebrow>}
           {asideBody?.trim() && <p className="mt-5 leading-relaxed text-pretty text-muted-foreground">{asideBody}</p>}
           <div className="mt-8"><FlowDiagram title={flow?.title} steps={flow?.steps} /></div>
-        </Reveal></div>
+        </div></div>
       </div></Container>
     </section>
   )
@@ -160,10 +160,10 @@ export function CaseStudyIndex({ studies }: { studies?: CaseStudy[] }) {
   const items = studies ?? []
   if (items.length === 0) return null
   return (
-    <section className="pb-24 sm:pb-32">
+    <section className="pb-16 sm:pb-24">
       <Container>
-        <RevealGroup className="flex flex-col">
-          {items.map((study, i) => <RevealItem key={study.slug}>
+        <div className="flex flex-col">
+          {items.map((study, i) => <div key={study.slug}>
             <Link href={`/case-studies/${study.slug}`} className="group grid gap-x-12 gap-y-8 border-t border-border py-12 transition-colors duration-300 last:border-b hover:border-foreground/25 sm:py-16 lg:grid-cols-[1fr_auto]">
               <div className="max-w-2xl">
                 <div className="flex items-center gap-3 text-[0.8125rem] font-medium tracking-[0.08em] text-muted-foreground uppercase">
@@ -183,8 +183,8 @@ export function CaseStudyIndex({ studies }: { studies?: CaseStudy[] }) {
                 </div>)}
               </div>}
             </Link>
-          </RevealItem>)}
-        </RevealGroup>
+          </div>)}
+        </div>
       </Container>
     </section>
   )
@@ -198,16 +198,16 @@ export function ContactIntro({ eyebrow, headline, body, points, responseNote, su
       <div>
         {eyebrow?.trim() && <Eyebrow>{eyebrow}</Eyebrow>}
         {lines.length > 0 && <h1 className="mt-6 text-5xl leading-[0.95] font-medium tracking-tight sm:text-6xl"><RevealLines lines={lines} /></h1>}
-        {body?.trim() && <Reveal delay={0.2}><p className="mt-6 max-w-md text-lg leading-relaxed text-pretty text-muted-foreground">{body}</p></Reveal>}
-        {bullets.length > 0 && <Reveal delay={0.3}><ul className="mt-8 flex flex-col gap-3">
+        {body?.trim() && <div><p className="mt-6 max-w-md text-lg leading-relaxed text-pretty text-muted-foreground">{body}</p></div>}
+        {bullets.length > 0 && <div><ul className="mt-8 flex flex-col gap-3">
           {bullets.map((point, i) => <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-foreground/85"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden /><span>{point}</span></li>)}
-        </ul></Reveal>}
-        <Reveal delay={0.4}><div className="mt-10 flex flex-col gap-4 border-t border-border pt-8">
+        </ul></div>}
+        <div><div className="mt-10 flex flex-col gap-4 border-t border-border pt-8">
           <a href={`mailto:${contactEmail}`} className="inline-flex items-center gap-3 text-sm text-foreground transition-colors hover:text-primary"><Mail className="h-4 w-4 text-muted-foreground" />{contactEmail}</a>
           {responseNote?.trim() && <span className="inline-flex items-center gap-3 text-sm text-muted-foreground"><Clock className="h-4 w-4 text-muted-foreground" />{responseNote}</span>}
-        </div></Reveal>
+        </div></div>
       </div>
-      <Reveal delay={0.2}><ContactForm submitLabel={submitLabel} successHeading={successHeading} successBody={successBody} /></Reveal>
+      <div><ContactForm submitLabel={submitLabel} successHeading={successHeading} successBody={successBody} /></div>
     </div></Container></section>
   )
 }
@@ -218,15 +218,15 @@ export function BookDetails({ points, writeFirstLabel, calendarTitle, notLoading
     <section className="pt-16 pb-24 sm:pt-20 sm:pb-32">
       <Container>
         <div className="grid gap-12 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-16">
-          <Reveal>
+          <div>
             {bullets.length > 0 && <ul className="flex flex-col gap-4">
               {bullets.map((point) => <li key={point} className="flex items-start gap-3"><span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand"><Check className="h-3 w-3" /></span><span className="text-sm leading-relaxed text-foreground/85">{point}</span></li>)}
             </ul>}
             <div className={bullets.length > 0 ? 'mt-8 border-t border-border pt-8' : undefined}>
               <p className="text-sm leading-relaxed text-muted-foreground">{writeFirstLabel?.trim() ? `${writeFirstLabel} ` : ''}<a href={`mailto:${contactEmail}`} className="text-foreground underline decoration-border-strong underline-offset-4 transition-colors hover:decoration-foreground">{contactEmail}</a></p>
             </div>
-          </Reveal>
-          <Reveal delay={0.1}><BookingEmbed url={bookingUrl} title={calendarTitle} notLoadingLabel={notLoadingLabel} openInTabLabel={openInTabLabel} /></Reveal>
+          </div>
+          <div><BookingEmbed url={bookingUrl} title={calendarTitle} notLoadingLabel={notLoadingLabel} openInTabLabel={openInTabLabel} /></div>
         </div>
       </Container>
     </section>

@@ -1,5 +1,4 @@
 import { Container } from './ui'
-import { Reveal } from './reveal'
 
 /**
  * The standard interior-page masthead.
@@ -37,39 +36,33 @@ export function PageHeader({
 }) {
   const standfirst = description ?? intro
   return (
-    <section className="relative overflow-hidden border-b border-border bg-background pt-36 pb-16 md:pt-44 md:pb-24">
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-64 [mask-image:linear-gradient(to_bottom,black,transparent)] opacity-[0.55]"
-        aria-hidden
-      >
-        <div className="grid-lines h-full w-full" />
-      </div>
+    <section className="relative overflow-hidden border-b border-border bg-background pt-36 pb-12 md:pt-44 md:pb-16">
       <Container>
         <div className="grid gap-x-12 gap-y-6 md:grid-cols-[10rem_1fr]">
-          <Reveal className="md:pt-4">
+          <div className="md:pt-4">
             <span className="block text-[0.8125rem] leading-none font-medium tracking-[0.08em] text-foreground/65 uppercase">
               {eyebrow}
             </span>
             <span className="mt-4 hidden h-px w-10 bg-brand md:block" aria-hidden />
-          </Reveal>
+          </div>
 
           <div className="max-w-3xl">
-            <Reveal delay={0.05}>
+            <div>
               <h1 className="tracking-tightest text-5xl leading-[1.03] font-semibold text-balance text-foreground md:text-6xl">
                 {title}
               </h1>
-            </Reveal>
+            </div>
             {standfirst && (
-              <Reveal delay={0.1}>
+              <div>
                 <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground md:text-xl">
                   {standfirst}
                 </p>
-              </Reveal>
+              </div>
             )}
             {children && (
-              <Reveal delay={0.15}>
+              <div>
                 <div className="mt-9">{children}</div>
-              </Reveal>
+              </div>
             )}
           </div>
         </div>

@@ -125,6 +125,7 @@ export async function getCaseStudyList(): Promise<CaseStudyListView[]> {
     automation: '',
     sms: '',
     results: study.results,
+    resultsPeriod: study.resultsPeriod,
     accent: study.accent || DEFAULT_CASE_STUDY_ACCENT,
     heroImage: study.heroImageId ? (media.get(study.heroImageId) ?? null) : null,
   }))

@@ -1,84 +1,8 @@
 'use client'
 
-import { motion, type Variants } from 'motion/react'
-import type { ReactNode } from 'react'
+import { motion } from 'motion/react'
 
 const easeOut = [0.16, 1, 0.3, 1] as const
-
-/** Fade + rise in as the element scrolls into view. */
-export function Reveal({
-  children,
-  className,
-  delay = 0,
-  y = 24,
-  as = 'div',
-}: {
-  children: ReactNode
-  className?: string
-  delay?: number
-  y?: number
-  as?: 'div' | 'span' | 'li' | 'section'
-}) {
-  const MotionTag = motion[as]
-  return (
-    <MotionTag
-      className={className}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '0px 0px -12% 0px' }}
-      transition={{ duration: 0.8, delay, ease: easeOut }}
-    >
-      {children}
-    </MotionTag>
-  )
-}
-
-const containerVariants: Variants = {
-  hidden: {},
-  show: {
-    transition: { staggerChildren: 0.08, delayChildren: 0.05 },
-  },
-}
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: easeOut } },
-}
-
-/** Wrap a group of <RevealItem> children to stagger their entrance. */
-export function RevealGroup({
-  children,
-  className,
-}: {
-  children: ReactNode
-  className?: string
-}) {
-  return (
-    <motion.div
-      className={className}
-      variants={containerVariants}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-    >
-      {children}
-    </motion.div>
-  )
-}
-
-export function RevealItem({
-  children,
-  className,
-}: {
-  children: ReactNode
-  className?: string
-}) {
-  return (
-    <motion.div className={className} variants={itemVariants}>
-      {children}
-    </motion.div>
-  )
-}
 
 /**
  * Reveal text line by line. Pass an array of lines.

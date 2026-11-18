@@ -5,8 +5,6 @@ import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import type { CaseStudy } from '@/lib/site-data'
 import { Container, Eyebrow, ButtonLink } from '@/components/site/ui'
 import { FlowDiagram, type FlowStep } from '@/components/site/mockups'
-import { MediaImage, type ImageAsset } from '@/components/media/media-image'
-import { cn } from '@/lib/utils'
 import { hasCta, type Cta } from '@/features/marketing/sections'
 
 /**
@@ -160,7 +158,7 @@ export function FeaturedCaseStudies({
   heading?: string
   body?: string
   limit?: number
-  studies?: (CaseStudy & { heroImage?: ImageAsset | null })[]
+  studies?: CaseStudy[]
 }) {
   const featured = (studies ?? []).slice(0, Math.max(1, limit))
 
@@ -206,23 +204,8 @@ export function FeaturedCaseStudies({
             <div key={cs.slug}>
               <Link
                 href={`/case-studies/${cs.slug}`}
-                className={cn(
-                  'group grid gap-x-12 gap-y-8 border-t border-border py-12 transition-colors duration-300 last:border-b hover:border-foreground/25 md:py-16',
-                  cs.heroImage
-                    ? 'md:grid-cols-[10rem_1fr_auto]'
-                    : 'md:grid-cols-[1fr_auto]',
-                )}
+                className="group grid gap-x-12 gap-y-8 border-t border-border py-12 transition-colors duration-300 last:border-b hover:border-foreground/25 md:grid-cols-[1fr_auto] md:py-16"
               >
-                {cs.heroImage && (
-                  <div className="h-28 w-40 bg-surface">
-                    <MediaImage
-                      asset={cs.heroImage}
-                      altOverride={cs.brand}
-                      sizes="160px"
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                )}
                 <div className="max-w-xl">
                   {cs.category && (
                     <span className="text-[0.8125rem] font-medium tracking-[0.08em] text-muted-foreground uppercase">

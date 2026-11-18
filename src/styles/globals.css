@@ -149,7 +149,7 @@
    * eyebrow marks, hovers, small emphasis — never a large fill. */
   --brand: #14b8a6;
   --brand-foreground: oklch(0.985 0 0);
-  --brand-muted: #e0f2fe;
+  --brand-muted: #ccfbf1;
 
   /* The booking action. Kova's teal — the same value as the accent, used at
    * full strength on the small number of elements that are the conversion
@@ -165,7 +165,7 @@
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.976 0.001 106);
   --secondary-foreground: oklch(0.205 0 0);
-  --accent: #e0f2fe;
+  --accent: #ccfbf1;
   --accent-foreground: #0f766e;
 
   /* State colours. Used by the admin and by form validation only — the public

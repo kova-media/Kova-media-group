@@ -104,6 +104,7 @@ export async function getCaseStudyList(): Promise<CaseStudyView[]> {
     automation: '',
     sms: '',
     results: study.results,
+    resultsPeriod: study.resultsPeriod,
     accent: study.accent || DEFAULT_CASE_STUDY_ACCENT,
   }))
 }

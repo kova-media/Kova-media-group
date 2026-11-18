@@ -44,33 +44,25 @@ export function ClientMarquee({
   // empty bordered band would read as a broken section.
   if (names.length === 0) return null
 
-  const row = [...names, ...names]
-
   return (
-    <section className="border-y border-border bg-background py-14">
+    <section className="border-y border-border bg-background py-10">
       <Container>
         {caption?.trim() && (
           <div>
-            <p className="mb-10 text-center text-[0.8125rem] font-medium tracking-[0.08em] text-foreground/65 uppercase">
+            <p className="mb-10 text-[0.8125rem] font-medium tracking-[0.08em] text-foreground/65 uppercase">
               {caption}
             </p>
           </div>
         )}
-        <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
-          <motion.div
-            className="flex w-max items-center gap-14"
-            animate={{ x: ['0%', '-50%'] }}
-            transition={{ duration: 32, ease: 'linear', repeat: Infinity }}
-          >
-            {row.map((name, i) => (
-              <span
-                key={`${name}-${i}`}
-                className="text-lg font-semibold tracking-tight whitespace-nowrap text-foreground/35 transition-colors hover:text-foreground/70"
-              >
-                {name}
-              </span>
-            ))}
-          </motion.div>
+        <div className="flex flex-wrap gap-x-14 gap-y-4">
+          {names.map((name, i) => (
+            <span
+              key={`${name}-${i}`}
+              className="text-lg font-semibold text-foreground/70"
+            >
+              {name}
+            </span>
+          ))}
         </div>
       </Container>
     </section>

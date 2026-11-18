@@ -1,38 +1,43 @@
 'use client'
 
-import { motion, type Variants } from 'motion/react'
+import { motion } from 'motion/react'
 
 const easeOut = [0.16, 1, 0.3, 1] as const
 
 /**
- * The wordmark line reveal: each line slides up into its masked slot when the
- * hero mounts, in sequence.
+ * Reveal text line by line. Pass an array of lines.
+ * `trigger="mount"` animates immediately (use for above-the-fold headings);
+ * `trigger="view"` animates when scrolled into view.
  */
 export function RevealLines({
   lines,
   className,
+  lineClassName,
+  delay = 0,
+  trigger = 'mount',
 }: {
   lines: string[]
   className?: string
+  lineClassName?: string
+  delay?: number
+  trigger?: 'mount' | 'view'
 }) {
-  const variants: Variants = {
-    hidden: { y: '110%' },
-    show: (i: number) => ({
-      y: '0%',
-      transition: { duration: 0.8, delay: 0.1 + i * 0.12, ease: easeOut },
-    }),
-  }
-
+  const anim =
+    trigger === 'mount'
+      ? { animate: { y: '0%' } as const }
+      : {
+          whileInView: { y: '0%' } as const,
+          viewport: { once: true, margin: '0px 0px -10% 0px' } as const,
+        }
   return (
     <span className={className}>
       {lines.map((line, i) => (
-        <span key={line} className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
+        <span key={i} className="block overflow-hidden pb-[0.08em]">
           <motion.span
-            className="block will-change-transform"
-            variants={variants}
-            custom={i}
-            initial="hidden"
-            animate="show"
+            className={lineClassName ?? 'block'}
+            initial={{ y: '110%' }}
+            {...anim}
+            transition={{ duration: 0.9, delay: delay + i * 0.09, ease: easeOut }}
           >
             {line}
           </motion.span>

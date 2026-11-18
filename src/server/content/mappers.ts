@@ -202,7 +202,6 @@ export function toCaseStudySummary(
     // The index and the homepage grid both show headline results, so the
     // summary carries them rather than forcing a second read per card.
     results: content.narrative.results,
-    resultsPeriod: content.narrative.resultsPeriod,
     accent: content.narrative.accent,
   }
 }

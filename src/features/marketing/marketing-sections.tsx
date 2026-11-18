@@ -171,24 +171,16 @@ function MarketingSection({
       )
     }
 
-    case 'HOME_HERO': {
-      // The hero's right column shows the Zilkee study's results, resolved from
-      // the case-study rows the page already loads. The figures are never
-      // copied into the hero: when Zilkee is unpublished the block drops out
-      // and the hero is headline-only.
-      const zilkee = refs.caseStudies.find((study) => study.slug === 'zilkee')
+    case 'HOME_HERO':
       return (
         <Hero
           headline={str(data['headline'])}
           subhead={str(data['subhead'])}
           primaryCta={cta(data['primaryCta'])}
           secondaryCta={cta(data['secondaryCta'])}
-          results={zilkee?.results.slice(0, 3)}
-          resultsPeriod={zilkee?.resultsPeriod}
-          slug={zilkee?.slug}
+          artwork={data['artwork'] as Parameters<typeof Hero>[0]['artwork']}
         />
       )
-    }
 
     case 'CLIENT_MARQUEE':
       return (

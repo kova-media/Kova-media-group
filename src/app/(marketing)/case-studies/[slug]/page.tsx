@@ -164,10 +164,25 @@ export default async function CaseStudyPage({
             <RevealLines lines={[study.brand]} />
           </h1>
           <Reveal delay={0.15}>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground">
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-foreground/80">
               {study.summary}
             </p>
           </Reveal>
+
+          {/* Only when a hero image has actually been chosen in the admin —
+              and there is no placeholder frame in the meantime. */}
+          {study.heroImage && (
+            <Reveal className="mt-14">
+              <div className="mx-auto w-full max-w-[640px]">
+                <MediaImage
+                  asset={study.heroImage}
+                  sizes="(max-width: 768px) 100vw, 768px"
+                  priority
+                  className="h-auto w-full max-h-[480px] object-contain"
+                />
+              </div>
+            </Reveal>
+          )}
 
           {study.results.length > 0 && (
             <div
@@ -192,20 +207,6 @@ export default async function CaseStudyPage({
           )}
           {study.results.length > 0 && study.resultsPeriod && (
             <p className="mt-4 text-sm text-muted-foreground">{study.resultsPeriod}</p>
-          )}
-
-          {/* Only when a hero image has actually been chosen in the admin. No
-              study has one today, so nothing about the page changes until one
-              is uploaded — and there is no placeholder frame in the meantime. */}
-          {study.heroImage && (
-            <Reveal className="mt-14">
-              <MediaImage
-                asset={study.heroImage}
-                sizes="(max-width: 768px) 100vw, 768px"
-                priority
-                className="mx-auto max-h-[480px] max-w-[640px] w-auto"
-              />
-            </Reveal>
           )}
           <div className="pb-16" />
         </Container>

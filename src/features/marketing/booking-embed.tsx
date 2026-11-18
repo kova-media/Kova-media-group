@@ -28,7 +28,7 @@ export function BookingEmbed({
   const embedUrl = `https://app.cal.com/${calLink}?embed=true&embedType=inline&layout=month_view&theme=light`
 
   return (
-    <div className="w-full overflow-hidden rounded-2xl border border-border bg-background">
+    <div className="w-full overflow-hidden bg-background">
       <iframe
         src={embedUrl}
         title={heading}

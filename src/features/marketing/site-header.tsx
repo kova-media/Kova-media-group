@@ -46,7 +46,7 @@ export function SiteHeader({
         className={cn(
           'transition-all duration-500',
           scrolled
-            ? 'border-b border-border bg-background'
+            ? 'border-b border-border bg-background/80 backdrop-blur-xl'
             : 'border-b border-transparent bg-transparent',
         )}
       >
@@ -62,7 +62,7 @@ export function SiteHeader({
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'relative px-3.5 py-2 text-sm transition-colors duration-200',
+                    'relative rounded-full px-3.5 py-2 text-sm transition-colors duration-200',
                     active
                       ? 'text-foreground'
                       : 'text-muted-foreground hover:text-foreground',
@@ -70,7 +70,11 @@ export function SiteHeader({
                 >
                   {item.label}
                   {active && (
-                    <span className="absolute inset-x-3.5 bottom-0 h-0.5 bg-brand" />
+                    <motion.span
+                      layoutId="nav-active"
+                      className="absolute inset-0 -z-10 rounded-full bg-foreground/[0.05]"
+                      transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                    />
                   )}
                 </Link>
               )
@@ -87,7 +91,7 @@ export function SiteHeader({
 
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-sm text-foreground md:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground md:hidden"
             aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
@@ -118,7 +122,7 @@ export function SiteHeader({
                   // click is the actual event, and reacting to the route
                   // change instead costs an extra render on every navigation.
                   onClick={() => setOpen(false)}
-                  className="rounded-sm px-3 py-3 text-base text-foreground hover:bg-muted"
+                  className="rounded-lg px-3 py-3 text-base text-foreground hover:bg-muted"
                 >
                   {item.label}
                 </Link>

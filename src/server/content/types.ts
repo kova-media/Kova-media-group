@@ -99,6 +99,7 @@ export type CaseStudySummary = {
   heroImageId: string | null
   metrics: CaseStudyMetric[]
   results: CaseStudyResult[]
+  resultsPeriod: string
   accent: string
 }
 

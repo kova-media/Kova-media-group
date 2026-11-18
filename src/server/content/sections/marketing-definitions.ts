@@ -69,53 +69,6 @@ export const pageHeaderSection = defineSection({
 
 /* ------------------------------------------------------------------ Home hero */
 
-/**
- * The hero's three panels, as content.
- *
- * These were sixteen strings in `mockups.tsx`, five of which read as reporting
- * data — an attributed-revenue figure, a change, an open rate, a click rate and
- * a count of live flows. Illustration or not, a visitor reads them as numbers
- * about this business, and numbers about the business belong where the owner
- * can change them. The panels, their motion and their layout stay in code.
- *
- * Figures are **strings**, matching the case-study results: "$248,910" carries
- * its own currency and grouping, and forcing it through a numeric field would
- * split the value from the symbol for no gain.
- */
-const heroArtworkFields = z.object({
-  report: z
-    .object({
-      label: z.string().max(40).default(''),
-      value: z.string().max(24).default(''),
-      change: z.string().max(16).default(''),
-      period: z.string().max(12).default(''),
-      stats: z
-        .array(
-          z.object({
-            value: z.string().max(16).default(''),
-            label: z.string().max(32).default(''),
-          }),
-        )
-        .max(3)
-        .default([]),
-    })
-    .default({ label: '', value: '', change: '', period: '', stats: [] }),
-  email: z
-    .object({
-      subject: z.string().max(80).default(''),
-      sender: z.string().max(60).default(''),
-      button: z.string().max(40).default(''),
-    })
-    .default({ subject: '', sender: '', button: '' }),
-  sms: z
-    .object({
-      label: z.string().max(24).default(''),
-      message: z.string().max(200).default(''),
-      reply: z.string().max(80).default(''),
-    })
-    .default({ label: '', message: '', reply: '' }),
-})
-
 const homeHeroFields = z.object({
   /**
    * Written as one field with line breaks rather than a list of lines.
@@ -128,14 +81,13 @@ const homeHeroFields = z.object({
   subhead: z.string().max(400).default(''),
   primaryCta: ctaSchema.default({ label: '', href: '' }),
   secondaryCta: ctaSchema.default({ label: '', href: '' }),
-  artwork: heroArtworkFields.default(() => heroArtworkFields.parse({})),
 })
 
 export const homeHeroSection = defineSection({
   type: 'HOME_HERO',
   label: 'Home hero',
   description:
-    'The opening band: animated headline, supporting paragraph, two buttons, and the layered composition.',
+    'The opening band: animated headline, supporting paragraph, two buttons.',
   group: MARKETING,
   maxPerPage: 1,
   schema: homeHeroFields,
@@ -145,7 +97,6 @@ export const homeHeroSection = defineSection({
     subhead: '',
     primaryCta: { label: 'Book a strategy call', href: '/book' },
     secondaryCta: { label: 'View case studies', href: '/case-studies' },
-    artwork: heroArtworkFields.parse({}),
   },
 })
 

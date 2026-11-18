@@ -49,6 +49,8 @@ export function FlowDiagram({
   steps?: FlowStep[]
 }) {
   const flowNodes = (steps ?? []).filter((step) => step.label?.trim())
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: '0px 0px -15% 0px' })
 
   // Nothing to draw is not an empty bordered box on the page. Hooks run first —
   // the early return has to sit below them.
@@ -56,6 +58,7 @@ export function FlowDiagram({
 
   return (
     <div
+      ref={ref}
       className={cn(
         'w-full max-w-[380px] border border-border bg-card p-6 shadow-[var(--shadow-soft)]',
         className,
@@ -71,7 +74,12 @@ export function FlowDiagram({
           const Icon = FLOW_ICONS[node.icon] ?? null
           return (
             <div key={`${node.label}-${i}`}>
-              <div className="flex items-center gap-4">
+              <motion.div
+                className="flex items-center gap-4"
+                initial={{ opacity: 0, x: -12 }}
+                animate={inView ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.6, delay: i * 0.22, ease }}
+              >
                 <div
                   className={cn(
                     'flex h-9 w-9 shrink-0 items-center justify-center border text-xs',
@@ -91,9 +99,15 @@ export function FlowDiagram({
                 <p className="text-[0.9375rem] font-medium text-foreground">
                   {node.label}
                 </p>
-              </div>
+              </motion.div>
               {i < flowNodes.length - 1 && (
-                <div className="ml-[1.125rem] h-5 w-px bg-border-strong" />
+                <motion.div
+                  className="ml-[1.125rem] h-5 w-px bg-border-strong"
+                  initial={{ scaleY: 0 }}
+                  animate={inView ? { scaleY: 1 } : {}}
+                  style={{ originY: 0 }}
+                  transition={{ duration: 0.3, delay: i * 0.22 + 0.15, ease }}
+                />
               )}
             </div>
           )
